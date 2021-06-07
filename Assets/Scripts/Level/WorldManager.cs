@@ -11,7 +11,7 @@ public class WorldManager : MonoBehaviour
     public float PlatformXOffset = 1.5f;
 
     [Header("Platform/game settings")]
-    public float Speed = 0.2f;
+    public float PlatformSpeed = 0.2f;
     public GameObject PlatformPrefab;
     public int RandomSeed = 1337;
 
@@ -40,6 +40,6 @@ public class WorldManager : MonoBehaviour
 	private void Update()
 	{
         // Moves platforms down
-        world.AnimateWorld(Speed);
+        world.AnimateWorld(PlatformSpeed);
     }
 }
