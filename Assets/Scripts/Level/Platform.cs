@@ -7,18 +7,20 @@ public enum PlatformType { NONE, NORMAL, SPIKES, SLIME, SLIDE_LEFT, SLIDE_RIGHT,
 // This is located on GameObject (prefab) and when the type is set it changes the sprite
 public class Platform : MonoBehaviour
 {
+	[Header("Platform settings")]
 	[Tooltip("Sprites that will be assigned to this platform based on type (has to be the same order as enum PlatformType)")]
 	public Sprite[] SpritePrefabs;
+	[Tooltip("Chance for each type of platform to be generated (has to be the same order as enum PlatformType)")]
+	public float[] platformChance = { 2, 1, 0.2f, 0.2f, 0.1f, 0.1f, 0.4f, 0.2f };
 
 	private PlatformType type;
 	private Item item;
 
 	// Chance for each platform type to be selected, in order as in enum PlatformType
-	private float[] platformChance = { 3, 2, 0.2f, 0.2f, 0.1f, 0.1f, 0.4f, 0.2f };
 
 	public void GeneratePlatform(Vector2 position, Item item)
 	{
-		this.type = generateRandomPlatformType();
+		type = generateRandomPlatformType();
 		this.item = item;
 		transform.position = position;
 
@@ -51,7 +53,9 @@ public class Platform : MonoBehaviour
 		{
 			random -= platformChance[i];
 			if(random <= 0)
+			{
 				return (PlatformType)i;
+			}
 		}
 
 		return PlatformType.NONE;

@@ -103,3 +103,12 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 6dd13b4600b7da64bb2e9f6f475734a5, type: 3}
   - {fileID: 21300000, guid: cb54ec8f76311094db11ce4287b1e02f, type: 3}
   - {fileID: 21300000, guid: 6163b714cd416ec48ae6859a3b9277fd, type: 3}
+  platformChance:
+  - 2
+  - 1
+  - 0.2
+  - 0.2
+  - 0.1
+  - 0.1
+  - 0.4
+  - 0.2

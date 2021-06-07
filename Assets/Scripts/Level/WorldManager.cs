@@ -10,9 +10,10 @@ public class WorldManager : MonoBehaviour
     public float PlatformHeight = 0.4f;
     public float PlatformXOffset = 1.5f;
 
-    [Header("Platform settings")]
+    [Header("Platform/game settings")]
     public float Speed = 0.2f;
     public GameObject PlatformPrefab;
+    public int RandomSeed = 1337;
 
     // World data, contains Rows which contain Platforms
     private World world;
@@ -20,6 +21,8 @@ public class WorldManager : MonoBehaviour
 
     private void Start()
     {
+        Random.InitState(RandomSeed);
+
         // Calculate screen border as the position of the top and rightmpst pixel visible on screen (top right viewport -> world coordinates)
         Vector3 screenBorderPosition = Camera.main.ViewportToWorldPoint(new Vector3(1, 1, 0));
         float screenBorderX = screenBorderPosition.x;
