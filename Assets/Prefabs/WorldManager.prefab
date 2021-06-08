@@ -47,6 +47,6 @@ MonoBehaviour:
   Height: 6
   PlatformHeight: 1
   PlatformXOffset: 4
-  Speed: 0.4
+  PlatformSpeed: 0.3
   PlatformPrefab: {fileID: 8512226233930854249, guid: 483c6cc6c408bec4d9037d652ee29ec3, type: 3}
   RandomSeed: 1337

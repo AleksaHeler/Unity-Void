@@ -18,7 +18,7 @@ public class WorldManager : MonoBehaviour
     // World data, contains Rows which contain Platforms
     private World world;
     
-
+    
     private void Start()
     {
         Random.InitState(RandomSeed);
