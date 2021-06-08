@@ -4,15 +4,14 @@ using UnityEngine;
 // And also an array of rows and animates them
 public class World
 {
-	private int width;		// Length of Platforms array inside Row
-	private int height;		// Length of Rows array inside this class
+	private int width;			// Length of Platforms array inside Row
+	private int height;			// Length of Rows array inside this class
 
-	private float border;	// Top-most/bottom-most coordinate of rows/platforms, used for respawning at the top of the screen
-	private Row[] rows;     // Contains platforms
-
+	private float border;		// Top-most/bottom-most coordinate of rows/platforms, used for respawning at the top of the screen
+	private Row[] rows;			// Contains platforms
 
 	// Creates all rows
-	public World(int width, int height, float border, GameObject platformPrefab, float spacingX, float spacingY)
+	public World(int width, int height, float border, GameObject platformPrefab, float spacingX, float spacingY, Transform parent)
 	{
 		this.width = width;
 		this.height = height;
@@ -20,11 +19,11 @@ public class World
 
 		rows = new Row[height];
 
-		for(int i = 0; i < height; i++)
+		for (int i = 0; i < height; i++)
 		{
 			// Create rows across the screen
 			float yPosition = (i - height / 2) * spacingY;
-			rows[i] = new Row(new Vector2(0, yPosition), width, platformPrefab, spacingX, border);
+			rows[i] = new Row(yPosition, width, platformPrefab, spacingX, border, i, parent);
 		}
 	}
 

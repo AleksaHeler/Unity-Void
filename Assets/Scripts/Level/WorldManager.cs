@@ -34,7 +34,7 @@ public class WorldManager : MonoBehaviour
         screenBorderY += PlatformHeight / 2;
 
         // Instantiate the world/platforms
-        world = new World(Width, Height, screenBorderY, PlatformPrefab, tileSpacingX, tileSpacingY);
+        world = new World(Width, Height, screenBorderY, PlatformPrefab, tileSpacingX, tileSpacingY, transform);
     }
 
 	private void Update()
