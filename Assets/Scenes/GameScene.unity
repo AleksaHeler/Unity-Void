@@ -155,6 +155,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b5d48a0269d95554aafd96e116b2de22, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  platformOffset: {x: 0, y: 0.42, z: 1}
 --- !u!114 &166817259
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -244,8 +245,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c198c208586d95042a0073f4fc9ad408, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  detectSwipeOnlyAfterRelease: 1
-  minDistanceForSwipe: 20
+  minDistanceForSwipe: 80
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
@@ -466,6 +466,10 @@ PrefabInstance:
     - target: {fileID: 5595110397561710934, guid: 5e23af3286ee4d44dab4322468a3ba9a, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5595110397561710935, guid: 5e23af3286ee4d44dab4322468a3ba9a, type: 3}
+      propertyPath: Width
+      value: 5
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 5e23af3286ee4d44dab4322468a3ba9a, type: 3}

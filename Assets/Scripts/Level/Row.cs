@@ -8,6 +8,7 @@ public class Row : MonoBehaviour
 	private float spacingX;			// Horizontal distance between two platforms 
 
 	private Platform[] platforms;   // References to Platform scripts on platform GameObjects
+	public Platform[] Platforms { get => platforms; }
 
 	private GameObject rowGameObject;      // Empty GameObject that will be the parent of all Platforms of this row 
 
@@ -70,12 +71,18 @@ public class Row : MonoBehaviour
 	}
 
 	// Respawns the row at the top of the screen
-	private void ResetRow() 
+	private void ResetRow()
 	{
+		// Trigger event: platforms are destroyed when they go below '-border' coordinates
+		WorldManager.TriggerPlatformDestroyEvent(-border);
+
+		/// Trigger an event here (arg is position)
+		float platformYPosition = 0;
 		for (int i = 0; i < width; i++)
 		{
 			// Calculate position of this Platform
 			Vector2 platformPosition = new Vector2(( i - width / 2) * spacingX, border);
+			platformYPosition = platformPosition.y;
 			// Generate this platform based on given parameters
 			platforms[i].GeneratePlatform(platformPosition, Item.NONE);
 		}

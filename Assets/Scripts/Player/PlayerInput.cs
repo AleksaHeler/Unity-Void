@@ -25,7 +25,6 @@ public enum SwipeDirection
 /// </summary>
 public class PlayerInput : MonoBehaviour
 {
-	public bool detectSwipeOnlyAfterRelease = false;
 	[Tooltip("Minimum distance in pixels needed to detect swipe")]
 	public float minDistanceForSwipe = 20f;
 
@@ -42,12 +41,6 @@ public class PlayerInput : MonoBehaviour
 		{
 			mouseUpPosition = Input.mousePosition;
 			mouseDownPosition = Input.mousePosition;
-		}
-
-		if (!detectSwipeOnlyAfterRelease && MouseMoved())
-		{
-			mouseDownPosition = Input.mousePosition;
-			DetectSwipe();
 		}
 
 		if(Input.GetMouseButtonUp(0))
@@ -74,7 +67,9 @@ public class PlayerInput : MonoBehaviour
 			mouseUpPosition = mouseDownPosition;
 		}
 	}
-	
+
+	#region Helper functions
+
 	private bool MouseMoved()
 	{
 		Vector2 currentMousePosition = Input.mousePosition;
@@ -117,5 +112,27 @@ public class PlayerInput : MonoBehaviour
 		};
 
 		OnSwipe(swipeData);
+	}
+
+	#endregion
+
+	/// <summary>
+	/// Converts swipe direction to player movement action (for example SwipeDirection.UP -> PlayerAction.MOVE_UP)
+	/// </summary>
+	public static PlayerAction SwipeDirectionToPlayerAction(SwipeDirection direction)
+	{
+		switch (direction)
+		{
+			case SwipeDirection.UP:
+				return PlayerAction.MOVE_UP;
+			case SwipeDirection.DOWN:
+				return PlayerAction.MOVE_DOWN;
+			case SwipeDirection.LEFT:
+				return PlayerAction.MOVE_LEFT;
+			case SwipeDirection.RIGHT:
+				return PlayerAction.MOVE_RIGHT;
+			default:
+				return PlayerAction.NONE;
+		}
 	}
 }

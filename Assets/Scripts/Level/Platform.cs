@@ -15,6 +15,7 @@ public class Platform : MonoBehaviour
 
 	private PlatformType type;
 	private Item item;
+	public PlatformType Type { get => type; }
 
 	// Chance for each platform type to be selected, in order as in enum PlatformType
 

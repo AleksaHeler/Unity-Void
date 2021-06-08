@@ -8,7 +8,8 @@ public class World
 	private int height;			// Length of Rows array inside this class
 
 	private float border;		// Top-most/bottom-most coordinate of rows/platforms, used for respawning at the top of the screen
-	private Row[] rows;			// Contains platforms
+	private Row[] rows;         // Contains platforms
+	public Row[] Rows { get => rows; }
 
 	// Creates all rows
 	public World(int width, int height, float border, GameObject platformPrefab, float spacingX, float spacingY, Transform parent)
