@@ -18,7 +18,6 @@ public class WorldManager : MonoBehaviour
     [Header("Platform/game settings")]
     public float PlatformSpeed = 0.2f;
     public GameObject PlatformPrefab;
-    public int RandomSeed = 1337;
 
 
     // Singleton
@@ -49,7 +48,8 @@ public class WorldManager : MonoBehaviour
             _instance = this;
         }
 
-        UnityEngine.Random.InitState(RandomSeed);
+        // My try at generating 'true' random seed with system time
+        UnityEngine.Random.InitState(System.DateTime.Now.Ticks.GetHashCode());
 
         // Calculate screen border as the position of the top and rightmpst pixel visible on screen (top right viewport -> world coordinates)
         Vector3 screenBorderPosition = Camera.main.ViewportToWorldPoint(new Vector3(1, 1, 0));

@@ -135,4 +135,36 @@ public class PlayerInput : MonoBehaviour
 				return PlayerAction.NONE;
 		}
 	}
+
+	// Returns true if passed action is a move
+	public static bool ActionIsMove(PlayerAction action)
+	{
+		switch (action)
+		{
+			case PlayerAction.MOVE_UP:
+			case PlayerAction.MOVE_DOWN:
+			case PlayerAction.MOVE_LEFT:
+			case PlayerAction.MOVE_RIGHT:
+				return true;
+			default:
+				return false;
+		}
+	}
+
+	public static Vector3 MoveActionToVector3(PlayerAction action)
+	{
+		switch (action)
+		{
+			case PlayerAction.MOVE_UP:
+				return new Vector3(0, 1, 0);
+			case PlayerAction.MOVE_DOWN:
+				return new Vector3(0, -1, 0);
+			case PlayerAction.MOVE_LEFT:
+				return new Vector3(-1, 0, 0);
+			case PlayerAction.MOVE_RIGHT:
+				return new Vector3(1, 0, 0);
+			default:
+				return Vector3.zero;
+		}
+	}
 }
