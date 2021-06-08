@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 // Contains an array of Platforms
@@ -5,7 +6,10 @@ public class Row : MonoBehaviour
 {
 	private int width;				// Number of platforms in this row
 	private float border;			// Top/bottom max world coordinates of the screen
-	private float spacingX;			// Horizontal distance between two platforms 
+	private float spacingX;         // Horizontal distance between two platforms 
+	private float percentOfRandomPlatforms;
+	[Range(0.001f, 0.01f)]
+	private float percentOfRandomPlatformsIncrement;
 
 	private Platform[] platforms;   // References to Platform scripts on platform GameObjects
 	public Platform[] Platforms { get => platforms; }
@@ -21,27 +25,23 @@ public class Row : MonoBehaviour
 	/// <param name="spacingX">Horizontal distance between two platforms</param>
 	/// <param name="border">Top/bottom edge of world</param>
 	/// <param name="id">Unique ID for this row</param>
-	public Row(float yPosition, int width, GameObject platformPrefab, float spacingX, float border, int id, Transform rowParent)
+	public Row(float yPosition, int width, GameObject platformPrefab, float spacingX, float border, int id, Transform rowParent, float percentOfRandomPlatforms)
 	{
 		this.width = width;
 		this.border = border;
 		this.spacingX = spacingX;
+		this.percentOfRandomPlatforms = percentOfRandomPlatforms;
 
 		platforms = new Platform[width];
-		rowGameObject = new GameObject("Row " + id);
-		rowGameObject.transform.parent = rowParent;	// Set parent of Row to WorldManager
 
-		for (int i = 0; i < width; i++)
-		{
-			// Calculate position of this Platform
-			Vector2 platformPosition = new Vector2((i - width / 2) * spacingX, yPosition);
-			// Instantiate the object and keep track of its script component
-			GameObject obj = Instantiate(platformPrefab, platformPosition, Quaternion.identity, rowGameObject.transform);
-			obj.name = "Platform " + id + ":" + i;
-			platforms[i] = obj.GetComponent<Platform>();
-			// Generate this platform based on given parameters
-			platforms[i].GeneratePlatform(platformPosition, Item.NONE);
-		}
+		// Parent object of all platforms in this row
+		rowGameObject = new GameObject("Row " + id);
+		rowGameObject.transform.parent = rowParent; // Set parent of Row to WorldManager
+
+		// First only instantiate all the platforms in the world
+		InstantiateRow(platformPrefab, yPosition);
+		// Then generate platform types
+		GenerateRow(yPosition);
 	}
 
 	// Move row tiles down by given speed
@@ -52,6 +52,12 @@ public class Row : MonoBehaviour
 		if (isBelowEndOfScreen())
 		{
 			ResetRow();
+		}
+
+		// By time more and more platforms should be random
+		if(percentOfRandomPlatforms < 1f)
+		{
+			percentOfRandomPlatforms += percentOfRandomPlatformsIncrement * Time.deltaTime;
 		}
 	}
 
@@ -76,15 +82,44 @@ public class Row : MonoBehaviour
 		// Trigger event: platforms are destroyed when they go below '-border' coordinates
 		WorldManager.TriggerPlatformDestroyEvent(-border);
 
-		/// Trigger an event here (arg is position)
-		float platformYPosition = 0;
+		GenerateRow(border);
+	}
+
+	private void InstantiateRow(GameObject prefab, float yPosition)
+	{
 		for (int i = 0; i < width; i++)
 		{
-			// Calculate position of this Platform
-			Vector2 platformPosition = new Vector2(( i - width / 2) * spacingX, border);
-			platformYPosition = platformPosition.y;
-			// Generate this platform based on given parameters
-			platforms[i].GeneratePlatform(platformPosition, Item.NONE);
+			Vector2 platformPosition = new Vector2((i - width / 2) * spacingX, yPosition);
+			GameObject obj = Instantiate(prefab, platformPosition, Quaternion.identity, rowGameObject.transform);
+			obj.name = "Platform " + (int)yPosition + ":" + i;
+			platforms[i] = obj.GetComponent<Platform>();
+		}
+	}
+
+	private void GenerateRow(float posY)
+	{
+		float randomPercent = Random.Range(0f, 1f);
+
+		// Generate random row
+		if(randomPercent < percentOfRandomPlatforms)
+		{
+			for (int i = 0; i < width; i++)
+			{
+				Vector2 platformPosition = new Vector2((i - width / 2) * spacingX, posY);
+				platforms[i].GeneratePlatform(platformPosition, Item.NONE);
+			}
+			return;
+		}
+
+		// Generate predefined row
+		// TODO: find a way to actually add predefined rows here
+		int randomIndex = Random.Range(0, WorldManager.Instance.PredefinedPlatformTypes.Length);
+		PlatformType[] platformTypes = WorldManager.Instance.PredefinedPlatformTypes[randomIndex];
+		for (int i = 0; i < width; i++)
+		{
+			Vector2 platformPosition = new Vector2((i - width / 2) * spacingX, posY);
+			PlatformType type = platformTypes[i];
+			platforms[i].GeneratePlatform(platformPosition, Item.NONE, type);
 		}
 	}
 }

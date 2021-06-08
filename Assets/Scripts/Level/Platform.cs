@@ -2,6 +2,7 @@ using UnityEngine;
 
 // What item is on a platform
 public enum Item { NONE, BOMB_COLLECTIBLE, BOMB_ACTIVE };
+[System.Serializable]
 public enum PlatformType { NONE, NORMAL, SPIKES, SLIME, SLIDE_LEFT, SLIDE_RIGHT, GRASS, GLASS }
 
 // This is located on GameObject (prefab) and when the type is set it changes the sprite
@@ -22,17 +23,15 @@ public class Platform : MonoBehaviour
 	public void GeneratePlatform(Vector2 position, Item item)
 	{
 		type = generateRandomPlatformType();
+		GeneratePlatform(position, item, type);
+	}
+	public void GeneratePlatform(Vector2 position, Item item, PlatformType type)
+	{
+		this.type = type;
 		this.item = item;
 		transform.position = position;
 
-		// If this is an empty platform
-		if (type == PlatformType.NONE)
-		{
-			setSprite(null);
-			return;
-		}
-
-		setSprite(SpritePrefabs[(int)type - 1]);
+		setSprite(type);
 	}
 
 	private PlatformType generateRandomPlatformType()
@@ -63,8 +62,15 @@ public class Platform : MonoBehaviour
 	}
 
 	// Sets sprite component of this gameobject to given sprite
-	private void setSprite(Sprite sprite)
+	private void setSprite(PlatformType type)
 	{
-		GetComponent<SpriteRenderer>().sprite = sprite;
+		// If this is an empty platform
+		if (type == PlatformType.NONE)
+		{
+			GetComponent<SpriteRenderer>().sprite = null;
+			return;
+		}
+
+		GetComponent<SpriteRenderer>().sprite = SpritePrefabs[(int)type - 1];
 	}
 }

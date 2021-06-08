@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 // TODO: add a float how much the player needs to move on both x and y axis
@@ -17,8 +18,12 @@ public class WorldManager : MonoBehaviour
 
     [Header("Platform/game settings")]
     public float PlatformSpeed = 0.2f;
+    [Range(0f, 1f)]
+    [Tooltip("How many platforms sould be random vs predetermined")]
+    public float percentOfRandomPlatforms = 0.1f;
     public GameObject PlatformPrefab;
 
+    public PlatformType[][] PredefinedPlatformTypes;
 
     // Singleton
     private static WorldManager _instance;
@@ -62,7 +67,7 @@ public class WorldManager : MonoBehaviour
         screenBorderY += PlatformHeight / 2;
 
         // Instantiate the world/platforms
-        world = new World(Width, Height, screenBorderY, PlatformPrefab, tileSpacingX, tileSpacingY, transform);
+        world = new World(Width, Height, screenBorderY, PlatformPrefab, tileSpacingX, tileSpacingY, transform, percentOfRandomPlatforms);
 
         platformDistanceX = tileSpacingX;
         platformDistanceY = tileSpacingY;

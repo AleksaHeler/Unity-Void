@@ -353,10 +353,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 8077238381102788552, guid: 61734854cb8936242b85c2bc2560b3cd, type: 3}
-      propertyPath: moveAnimationSpeed
-      value: 6
-      objectReference: {fileID: 0}
     - target: {fileID: 8077238381102788555, guid: 61734854cb8936242b85c2bc2560b3cd, type: 3}
       propertyPath: m_Name
       value: Player
