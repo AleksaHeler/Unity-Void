@@ -2,11 +2,19 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-// TODO: add a float how much the player needs to move on both x and y axis
-// in order to reach the next platform at that point
-
 public class WorldManager : MonoBehaviour
 {
+    // Using 1D array as a 2D (indexing x + y*w)
+    public static PlatformType[] PredefinedRows = new PlatformType[] {
+        PlatformType.NONE, PlatformType.SLIDE_LEFT, PlatformType.SPIKES, PlatformType.SLIDE_RIGHT, PlatformType.NONE,
+        PlatformType.NONE, PlatformType.GLASS, PlatformType.NORMAL, PlatformType.SLIME, PlatformType.NONE,
+        PlatformType.NORMAL, PlatformType.NONE, PlatformType.NORMAL, PlatformType.NONE, PlatformType.NORMAL,
+        PlatformType.SPIKES, PlatformType.SLIDE_LEFT, PlatformType.NORMAL, PlatformType.SPIKES, PlatformType.SLIDE_LEFT,
+        PlatformType.GLASS, PlatformType.NONE, PlatformType.GLASS, PlatformType.NONE, PlatformType.GLASS,
+        PlatformType.NORMAL, PlatformType.SLIME, PlatformType.SLIME, PlatformType.GLASS, PlatformType.NORMAL,
+        PlatformType.SLIDE_RIGHT, PlatformType.GLASS, PlatformType.GLASS, PlatformType.GLASS, PlatformType.SLIDE_LEFT,
+        PlatformType.NORMAL, PlatformType.SPIKES, PlatformType.NORMAL, PlatformType.SPIKES, PlatformType.NORMAL
+    };
 
     [Header("World size (# of platforms)")]
     public int Width = 5;
@@ -23,11 +31,11 @@ public class WorldManager : MonoBehaviour
     public float percentOfRandomPlatforms = 0.1f;
     public GameObject PlatformPrefab;
 
-    public PlatformType[][] PredefinedPlatformTypes;
 
     // Singleton
     private static WorldManager _instance;
     public static WorldManager Instance { get { return _instance; } }
+
 
     // After a swipe is registered fire an event, parameter is destroyed platforms Y position
     public static event Action<float> OnPlatformDestroy = delegate { };

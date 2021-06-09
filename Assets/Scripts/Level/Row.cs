@@ -112,13 +112,11 @@ public class Row : MonoBehaviour
 		}
 
 		// Generate predefined row
-		// TODO: find a way to actually add predefined rows here
-		int randomIndex = Random.Range(0, WorldManager.Instance.PredefinedPlatformTypes.Length);
-		PlatformType[] platformTypes = WorldManager.Instance.PredefinedPlatformTypes[randomIndex];
+		int randomIndex = Random.Range(0, WorldManager.PredefinedRows.Length / width);	// Calculate row in the array
 		for (int i = 0; i < width; i++)
 		{
 			Vector2 platformPosition = new Vector2((i - width / 2) * spacingX, posY);
-			PlatformType type = platformTypes[i];
+			PlatformType type = WorldManager.PredefinedRows[i + randomIndex * width];	// Calculate platform in row
 			platforms[i].GeneratePlatform(platformPosition, Item.NONE, type);
 		}
 	}
