@@ -3,6 +3,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Manager script in charge of actually playing all the sounds.
+/// This is a singleton and has a DontDestroyOnLoad property, so other scripts can call
+/// functions like AudioManager.Instance.Play("Sound Name");
+/// Also has functions: Pause(), Stop() and PlayPlatformSound(platform)
+/// </summary>
 public class AudioManager : MonoBehaviour
 {
     public Sound[] Sounds;
@@ -30,6 +36,7 @@ public class AudioManager : MonoBehaviour
 		{
             sound.source = gameObject.AddComponent<AudioSource>();
 
+            sound.source.clip = sound.Clip;
             sound.source.volume = sound.Volume;
             sound.source.pitch = sound.Pitch;
             sound.source.loop = sound.Loop;
@@ -40,61 +47,65 @@ public class AudioManager : MonoBehaviour
     /// Plays the clip with given name and returns true if successful
     /// </summary>
     /// <param name="name">Name of the source clip, same as in audio manager</param>
-    /// <returns></returns>
-    public bool PlaySound(string name)
+    public void PlaySound(string name)
     {
-        Sound sound = FindSound(name);
+        Sound sound = FindSoundInArray(name);
 
         if (sound == null)
         {
             Debug.LogWarning("Sound with name: '" + name + "' was not found");
-            return false;
+            return;
         }
 
         sound.source.Play();
-        return true;
+        return;
     }
 
     /// <summary>
     /// Stops the clip with given name and returns true if successful
     /// </summary>
     /// <param name="name">Name of the source clip, same as in audio manager</param>
-    /// <returns></returns>
-    public bool StopSound(string name)
+    public void StopSound(string name)
     {
-        Sound sound = FindSound(name);
+        Sound sound = FindSoundInArray(name);
 
         if (sound == null)
         {
             Debug.LogWarning("Sound with name: '" + name + "' was not found");
-            return false;
+            return;
         }
 
         sound.source.Stop();
-        return true;
+        return;
     }
 
     /// <summary>
     /// Pauses the clip with given name so when it is played again it is resumed, and returns true if successful
     /// </summary>
     /// <param name="name">Name of the source clip, same as in audio manager</param>
-    /// <returns></returns>
-    public bool PauseSound(string name)
+    public void PauseSound(string name)
     {
-        Sound sound = FindSound(name);
+        Sound sound = FindSoundInArray(name);
 
         if (sound == null)
         {
             Debug.LogWarning("Sound with name: '" + name + "' was not found");
-            return false;
+            return;
         }
 
         sound.source.Pause();
-        return true;
+        return;
     }
 
-    private Sound FindSound(string name)
+    private Sound FindSoundInArray(string name)
     {
         return Array.Find(Sounds, sound => sound.name == name);
+    }
+
+    // Play the sound that corresponds to given platforms type
+    public void PlayPlatformSound(PlatformType platformType)
+    {
+        string soundName = SettingsReader.Instance.GameSettings.PlatformTypeToSound[platformType];
+        PlaySound(soundName);
     }
 }

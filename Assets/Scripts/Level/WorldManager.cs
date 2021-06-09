@@ -4,49 +4,15 @@ using UnityEngine;
 
 public class WorldManager : MonoBehaviour
 {
-    // Using 1D array as a 2D (indexing x + y*w)
-    public static PlatformType[] PredefinedRows = new PlatformType[] {
-        PlatformType.NONE, PlatformType.SLIDE_LEFT, PlatformType.SPIKES, PlatformType.SLIDE_RIGHT, PlatformType.NONE,
-        PlatformType.NONE, PlatformType.GLASS, PlatformType.NORMAL, PlatformType.SLIME, PlatformType.NONE,
-        PlatformType.NORMAL, PlatformType.NONE, PlatformType.NORMAL, PlatformType.NONE, PlatformType.NORMAL,
-        PlatformType.SPIKES, PlatformType.SLIDE_LEFT, PlatformType.NORMAL, PlatformType.SPIKES, PlatformType.SLIDE_LEFT,
-        PlatformType.GLASS, PlatformType.NONE, PlatformType.GLASS, PlatformType.NONE, PlatformType.GLASS,
-        PlatformType.NORMAL, PlatformType.SLIME, PlatformType.SLIME, PlatformType.GLASS, PlatformType.NORMAL,
-        PlatformType.SLIDE_RIGHT, PlatformType.GLASS, PlatformType.GLASS, PlatformType.GLASS, PlatformType.SLIDE_LEFT,
-        PlatformType.NORMAL, PlatformType.SPIKES, PlatformType.NORMAL, PlatformType.SPIKES, PlatformType.NORMAL
-    };
-
-    [Header("World size (# of platforms)")]
-    public int Width = 5;
-    public int Height = 5;
-
-    [Header("Platform size (for spacing)")]
-    public float PlatformHeight = 0.4f;
-    public float PlatformXOffset = 1.5f;
-
-    [Header("Platform/game settings")]
-    public float PlatformSpeed = 0.2f;
-    [Range(0f, 1f)]
-    [Tooltip("How many platforms sould be random vs predetermined")]
-    public float percentOfRandomPlatforms = 0.1f;
-    public GameObject PlatformPrefab;
-
-
     // Singleton
     private static WorldManager _instance;
     public static WorldManager Instance { get { return _instance; } }
 
-
-    // After a swipe is registered fire an event, parameter is destroyed platforms Y position
+    // When a platform is destroyed when it goes off screen it triggers this event, parameter is destroyed platforms Y position
     public static event Action<float> OnPlatformDestroy = delegate { };
-
 
     // World data, contains Rows which contain Platforms
     private World world;
-    private float platformDistanceX;
-    private float platformDistanceY;
-    public float PlatformDistanceX { get => platformDistanceX; }
-    public float PlatformDistanceY { get => platformDistanceY; }
 
 
     private void Awake()
@@ -61,38 +27,20 @@ public class WorldManager : MonoBehaviour
             _instance = this;
         }
 
-        // My try at generating 'true' random seed with system time
-        UnityEngine.Random.InitState(System.DateTime.Now.Ticks.GetHashCode());
-
-        // Calculate screen border as the position of the top and rightmpst pixel visible on screen (top right viewport -> world coordinates)
-        Vector3 screenBorderPosition = Camera.main.ViewportToWorldPoint(new Vector3(1, 1, 0));
-        float screenBorderX = screenBorderPosition.x;
-        float screenBorderY = screenBorderPosition.y;
-
-        // Space evenly (from top to bottom of screen and left to right)
-        float tileSpacingY = (screenBorderY * 2 + PlatformHeight) / Height;
-        float tileSpacingX = ((screenBorderX - PlatformXOffset) * 2) / Width;
-        screenBorderY += PlatformHeight / 2;
+        int seed = System.DateTime.Now.Ticks.GetHashCode();
+        UnityEngine.Random.InitState(seed);
 
         // Instantiate the world/platforms
-        world = new World(Width, Height, screenBorderY, PlatformPrefab, tileSpacingX, tileSpacingY, transform, percentOfRandomPlatforms);
-
-        platformDistanceX = tileSpacingX;
-        platformDistanceY = tileSpacingY;
+        world = new World(transform);
     }
 
 	private void Update()
 	{
         // Moves platforms down
-        world.AnimateWorld(PlatformSpeed);
+        world.AnimateWorld();
     }
 
-    /// <summary>
-    /// Returns a platform that is within the given range of the given position
-    /// </summary>
-    /// <param name="posX">Position on horizontal axis, left is 0, right is Width</param>
-    /// <param name="posY">Position on vertical axis, botton is 0, top is Height</param>
-    /// <returns></returns>
+    // Returns a platform that is within the given range of the given position
     public Platform GetPlatformWithinRange(Vector3 position, float range)
 	{
         Platform platform = GetPlatformClosestToPos(position);
@@ -105,12 +53,7 @@ public class WorldManager : MonoBehaviour
         return null;
     }
 
-
-    /// <summary>
-    /// Returns a platform closest to given position
-    /// </summary>
-    /// <param name="position">Global position (transform.position)</param>
-    /// <returns></returns>
+    // Returns a platform closest to given position that isnt spikes
     public Platform GetPlatformClosestToPos(Vector3 position)
 	{
         // for each platform check distance and return one with min
@@ -127,10 +70,10 @@ public class WorldManager : MonoBehaviour
                     continue;
                 }
 
-                if(platform.Type == PlatformType.NONE)
-				{
+                if (platform.PlatformType == PlatformType.NONE)
+                {
                     continue;
-				}
+                }
 
                 float distance = Vector3.Distance(platform.transform.position, position);
                 if (distance < minDistance)

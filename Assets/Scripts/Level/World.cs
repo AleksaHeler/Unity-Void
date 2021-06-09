@@ -1,39 +1,35 @@
 using UnityEngine;
 
-// Contains world data: width/height
-// And also an array of rows and animates them
 public class World
 {
-	private int width;			// Length of Platforms array inside Row
-	private int height;         // Length of Rows array inside this class
-
-	private float border;		// Top-most/bottom-most coordinate of rows/platforms, used for respawning at the top of the screen
-	private Row[] rows;         // Contains platforms
+	private Row[] rows;				// Contains platforms
 	public Row[] Rows { get => rows; }
 
-	// Creates all rows
-	public World(int width, int height, float border, GameObject platformPrefab, float spacingX, float spacingY, Transform parent, float percentOfRandomPlatforms)
+	/// <summary>
+	/// Create all rows
+	/// </summary>
+	/// <param name="parent">Transform of a GameObject that will be the parent of all rows and platforms (in editor hierarchy)</param>
+	public World(Transform parent)
 	{
-		this.width = width;
-		this.height = height;
-		this.border = border;
+		GameSettings gameSettings = SettingsReader.Instance.GameSettings;
 
-		rows = new Row[height];
+		rows = new Row[gameSettings.RowsCount];
 
-		for (int i = 0; i < height; i++)
+		// Create all rows
+		for (int i = 0; i < rows.Length; i++)
 		{
 			// Create rows across the screen
-			float yPosition = (i - height / 2) * spacingY;
-			rows[i] = new Row(yPosition, width, platformPrefab, spacingX, border, i, parent, percentOfRandomPlatforms);
+			float yPosition = (i - rows.Length / 2) * gameSettings.PlatformSpacingY;
+			rows[i] = new Row(yPosition, i, parent);
 		}
 	}
 
-	// Animates all rows
-	public void AnimateWorld(float speed)
+	/// Animates all rows
+	public void AnimateWorld()
 	{
-		for (int i = 0; i < height; i++)
+		for (int i = 0; i < rows.Length; i++)
 		{
-			rows[i].AnimateRow(speed);
+			rows[i].AnimateRow();
 		}
 	}
 }

@@ -3,53 +3,43 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public struct SwipeData
-{
-	public Vector2 StartPosition;
-	public Vector2 EndPosition;
-	public SwipeDirection Direction;
-}
 
-public enum SwipeDirection
-{
-	UP,
-	DOWN,
-	LEFT,
-	RIGHT
-}
+public enum SwipeDirection { UP, DOWN, LEFT, RIGHT }
 
 /// <summary>
 /// Detects swipes and triggers an event on each swipe
 /// Event passes SwipeData as parameter to delegate functions
-/// SwipeData contains direction, start and end position
 /// </summary>
 public class PlayerInput : MonoBehaviour
 {
-	[Tooltip("Minimum distance in pixels needed to detect swipe")]
+	[Tooltip("Minimum distance (in pixels) needed to detect swipe")]
 	public float minDistanceForSwipe = 20f;
 
-	private Vector2 previousMousePosition;
 	private Vector2 mouseDownPosition;
 	private Vector2 mouseUpPosition;
-	
+
 	// After a swipe is registered fire an event
-	public static event Action<SwipeData> OnSwipe = delegate { };
+	public static event Action<SwipeDirection> OnSwipe = delegate { };
 
 	public void Update()
 	{
-		if(Input.GetMouseButtonDown(0))
+		// Begin/end swipes based on mouse clicks
+		if (Input.GetMouseButtonDown(0))
 		{
-			mouseUpPosition = Input.mousePosition;
 			mouseDownPosition = Input.mousePosition;
-		}
+			mouseUpPosition = Input.mousePosition;
+		} 
 
-		if(Input.GetMouseButtonUp(0))
+		if (Input.GetMouseButtonUp(0))
 		{
 			mouseDownPosition = Input.mousePosition;
 			DetectSwipe();
 		}
 	}
 
+	/// <summary>
+	/// Check if swipe was ok
+	/// </summary>
 	private void DetectSwipe()
 	{
 		if (SwipeDistanceCheckMet())
@@ -57,30 +47,18 @@ public class PlayerInput : MonoBehaviour
 			if (IsVerticalSwipe())
 			{
 				var direction = mouseDownPosition.y - mouseUpPosition.y > 0 ? SwipeDirection.UP : SwipeDirection.DOWN;
-				SendSwipe(direction);
+				OnSwipe(direction);
 			}
 			else
 			{
 				var direction = mouseDownPosition.x - mouseUpPosition.x > 0 ? SwipeDirection.RIGHT : SwipeDirection.LEFT;
-				SendSwipe(direction);
+				OnSwipe(direction);
 			}
 			mouseUpPosition = mouseDownPosition;
 		}
 	}
 
 	#region Helper functions
-
-	private bool MouseMoved()
-	{
-		Vector2 currentMousePosition = Input.mousePosition;
-		if (currentMousePosition != previousMousePosition)
-		{
-			previousMousePosition = currentMousePosition;
-			return true;
-		}
-
-		return false;
-	}
 
 	private bool IsVerticalSwipe()
 	{
@@ -102,16 +80,11 @@ public class PlayerInput : MonoBehaviour
 		return Mathf.Abs(mouseDownPosition.x - mouseUpPosition.x);
 	}
 
+	/// <summary>
+	/// Triggers swipe event with given swipe direction
+	/// </summary>
 	private void SendSwipe(SwipeDirection direction)
 	{
-		SwipeData swipeData = new SwipeData()
-		{
-			Direction = direction,
-			StartPosition = mouseDownPosition,
-			EndPosition = mouseUpPosition
-		};
-
-		OnSwipe(swipeData);
 	}
 
 	#endregion
@@ -121,6 +94,7 @@ public class PlayerInput : MonoBehaviour
 	/// </summary>
 	public static PlayerAction SwipeDirectionToPlayerAction(SwipeDirection direction)
 	{
+		// Dictionary: key-value pair za ovo umesto switch
 		switch (direction)
 		{
 			case SwipeDirection.UP:
@@ -136,35 +110,11 @@ public class PlayerInput : MonoBehaviour
 		}
 	}
 
-	// Returns true if passed action is a move
+	/// Returns true if passed action is a move
 	public static bool ActionIsMove(PlayerAction action)
 	{
-		switch (action)
-		{
-			case PlayerAction.MOVE_UP:
-			case PlayerAction.MOVE_DOWN:
-			case PlayerAction.MOVE_LEFT:
-			case PlayerAction.MOVE_RIGHT:
-				return true;
-			default:
-				return false;
-		}
+		return SettingsReader.Instance.GameSettings.MovePlayerActions.Contains(action);
 	}
 
-	public static Vector3 MoveActionToVector3(PlayerAction action)
-	{
-		switch (action)
-		{
-			case PlayerAction.MOVE_UP:
-				return new Vector3(0, 1, 0);
-			case PlayerAction.MOVE_DOWN:
-				return new Vector3(0, -1, 0);
-			case PlayerAction.MOVE_LEFT:
-				return new Vector3(-1, 0, 0);
-			case PlayerAction.MOVE_RIGHT:
-				return new Vector3(1, 0, 0);
-			default:
-				return Vector3.zero;
-		}
-	}
+	
 }

@@ -2,6 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Class describing a sound entyty that can be played in game
+/// Contains fields like name (for identifying which sound to play), volume/pitch, loop
+/// </summary>
 [System.Serializable]
 public class Sound
 {

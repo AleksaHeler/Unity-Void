@@ -43,4 +43,100 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c59a045a138dadf4f9335bf04bfda547, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Sounds: []
+  Sounds:
+  - name: Main Menu Music
+    Clip: {fileID: 8300000, guid: 1ef0994f1bd011342bcfb9bdd5fe8cba, type: 3}
+    Volume: 1
+    Pitch: 1
+    Loop: 1
+    source: {fileID: 0}
+  - name: Game Music
+    Clip: {fileID: 8300000, guid: 9d4072cc1b1a4734081986ed7c69c80d, type: 3}
+    Volume: 1
+    Pitch: 1
+    Loop: 1
+    source: {fileID: 0}
+  - name: Step Normal
+    Clip: {fileID: 8300000, guid: b041f1f1d53138049ae835da6d360c22, type: 3}
+    Volume: 1
+    Pitch: 1
+    Loop: 0
+    source: {fileID: 0}
+  - name: Step Grass
+    Clip: {fileID: 8300000, guid: 0e35e0344aff7e4499f6035bc753301b, type: 3}
+    Volume: 1
+    Pitch: 1
+    Loop: 0
+    source: {fileID: 0}
+  - name: Step Glass
+    Clip: {fileID: 8300000, guid: 3653af61debbbf7479770e2a32da6ac7, type: 3}
+    Volume: 1
+    Pitch: 1
+    Loop: 0
+    source: {fileID: 0}
+  - name: Step Slime
+    Clip: {fileID: 8300000, guid: adc5376dc30a08040a133a96e9f3fd45, type: 3}
+    Volume: 1
+    Pitch: 1
+    Loop: 0
+    source: {fileID: 0}
+  - name: Step Slide
+    Clip: {fileID: 8300000, guid: 13ac0272e3a2d764885bdc5f84e494b3, type: 3}
+    Volume: 1
+    Pitch: 1
+    Loop: 0
+    source: {fileID: 0}
+  - name: Step Spike
+    Clip: {fileID: 8300000, guid: 1efa6fcec3741e745929123bb743e063, type: 3}
+    Volume: 1
+    Pitch: 1
+    Loop: 0
+    source: {fileID: 0}
+  - name: Win
+    Clip: {fileID: 8300000, guid: 455a3f5c2d4ad56478b60ca4c0e63956, type: 3}
+    Volume: 1
+    Pitch: 1
+    Loop: 0
+    source: {fileID: 0}
+  - name: Lose
+    Clip: {fileID: 8300000, guid: ff7abf1966898004d9d5c8c82a4f978c, type: 3}
+    Volume: 1
+    Pitch: 1
+    Loop: 0
+    source: {fileID: 0}
+  - name: Click
+    Clip: {fileID: 8300000, guid: 43d6c0d842ed1e34180a650fa95556eb, type: 3}
+    Volume: 1
+    Pitch: 1
+    Loop: 0
+    source: {fileID: 0}
+  - name: Bomb Place
+    Clip: {fileID: 8300000, guid: e4b4ee70c650dce48b17b8b2d0f57b26, type: 3}
+    Volume: 1
+    Pitch: 1
+    Loop: 0
+    source: {fileID: 0}
+  - name: Bomb Tick
+    Clip: {fileID: 8300000, guid: d64abbf6139ae4f48bfe8ac22de0b24d, type: 3}
+    Volume: 1
+    Pitch: 1
+    Loop: 1
+    source: {fileID: 0}
+  - name: Bomb Explode
+    Clip: {fileID: 8300000, guid: 08b4627be354be94aac714991ebc3aa2, type: 3}
+    Volume: 1
+    Pitch: 1
+    Loop: 0
+    source: {fileID: 0}
+  - name: Glass Breaking
+    Clip: {fileID: 8300000, guid: 0cb8b20e69d6687459315a90aaf8f9bb, type: 3}
+    Volume: 1
+    Pitch: 1
+    Loop: 0
+    source: {fileID: 0}
+  - name: Slime Exit
+    Clip: {fileID: 8300000, guid: fc6ed3198da871846943eb4ce0131ac4, type: 3}
+    Volume: 1
+    Pitch: 1
+    Loop: 0
+    source: {fileID: 0}

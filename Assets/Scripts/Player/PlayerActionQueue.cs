@@ -10,7 +10,7 @@ public class PlayerActionQueue
 {
 	private List<PlayerAction> actions;
 
-	public int Count { get => actions.Count; }
+	public int ActionCount { get => actions.Count; }
 
 	// Constructor
 	public PlayerActionQueue()

@@ -2,55 +2,66 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-/// <summary>
-/// Subscribes(?) to PlayerInput scripts event system which triggers the event on detected swipe.
-/// So this script then adds a movement action to actions queue on swipe
-/// </summary>
+// Subscribes to PlayerInput scripts event system which triggers the event on detected swipe.
+// So this script then adds a movement action to actions queue on swipe
 public class PlayerMovement : MonoBehaviour
 {
     [Tooltip("Players offset from center of the platform, so he is actually on top of the platform")]
     public Vector3 platformOffset;
-    public float moveAnimationSpeed = 2;
+    public float moveAnimationDuration = 0.2f;
     [Tooltip("How much sould player be offset from platforms while animating movement, so it looks like jump")]
     public float moveAnimationOffset;
 
     // From how far away can player snap to a platform (used for movement)
-    private float platformSnapRange;
-    private bool isMoving;
-    private Vector3 originalPosition, targetPosition;
-    private float timeToMove;
+    private float platformSnapRange; 
+    private bool isMoving;                                  
+    private Vector3 moveOriginalPosition, moveTargetPosition;
     private PlayerActionQueue actions;
-
-    private void Awake()
-    {
-        PlayerInput.OnSwipe += OnSwipe;
-        WorldManager.OnPlatformDestroy += OnPlatformDestroy;
-        actions = new PlayerActionQueue();
-        timeToMove = 1.0f / moveAnimationSpeed; 
-    }
+    private GameSettings gameSettings;
 
     private void Start()
     {
-        CalculatePlatformSnapRange();
+        // Subsctribe to events
+        PlayerInput.OnSwipe += OnSwipe;
+        WorldManager.OnPlatformDestroy += OnPlatformDestroy;
+
+        actions = new PlayerActionQueue();
+
+        gameSettings = SettingsReader.Instance.GameSettings;
+
+        platformSnapRange = SettingsReader.Instance.GameSettings.PlayerToPlatformSnapRange;
         SnapToClosestPlatform();
     }
 
-    private void Update()
+	private void OnDestroy()
+	{
+        // Unsubscribe from events
+        PlayerInput.OnSwipe -= OnSwipe;
+        WorldManager.OnPlatformDestroy -= OnPlatformDestroy;
+    }
+
+	/// <summary>
+	/// If there is an available action: Get it from queue
+	/// If it is a move action: execute it if player is not already moving (else just add it back)
+	/// If it is anything else just ignore it: we dont have a way to handle them yet
+	/// </summary>
+	private void Update()
     {
-        // Check if there is an action to be done and do it
-        if (actions.Count > 0)
+        if (actions.ActionCount > 0)
         {
             PlayerAction action = actions.Pop();
-			if (PlayerInput.ActionIsMove(action) && !isMoving)
+
+
+            if (ActionIsMove(action) && !isMoving)
             {
                 Move(action);
-            }
-            else if (PlayerInput.ActionIsMove(action) && isMoving)
-            {
-                // If player wants to move but is already moving, put it back in queue (still processing the movement)
-                actions.PushFront(action);
+                return;
             }
 
+            if (ActionIsMove(action) && isMoving)
+            {
+                actions.PushFront(action);
+            }
         }
 
 		if (!isMoving)
@@ -62,58 +73,61 @@ public class PlayerMovement : MonoBehaviour
     private void Move(PlayerAction action)
     {
         // Get how much to move and in what direction
-        Vector3 movement = PlayerInput.MoveActionToVector3(action);
-        movement.x *= WorldManager.Instance.PlatformDistanceX;
-        movement.y *= WorldManager.Instance.PlatformDistanceY;
+        Vector3 movement = MovePlayerActionToVector3(action);
 
         // Before we move we have to check of there is a platform at that point
         Platform platform = WorldManager.Instance.GetPlatformWithinRange(transform.position + movement, platformSnapRange);
 
-        if (platform != null)
-		{
-            //SnapToPlatform(platform);
-            // TODO: here initiate player move
-            StartCoroutine(MovePlayer(movement));
-        }
+        StartCoroutine(MovePlayerCoroutine(movement, platform));
     }
 
-    private IEnumerator MovePlayer(Vector3 movement)
+
+    /// <summary>
+    /// Animate player jump
+    /// </summary>
+    /// <param name="movement">How much to move</param>
+    /// <param name="platform">What platform is at destination</param>
+    /// <returns></returns>
+    private IEnumerator MovePlayerCoroutine(Vector3 movement, Platform platform)
     {
+        // If platform at destination doesnt exist, just dont move for now
+        if (platform == null)
+        {
+            yield break;
+        }
+
         isMoving = true;
 
         float elapsedTime = 0;
-        originalPosition = transform.position;
-        targetPosition = originalPosition + movement;
+        moveOriginalPosition = transform.position;
+        moveTargetPosition = moveOriginalPosition + movement;
 
-        while (elapsedTime < timeToMove)
+        while (elapsedTime < moveAnimationDuration)
         {
-            float percent = elapsedTime / timeToMove;
+            float animationPercent = elapsedTime / moveAnimationDuration;
             
             // If movement is on X axis, add part of the sin() wave to move so it looks like parabola
-            Vector3 sinOffset = Vector3.zero;
+            Vector3 sineOffset = Vector3.zero;
 			if (Mathf.Abs(movement.x) > 0)
 			{
-                float f = Mathf.PI * percent;
-                sinOffset = new Vector3(0, Mathf.Sin(f)) * moveAnimationOffset;
+                float f = Mathf.PI * animationPercent;
+                sineOffset = new Vector3(0, Mathf.Sin(f)) * moveAnimationOffset;
             }
 
-            transform.position = Vector3.Lerp(originalPosition, targetPosition, percent) + sinOffset;
+            transform.position = Vector3.Lerp(moveOriginalPosition, moveTargetPosition, animationPercent) + sineOffset;
             elapsedTime += Time.deltaTime;
             yield return null;
 		}
 
-        transform.position = targetPosition;
+        if (platform != null)
+        {
+            AudioManager.Instance.PlayPlatformSound(platform.PlatformType);
+        }
+
+        transform.position = moveTargetPosition;
 
         isMoving = false;
     }
-
-    // Snap range is the minimum of platform spacings on both axis (*0.6)
-    private void CalculatePlatformSnapRange()
-    {
-        float snapRangeX = WorldManager.Instance.PlatformDistanceX;
-        float snapRangeY = WorldManager.Instance.PlatformDistanceY;
-        platformSnapRange = Mathf.Min(snapRangeX, snapRangeY) * 0.8f;
-	}
 
     private void SnapToClosestPlatformInRange()
     {
@@ -127,30 +141,10 @@ public class PlayerMovement : MonoBehaviour
         SnapToPlatform(platform);
     }
 
-    // Convert swipe direction to player action and add it to actions queue
-    private void OnSwipe(SwipeData swipeData)
-    {
-        PlayerAction action = PlayerInput.SwipeDirectionToPlayerAction(swipeData.Direction);
-
-        if (action != PlayerAction.NONE)
-        {
-            actions.Push(action);
-        }
-    }
-
-    // Check if our platform was destroyed, and if it was its game over
-    private void OnPlatformDestroy(float platformYPosition)
-    {
-        if (Mathf.Abs(transform.position.y - platformYPosition) < 1.5f * platformOffset.y)
-        {
-            PlayerDie();
-        }
-    }
-
     // If the given platform exists, snap to it (with some offset)
     private void SnapToPlatform(Platform platform)
     {
-        if (platform.Type == PlatformType.SPIKES)
+        if (platform.PlatformType == PlatformType.SPIKES)
         {
             PlayerDie();
             return;
@@ -162,10 +156,45 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-    private void PlayerDie()
+    // Convert swipe direction to player action and add it to actions queue
+    private void OnSwipe(SwipeDirection swipeDirection)
+    {
+        PlayerAction action = PlayerInput.SwipeDirectionToPlayerAction(swipeDirection);
+
+        if (action != PlayerAction.NONE)
+        {
+            actions.Push(action);
+        }
+    }
+
+    // Check if OUR platform was destroyed, and if it was its game over
+    private void OnPlatformDestroy(float platformYPosition)
+    {
+        if (Mathf.Abs(transform.position.y - platformYPosition) < 1.5f * platformOffset.y)
+        {
+            PlayerDie();
+        }
+    }
+
+    // Destroy player, play lose sound and stop time
+	private void PlayerDie()
 	{
         Debug.Log("Player died...");
+        AudioManager.Instance.PlaySound("Lose");
         Destroy(gameObject);
         Time.timeScale = 0f;
+    }
+    
+    private bool ActionIsMove(PlayerAction action)
+	{
+        return gameSettings.MovePlayerActions.Contains(action);
+	}
+
+    private Vector3 MovePlayerActionToVector3(PlayerAction action)
+    {
+        Vector3 moveAmount = gameSettings.MovePlayerActionToVector3[action];
+        moveAmount.x *= gameSettings.PlatformSpacingX;
+        moveAmount.y *= gameSettings.PlatformSpacingY;
+        return moveAmount;
     }
 }
