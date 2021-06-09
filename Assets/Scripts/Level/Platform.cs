@@ -1,17 +1,8 @@
 using UnityEngine;
 
-/// <summary>
-/// Describes what item is located on platform
-/// </summary>
-//public enum Item { NONE };
 
-//public enum PlatformType { NONE, NORMAL, SPIKES, SLIME, SLIDE_LEFT, SLIDE_RIGHT, GRASS, GLASS }
-
-// This is located on GameObject (prefab) and when the type is set it changes the sprite
-/// <summary>
-/// This script is located on a prefab GameObject that represents a platform.
-/// The object has a SpriteRenderer component where platform image is set.
-/// </summary>
+// This script is located on a prefab GameObject that represents a platform.
+// The object has a SpriteRenderer component where platform image is set.
 public class Platform : MonoBehaviour
 {
 	// Settings/parameters
