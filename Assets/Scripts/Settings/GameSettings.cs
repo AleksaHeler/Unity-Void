@@ -166,7 +166,6 @@ public class GameSettings : ScriptableObject
 	public int MinDistanceToSwipe { get => minDistanceToSwipe; }
 	public PlatformType[][] PredefinedRows { get => predefinedRows; }
 	public Dictionary<PlatformType, string> PlatformTypeToSound { get => platformTypeToSound; }
-	public Dictionary<PlayerAction, Vector3> MovePlayerActionToVector3 { get => movePlayerActionToVector3; }
 	public Dictionary<SwipeDirection, PlayerAction> SwipeDirectionToPlayerAction { get => swipeDirectionToPlayerAction; }
 	public List<PlayerAction> MovePlayerActions { get => movePlayerActions; }
 	public PlatformSettings[] PlatformSettings { get => platformSettings; }
@@ -231,6 +230,14 @@ public class GameSettings : ScriptableObject
 		}
 
 		return PlatformType.NONE;
+	}
+
+	public Vector3 MovePlayerActionToVector3(PlayerAction action)
+	{
+		Vector3 movement = movePlayerActionToVector3[action];
+		movement.x *= PlatformSpacingX;
+		movement.y *= PlatformSpacingY;
+		return movement;
 	}
 	#endregion
 

@@ -46,13 +46,13 @@ MonoBehaviour:
   Sounds:
   - name: Main Menu Music
     Clip: {fileID: 8300000, guid: 1ef0994f1bd011342bcfb9bdd5fe8cba, type: 3}
-    Volume: 1
+    Volume: 0.6
     Pitch: 1
     Loop: 1
     source: {fileID: 0}
   - name: Game Music
     Clip: {fileID: 8300000, guid: 9d4072cc1b1a4734081986ed7c69c80d, type: 3}
-    Volume: 1
+    Volume: 0.9
     Pitch: 1
     Loop: 1
     source: {fileID: 0}

@@ -34,8 +34,8 @@ MonoBehaviour:
   chanceForBomb: 0.1
   platformSideOffset: 2
   playerToPlatformOffset: {x: 0, y: 0.45, z: 1}
-  playerToPlatformSnapRange: 1.5
-  playerGravity: 0.1
+  playerToPlatformSnapRange: 1.6
+  playerGravity: 0.2
   moveAnimationDuration: 0.2
   moveAnimationCurveOffset: 0.3
   minDistanceToSwipe: 50

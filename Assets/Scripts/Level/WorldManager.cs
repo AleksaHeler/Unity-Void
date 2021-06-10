@@ -31,7 +31,7 @@ public class WorldManager : MonoBehaviour
         UnityEngine.Random.InitState(seed);
 
         // Instantiate the world/platforms
-        world = new World(transform);
+        world = new World(gameObject.transform);
     }
 
 	private void Update()
@@ -97,32 +97,82 @@ public class WorldManager : MonoBehaviour
 
     // Returns a platform closest to given position that isnt spikes
     public Platform GetPlatformClosestToPos(Vector3 position)
+    {
+        // for each platform check distance and return one with minimum distance
+        Platform closestPlatform = null;
+        float minDistance = Mathf.Infinity;
+
+        foreach (Row row in world.Rows)
+        {
+            foreach (Platform platform in row.Platforms)
+            {
+                float distance = Vector3.Distance(platform.transform.position, position);
+                if (closestPlatform == null || distance < minDistance)
+                {
+                    minDistance = distance;
+                    closestPlatform = platform;
+                }
+            }
+        }
+
+        return closestPlatform;
+    }
+
+    // Returns a platform closest to given position that isnt spikes
+    public Platform GetWalkablePlatformClosestToPos(Vector3 position)
+    {
+        // for each platform check distance and return one with minimum distance
+        Platform closestPlatform = null;
+        float minDistance = Mathf.Infinity;
+        foreach (Row row in world.Rows)
+        {
+            foreach (Platform platform in row.Platforms)
+            {
+                bool platformNotNone = platform.PlatformType != PlatformType.NONE;
+                float distance = Vector3.Distance(platform.transform.position, position);
+
+                bool closestPlatformIsNull = closestPlatform == null;
+                bool newMinDistance = distance <= minDistance;
+                if ((closestPlatformIsNull || newMinDistance) && platformNotNone)
+                {
+                    minDistance = distance;
+                    closestPlatform = platform;
+                }
+            }
+        }
+
+        return closestPlatform;
+    }
+
+    public Platform GetSafePlatformClosestToPos(Vector3 position)
 	{
         // for each platform check distance and return one with min
         // private World world;
         Platform closestPlatform = null;
         float minDistance = Mathf.Infinity;
-        foreach(Row row in world.Rows)
-		{
+        foreach (Row row in world.Rows)
+        {
             foreach (Platform platform in row.Platforms)
             {
-                if (closestPlatform == null)
+                bool platformNotNone = platform.PlatformType != PlatformType.NONE;
+                bool platformNotSpikes = platform.PlatformType != PlatformType.SPIKES;
+                if (closestPlatform == null && platformNotNone && platformNotSpikes)
                 {
                     closestPlatform = platform;
                     continue;
                 }
 
                 float distance = Vector3.Distance(platform.transform.position, position);
-                if (distance < minDistance)
-				{
+                if (distance < minDistance && platformNotNone && platformNotSpikes)
+                {
                     minDistance = distance;
                     closestPlatform = platform;
-				}
+                }
             }
-		}
+        }
 
         return closestPlatform;
-	}
+    }
 
     private int PositionToPlatformIndex(Vector3 position)
 	{

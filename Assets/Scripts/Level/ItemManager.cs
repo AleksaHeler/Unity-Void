@@ -8,7 +8,7 @@ public class ItemManager : MonoBehaviour
 	private static ItemManager _instance;
 	public static ItemManager Instance { get { return _instance; } }
 
-
+	// TODO: mozda koristiti ID umesto reference na Platform
 	Dictionary<Platform, ItemType> itemsOnPlatforms;
 
 
