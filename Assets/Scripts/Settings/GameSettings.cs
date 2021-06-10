@@ -1,13 +1,18 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+
 #region Global defines
-public enum Item { NONE }
+public enum ItemType { NONE, BOMB_COLLECTIBLE, BOMB_ACTIVE }
 
-public enum PlatformType { NONE, NORMAL, SPIKES, SLIME, SLIDE_LEFT, SLIDE_RIGHT, GRASS, GLASS }
+public enum PlatformType { NONE, GLASS, GRASS, NORMAL, SLIDE_LEFT, SLIDE_RIGHT, SLIME, SPIKES }
 
-public enum PlayerAction { NONE, MOVE_LEFT, MOVE_RIGHT, MOVE_UP, MOVE_DOWN, PLACE_BOMB }
+public enum PlayerAction { NONE, MOVE_UP, MOVE_DOWN, MOVE_LEFT, MOVE_RIGHT }
+
+public enum SwipeDirection { UP, DOWN, LEFT, RIGHT }
+
 #endregion
 
 
@@ -28,6 +33,12 @@ public class GameSettings : ScriptableObject
 	[SerializeField]
 	private GameObject platformPrefab;
 
+	[SerializeField]
+	private PlatformSettings[] platformSettings;
+
+	[SerializeField]
+	private ItemSettings[] itemSettings;
+
 	[Tooltip("Horizontal size of platform sprite")]
 	[SerializeField]
 	private float platformWidth = 1.5f;
@@ -46,11 +57,32 @@ public class GameSettings : ScriptableObject
 	[SerializeField]
 	private float percentOfRandomPlatforms = 0.1f;
 
+	[SerializeField]
+	private float chanceForBomb = 0.1f;
+
 	[Tooltip("How much spacing should be on sides of level")]
 	[SerializeField]
 	private float platformSideOffset = 4f;
 
-	[Header("Platform settings")]
+	[Header("Player settings")]
+	[SerializeField]
+	private Vector3 playerToPlatformOffset;
+
+	[SerializeField]
+	private float playerToPlatformSnapRange;
+
+	[SerializeField]
+	private float playerGravity;
+
+	[SerializeField]
+	private float moveAnimationDuration;
+
+	[SerializeField]
+	private float moveAnimationCurveOffset;
+
+	[SerializeField]
+	private int minDistanceToSwipe;
+
 	#endregion
 
 
@@ -115,6 +147,7 @@ public class GameSettings : ScriptableObject
 	public float PlatformHeight { get => platformHeight; }
 	public float PlatformSpeed { get => platformSpeed; }
 	public float PercentOfRandomPlatforms { get => percentOfRandomPlatforms; }
+	public float ChanceForBomb { get => chanceForBomb; }
 	public float ScreenBorderTop {
 		get {
 			Vector3 topRightViewport = new Vector3(1, 1, 0);
@@ -125,12 +158,80 @@ public class GameSettings : ScriptableObject
 	public float ScreenBorderBottom { get => -ScreenBorderTop; }
 	public float PlatformSpacingY { get { return (ScreenBorderTop * 2f) / height; } }
 	public float PlatformSpacingX { get { return ((Camera.main.ViewportToWorldPoint(new Vector3(1, 1, 0)).x - platformSideOffset) * 2f) / width; } }
-	public float PlayerToPlatformSnapRange { get => Mathf.Min(PlatformSpacingX, PlatformSpacingY) * 0.8f; }
+	public float PlayerToPlatformSnapRange { get => playerToPlatformSnapRange; }
+	public Vector3 PlayerToPlatformOffset { get => playerToPlatformOffset;  }
+	public float PlayerGravity { get => playerGravity; }
+	public float MoveAnimationDuration { get => moveAnimationDuration; }
+	public float MoveAnimationCurveOffset { get => moveAnimationCurveOffset; }
+	public int MinDistanceToSwipe { get => minDistanceToSwipe; }
 	public PlatformType[][] PredefinedRows { get => predefinedRows; }
 	public Dictionary<PlatformType, string> PlatformTypeToSound { get => platformTypeToSound; }
 	public Dictionary<PlayerAction, Vector3> MovePlayerActionToVector3 { get => movePlayerActionToVector3; }
 	public Dictionary<SwipeDirection, PlayerAction> SwipeDirectionToPlayerAction { get => swipeDirectionToPlayerAction; }
 	public List<PlayerAction> MovePlayerActions { get => movePlayerActions; }
+	public PlatformSettings[] PlatformSettings { get => platformSettings; }
+	public ItemSettings[] ItemSettings { get => itemSettings; }
+	#endregion
+
+
+	#region Helper functions for finding stuff
+	public Sprite PlatformTypeToSprite(PlatformType type)
+	{
+		PlatformSettings platform = Array.Find(platformSettings, platform => platform.PlatformType == type);
+
+		if (platform != null)
+		{
+			return platform.PlatformSprite;
+		}
+
+		return null;
+	}
+	public Sprite ItemTypeToSprite(ItemType type)
+	{
+		ItemSettings item = Array.Find(itemSettings, item => item.ItemType == type);
+
+		if (item != null)
+		{
+			return item.ItemSprite;
+		}
+
+		return null;
+	}
+
+	public float PlatformTypeToChance(PlatformType type)
+	{
+		PlatformSettings platform = Array.Find(platformSettings, platform => platform.PlatformType == type);
+
+		if (platform != null)
+		{
+			return platform.PlatformChance;
+		}
+
+		return 0;
+	}
+
+	public PlatformType GetRandomPlatformType()
+	{
+		float totalChance = 0;
+		for (int i = 0; i < platformSettings.Length; i++)
+		{
+			totalChance += platformSettings[i].PlatformChance;
+		}
+
+		float random = UnityEngine.Random.Range(0, totalChance);
+
+		// Subtract possibilities one by one from the random number, and as soon as that number is less than 0 return that type
+		for (int i = 0; i < platformSettings.Length; i++)
+		{
+			random -= platformSettings[i].PlatformChance;
+			if (random <= 0)
+			{
+				return (PlatformType)i;
+			}
+		}
+
+		return PlatformType.NONE;
+	}
 	#endregion
 
 }

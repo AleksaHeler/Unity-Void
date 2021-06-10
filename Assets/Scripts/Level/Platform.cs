@@ -1,90 +1,56 @@
+using System.Collections;
 using UnityEngine;
 
 
-// This script is located on a prefab GameObject that represents a platform.
-// The object has a SpriteRenderer component where platform image is set.
+// This script is located on a prefab GameObject that represents a platform
+// The object has a SpriteRenderer component where platform image is set
 public class Platform : MonoBehaviour
 {
-	// Settings/parameters
-	[Header("Platform settings")]
-	[Tooltip("Sprites that will be assigned to this platform based on type (has to be the same order as enum PlatformType)")]
-	// TODO: da ne moraju imati iste indekse: smisliti resenje
-	// Dictionary:       platformType  :   struct (sprite + float)
-	// 
-	// TODO: Pogledati scripable object za platformu !!!
-	// Na pocetku izvlaci konfiguracije 
-	public Sprite[] SpritePrefabs;
-	[Tooltip("Chance for each type of platform to be generated (has to be the same order as enum PlatformType)")]
-	public float[] PlatformChance = { 1, 1, 0.2f, 0.2f, 0.1f, 0.1f, 0.4f, 0.2f };
-
-	private Item item;
+	[SerializeField]
+	private SpriteRenderer itemSpriteRenderer;
+	private ItemType platformItem;
 	private PlatformType platformType;
-
+	private int platformId;
 
 	public PlatformType PlatformType { get => platformType; }
+	public ItemType PlatformItem { get => platformItem; }
+	public int PlatformID { get => platformId; }
 
 
-	/// <summary>
-	/// Generates random platform at given position with given item on it
-	/// </summary>
-	public void GeneratePlatform(Vector2 position, Item item)
+	// Generates random platform at given position with given item on it
+	public void GeneratePlatform(Vector2 position, ItemType item, int id)
 	{
-		platformType = GenerateRandomPlatformType();
-		GeneratePlatform(position, item, platformType);
+		platformType = SettingsReader.Instance.GameSettings.GetRandomPlatformType();
+		GeneratePlatform(position, item, id, platformType);
 	}
 
-	/// <summary>
-	/// Generates a platform with given type at position with item on it
-	/// </summary>
-	public void GeneratePlatform(Vector2 position, Item item, PlatformType type)
+	// Generates a platform with given type at position with item on it
+	public void GeneratePlatform(Vector2 position, ItemType item, int id, PlatformType type)
 	{
 		this.platformType = type;
-		this.item = item;
+		this.platformItem = item;
+		platformId = id;
 		transform.position = position;
 
 		SetSprite(type);
+		SetItemSprite(item);
 	}
 
-	/// <summary>
-	/// Returns random platform type based on probabilities from 'platformChance' array
-	/// </summary>
-	private PlatformType GenerateRandomPlatformType()
-	{
-		// We have an array of probabilities
-		// Calculate the sum of it and generate a random number
-		float totalChance = 0;
-		for(int i = 0; i < PlatformChance.Length; i++)
-		{
-			totalChance += PlatformChance[i];
-		}
-
-		float random = Random.Range(0, totalChance);
-
-		// Subtract possibilities one by one from the random number, and as soon as that number is less than 0 return that type
-		for (int i = 0; i < PlatformChance.Length; i++)
-		{
-			random -= PlatformChance[i];
-			if(random <= 0)
-			{
-				return (PlatformType)i;
-			}
-		}
-
-		return PlatformType.NONE;
-	}
-
-	/// <summary>
-	/// Sets sprite component of this gameobject to given platform type
-	/// </summary>
+	// Sets sprite component of this gameobject to given platform type
 	private void SetSprite(PlatformType type)
 	{
-		// If this is an empty platform
-		if (type == PlatformType.NONE)
-		{
-			GetComponent<SpriteRenderer>().sprite = null;
-			return;
-		}
+		Sprite platformSprite = SettingsReader.Instance.GameSettings.PlatformTypeToSprite(type);
+		GetComponent<SpriteRenderer>().sprite = platformSprite;
+	}
 
-		GetComponent<SpriteRenderer>().sprite = SpritePrefabs[(int)type - 1];
+	public void SetItemSprite(ItemType itemType)
+	{
+		Sprite sprite = SettingsReader.Instance.GameSettings.ItemTypeToSprite(itemType);
+		SetItemSprite(sprite);
+	}
+
+	public void SetItemSprite(Sprite sprite)
+	{
+		itemSpriteRenderer.sprite = sprite;
 	}
 }

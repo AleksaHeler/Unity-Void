@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5595110397561710934}
   - component: {fileID: 5595110397561710935}
+  - component: {fileID: 4979724663927637816}
   m_Layer: 0
   m_Name: WorldManager
   m_TagString: Untagged
@@ -43,10 +44,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1e1e98175378ff24bab98bc6a97bce17, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Width: 5
-  Height: 6
-  PlatformHeight: 1
-  PlatformXOffset: 4
-  PlatformSpeed: 0.3
-  PlatformPrefab: {fileID: 8512226233930854249, guid: 483c6cc6c408bec4d9037d652ee29ec3, type: 3}
-  RandomSeed: 1337
+--- !u!114 &4979724663927637816
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5595110397561710928}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 01de947d57b9625439c83b1b1aa8d3af, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

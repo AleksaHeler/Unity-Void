@@ -2,9 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-/// <summary>
-/// Contains an array of Platforms
-/// </summary>
+// Contains an array of Platforms
 public class Row : MonoBehaviour
 {
 	private int numberOfPlatforms;                      // Number of platforms in this row
@@ -38,14 +36,15 @@ public class Row : MonoBehaviour
 		platforms = new Platform[numberOfPlatforms];
 
 		// Parent object of all platforms in this row
-		rowGameObject = new GameObject("Row " + id);
+		string gameObjectName = "Row " + id;
+		rowGameObject = new GameObject(gameObjectName);
 		rowGameObject.transform.SetParent(rowParent);
 
 		InstantiateRow(yPosition);
 		GenerateRow(yPosition);
 	}
 
-	/// Move platforms down by given speed
+	// Move platforms down by given speed
 	public void AnimateRow()
 	{
 		MovePlatforms();
@@ -82,11 +81,7 @@ public class Row : MonoBehaviour
 		GenerateRow(worldBorderTop);
 	}
 
-	/// <summary>
-	/// Instantate platform game objects
-	/// </summary>
-	/// <param name="prefab">What prefab to spawn</param>
-	/// <param name="yPosition">On what Y position should the row be</param>
+	// Instantate platform game objects
 	private void InstantiateRow(float yPosition)
 	{
 		for (int i = 0; i < numberOfPlatforms; i++)
@@ -111,26 +106,26 @@ public class Row : MonoBehaviour
 		int predefinedRowsCount = SettingsReader.Instance.GameSettings.PredefinedRows.Length;
 		int randomIndex = Random.Range(0, predefinedRowsCount);
 
-		// Go trough the row
-		for (int i = 0; i < numberOfPlatforms; i++)
+		// Go trough the row and generate each platform
+		int i = 0;
+		foreach(Platform platform in platforms)
 		{
-			GeneratePlatform(i, rowIsRandom, randomIndex, yPosition);
+			float xPosition = (i - numberOfPlatforms / 2) * platformSpacing;
+			Vector2 platformPosition = new Vector2(xPosition, yPosition);
+			if (rowIsRandom)
+			{
+				platform.GeneratePlatform(platformPosition, ItemType.NONE, i);
+			}
+			if (!rowIsRandom)
+			{
+				PlatformType type = SettingsReader.Instance.GameSettings.PredefinedRows[randomIndex][i];
+				platform.GeneratePlatform(platformPosition, ItemType.NONE, i, type);
+			}
+			i++;
 		}
+
+		ItemManager.Instance.GenerateItemArrayForRow(platforms);
 
 		return;
-	}
-
-	private void GeneratePlatform(int i, bool rowIsRandom, int randomIndex, float yPosition)
-	{
-		Vector2 platformPosition = new Vector2((i - numberOfPlatforms / 2) * platformSpacing, yPosition);
-		if (!rowIsRandom)
-		{
-			PlatformType type = SettingsReader.Instance.GameSettings.PredefinedRows[randomIndex][i];
-			platforms[i].GeneratePlatform(platformPosition, Item.NONE, type);
-		}
-		if (rowIsRandom)
-		{
-			platforms[i].GeneratePlatform(platformPosition, Item.NONE);
-		}
 	}
 }

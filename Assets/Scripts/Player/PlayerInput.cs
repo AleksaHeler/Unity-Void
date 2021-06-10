@@ -4,17 +4,10 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-public enum SwipeDirection { UP, DOWN, LEFT, RIGHT }
-
-/// <summary>
-/// Detects swipes and triggers an event on each swipe
-/// Event passes SwipeData as parameter to delegate functions
-/// </summary>
+// Detects swipes and triggers an event on each swipe
+// Event passes SwipeData as parameter to delegate functions
 public class PlayerInput : MonoBehaviour
 {
-	[Tooltip("Minimum distance (in pixels) needed to detect swipe")]
-	public float minDistanceForSwipe = 20f;
-
 	private Vector2 mouseDownPosition;
 	private Vector2 mouseUpPosition;
 
@@ -37,9 +30,7 @@ public class PlayerInput : MonoBehaviour
 		}
 	}
 
-	/// <summary>
-	/// Check if swipe was ok
-	/// </summary>
+	// Check if swipe was ok
 	private void DetectSwipe()
 	{
 		if (SwipeDistanceCheckMet())
@@ -67,6 +58,7 @@ public class PlayerInput : MonoBehaviour
 
 	private bool SwipeDistanceCheckMet()
 	{
+		int minDistanceForSwipe = SettingsReader.Instance.GameSettings.MinDistanceToSwipe;
 		return VerticalMovementDistance() > minDistanceForSwipe || HorizontalMoveDistance() > minDistanceForSwipe;
 	}
 
@@ -80,41 +72,12 @@ public class PlayerInput : MonoBehaviour
 		return Mathf.Abs(mouseDownPosition.x - mouseUpPosition.x);
 	}
 
-	/// <summary>
-	/// Triggers swipe event with given swipe direction
-	/// </summary>
-	private void SendSwipe(SwipeDirection direction)
-	{
-	}
-
-	#endregion
-
-	/// <summary>
-	/// Converts swipe direction to player movement action (for example SwipeDirection.UP -> PlayerAction.MOVE_UP)
-	/// </summary>
-	public static PlayerAction SwipeDirectionToPlayerAction(SwipeDirection direction)
-	{
-		// Dictionary: key-value pair za ovo umesto switch
-		switch (direction)
-		{
-			case SwipeDirection.UP:
-				return PlayerAction.MOVE_UP;
-			case SwipeDirection.DOWN:
-				return PlayerAction.MOVE_DOWN;
-			case SwipeDirection.LEFT:
-				return PlayerAction.MOVE_LEFT;
-			case SwipeDirection.RIGHT:
-				return PlayerAction.MOVE_RIGHT;
-			default:
-				return PlayerAction.NONE;
-		}
-	}
-
-	/// Returns true if passed action is a move
+	// Returns true if passed action is a move
 	public static bool ActionIsMove(PlayerAction action)
 	{
 		return SettingsReader.Instance.GameSettings.MovePlayerActions.Contains(action);
 	}
 
-	
+	#endregion
+
 }

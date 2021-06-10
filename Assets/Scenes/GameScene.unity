@@ -271,30 +271,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 3586658568221629736, guid: b8581f20cd1696e4ca1f7f3800c99334, type: 3}
-      propertyPath: Sounds.Array.data[2].Volume
-      value: 0.8
-      objectReference: {fileID: 0}
-    - target: {fileID: 3586658568221629736, guid: b8581f20cd1696e4ca1f7f3800c99334, type: 3}
-      propertyPath: Sounds.Array.data[3].Volume
-      value: 0.8
-      objectReference: {fileID: 0}
-    - target: {fileID: 3586658568221629736, guid: b8581f20cd1696e4ca1f7f3800c99334, type: 3}
-      propertyPath: Sounds.Array.data[4].Volume
-      value: 0.8
-      objectReference: {fileID: 0}
-    - target: {fileID: 3586658568221629736, guid: b8581f20cd1696e4ca1f7f3800c99334, type: 3}
-      propertyPath: Sounds.Array.data[6].Volume
-      value: 0.6
-      objectReference: {fileID: 0}
-    - target: {fileID: 3586658568221629736, guid: b8581f20cd1696e4ca1f7f3800c99334, type: 3}
-      propertyPath: Sounds.Array.data[7].Volume
-      value: 0.7
-      objectReference: {fileID: 0}
-    - target: {fileID: 3586658568221629736, guid: b8581f20cd1696e4ca1f7f3800c99334, type: 3}
-      propertyPath: Sounds.Array.data[9].Volume
-      value: 0.6
-      objectReference: {fileID: 0}
     - target: {fileID: 3586658568221629737, guid: b8581f20cd1696e4ca1f7f3800c99334, type: 3}
       propertyPath: m_RootOrder
       value: 2
@@ -480,30 +456,6 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5595110397561710934, guid: 5e23af3286ee4d44dab4322468a3ba9a, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5595110397561710935, guid: 5e23af3286ee4d44dab4322468a3ba9a, type: 3}
-      propertyPath: Height
-      value: 6
-      objectReference: {fileID: 0}
-    - target: {fileID: 5595110397561710935, guid: 5e23af3286ee4d44dab4322468a3ba9a, type: 3}
-      propertyPath: settigns
-      value: 
-      objectReference: {fileID: 11400000, guid: e1c9ce1c18822a94084340bdf853081e, type: 2}
-    - target: {fileID: 5595110397561710935, guid: 5e23af3286ee4d44dab4322468a3ba9a, type: 3}
-      propertyPath: settings
-      value: 
-      objectReference: {fileID: 11400000, guid: e1c9ce1c18822a94084340bdf853081e, type: 2}
-    - target: {fileID: 5595110397561710935, guid: 5e23af3286ee4d44dab4322468a3ba9a, type: 3}
-      propertyPath: percentOfRandomPlatforms
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5595110397561710935, guid: 5e23af3286ee4d44dab4322468a3ba9a, type: 3}
-      propertyPath: PredefinedRows.Array.size
-      value: 4
-      objectReference: {fileID: 0}
-    - target: {fileID: 5595110397561710935, guid: 5e23af3286ee4d44dab4322468a3ba9a, type: 3}
-      propertyPath: PredefinedPlatformTypes.Array.size
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []

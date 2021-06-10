@@ -15,8 +15,27 @@ MonoBehaviour:
   width: 5
   height: 6
   platformPrefab: {fileID: 8512226233930854249, guid: 483c6cc6c408bec4d9037d652ee29ec3, type: 3}
+  platformSettings:
+  - {fileID: 11400000, guid: 6f3b2f79f042e3b4e84f859a7643d187, type: 2}
+  - {fileID: 11400000, guid: 9895a6ef84a26ec48b3c298f0756eb46, type: 2}
+  - {fileID: 11400000, guid: bc39b3eb7c8cb75438c9f058418b5cd6, type: 2}
+  - {fileID: 11400000, guid: 162c867e733f4474ca0ac953dc823061, type: 2}
+  - {fileID: 11400000, guid: f1fe1b3643b8add4d85745049c59f90b, type: 2}
+  - {fileID: 11400000, guid: 776e2488a042eaf46bf8594ec39ee081, type: 2}
+  - {fileID: 11400000, guid: 0eec3e441624e394fb2f930fbf75ad7d, type: 2}
+  - {fileID: 11400000, guid: 0ac12dc0fba61d24f946cab8790caa27, type: 2}
+  itemSettings:
+  - {fileID: 11400000, guid: 06b0f0a98186cc241bbc9f6ac9cdade4, type: 2}
+  - {fileID: 11400000, guid: 8ad0a5e88e1226942ad5cbef163b3d82, type: 2}
   platformWidth: 1.5
   platformHeight: 1
   platformSpeed: 0.3
-  percentOfRandomPlatforms: 0.1
-  platformSideOffset: 3
+  percentOfRandomPlatforms: 0.4
+  chanceForBomb: 0.1
+  platformSideOffset: 2
+  playerToPlatformOffset: {x: 0, y: 0.45, z: 1}
+  playerToPlatformSnapRange: 1.5
+  playerGravity: 0.1
+  moveAnimationDuration: 0.2
+  moveAnimationCurveOffset: 0.3
+  minDistanceToSwipe: 50
