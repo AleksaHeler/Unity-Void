@@ -11,7 +11,6 @@ public class PlayerInventory : MonoBehaviour
 		hasBomb = false;
 	}
 
-	// TODO: Implementirati postavljanje bombe
 	private void Update()
 	{
 		if (Input.GetMouseButtonDown(1) && hasBomb)
@@ -20,7 +19,6 @@ public class PlayerInventory : MonoBehaviour
 		}
 	}
 
-	// TODO: Implementirati uzimanje itema
 	public void CollectItem(Platform platform)
 	{
         ItemType itemType = ItemManager.Instance.ItemTypeAtPlatform(platform);
@@ -41,8 +39,25 @@ public class PlayerInventory : MonoBehaviour
 	{
 		hasBomb = false;
 
-		float range = SettingsReader.Instance.GameSettings.PlayerToPlatformSnapRange;
-		Platform platform = WorldManager.Instance.GetPlatformWithinRange(transform.position, range);
+		float placementRange = SettingsReader.Instance.GameSettings.PlayerToPlatformSnapRange;
+		float bombPrimingTime = SettingsReader.Instance.GameSettings.BombPrimingTime;
+		Platform platform = WorldManager.Instance.GetPlatformWithinRange(transform.position, placementRange);
+		StartCoroutine(BombPrimeCountdown(platform, bombPrimingTime));
+	}
+
+	private IEnumerator BombPrimeCountdown(Platform platform, float duration)
+	{
+		Debug.Log("Planted bomb with timer");
+		ItemManager.Instance.PlaceItemAtPlatform(platform, ItemType.BOMB_PRIMING);
+
+		float elapsedTime = 0;
+		while (elapsedTime < duration)
+		{
+			elapsedTime += Time.deltaTime;
+			yield return null;
+		}
+
+		Debug.Log("Bomb is active");
 		ItemManager.Instance.PlaceItemAtPlatform(platform, ItemType.BOMB_ACTIVE);
 	}
 }

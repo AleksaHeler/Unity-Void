@@ -25,8 +25,9 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 0eec3e441624e394fb2f930fbf75ad7d, type: 2}
   - {fileID: 11400000, guid: 0ac12dc0fba61d24f946cab8790caa27, type: 2}
   itemSettings:
-  - {fileID: 11400000, guid: 06b0f0a98186cc241bbc9f6ac9cdade4, type: 2}
   - {fileID: 11400000, guid: 8ad0a5e88e1226942ad5cbef163b3d82, type: 2}
+  - {fileID: 11400000, guid: 06b0f0a98186cc241bbc9f6ac9cdade4, type: 2}
+  - {fileID: 11400000, guid: cfab81d631bc02d4bba333b7c1ba9b45, type: 2}
   platformWidth: 1.5
   platformHeight: 2
   unsafePlatforms: 0000000007000000
@@ -37,6 +38,8 @@ MonoBehaviour:
   playerToPlatformOffset: {x: 0, y: 0.45, z: 1}
   playerToPlatformSnapRange: 1.6
   playerGravity: 0.2
-  moveAnimationDuration: 0.2
+  playerSpeed: 10
+  playerCheckTolerance: 0.05
   moveAnimationCurveOffset: 0.3
   minDistanceToSwipe: 50
+  bombPrimingTime: 3

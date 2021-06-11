@@ -5,7 +5,7 @@ using UnityEngine;
 
 
 #region Global defines
-public enum ItemType { NONE, BOMB_COLLECTIBLE, BOMB_ACTIVE }
+public enum ItemType { NONE, BOMB_COLLECTIBLE, BOMB_PRIMING, BOMB_ACTIVE }
 
 public enum PlatformType { NONE, GLASS, GRASS, NORMAL, SLIDE_LEFT, SLIDE_RIGHT, SLIME, SPIKES }
 
@@ -78,13 +78,19 @@ public class GameSettings : ScriptableObject
 	private float playerGravity;
 
 	[SerializeField]
-	private float moveAnimationDuration;
+	private float playerSpeed;
+
+	[SerializeField]
+	private float playerCheckTolerance;
 
 	[SerializeField]
 	private float moveAnimationCurveOffset;
 
 	[SerializeField]
 	private int minDistanceToSwipe;
+
+	[SerializeField]
+	private float bombPrimingTime;
 
 	#endregion
 
@@ -164,9 +170,11 @@ public class GameSettings : ScriptableObject
 	public float PlayerToPlatformSnapRange { get => playerToPlatformSnapRange; }
 	public Vector3 PlayerToPlatformOffset { get => playerToPlatformOffset;  }
 	public float PlayerGravity { get => playerGravity; }
-	public float MoveAnimationDuration { get => moveAnimationDuration; }
+	public float PlayerSpeed { get => playerSpeed; }
+	public float PlayerCheckTolerance { get => playerCheckTolerance; }
 	public float MoveAnimationCurveOffset { get => moveAnimationCurveOffset; }
 	public int MinDistanceToSwipe { get => minDistanceToSwipe; }
+	public float BombPrimingTime { get => bombPrimingTime; }
 	public PlatformType[][] PredefinedRows { get => predefinedRows; }
 	public Dictionary<PlatformType, string> PlatformTypeToSound { get => platformTypeToSound; }
 	public Dictionary<SwipeDirection, PlayerAction> SwipeDirectionToPlayerAction { get => swipeDirectionToPlayerAction; }
