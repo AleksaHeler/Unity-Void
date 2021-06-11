@@ -33,7 +33,7 @@ public class PlayerInventory : MonoBehaviour
 
 		if (itemType == ItemType.BOMB_ACTIVE)
 		{
-			Debug.Log("Im standing on the bomb");
+			//Debug.Log("Im standing on the bomb");
 		}
 	}
 

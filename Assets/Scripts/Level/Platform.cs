@@ -16,14 +16,6 @@ public class Platform : MonoBehaviour
 	public ItemType PlatformItem { get => platformItem; }
 	public int PlatformID { get => platformId; }
 
-
-	// Generates random platform at given position with given item on it
-	public void GeneratePlatform(Vector2 position, ItemType item, int id)
-	{
-		platformType = SettingsReader.Instance.GameSettings.GetRandomPlatformType();
-		GeneratePlatform(position, item, id, platformType);
-	}
-
 	// Generates a platform with given type at position with item on it
 	public void GeneratePlatform(Vector2 position, ItemType item, int id, PlatformType type)
 	{

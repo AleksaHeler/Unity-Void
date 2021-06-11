@@ -28,7 +28,8 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 06b0f0a98186cc241bbc9f6ac9cdade4, type: 2}
   - {fileID: 11400000, guid: 8ad0a5e88e1226942ad5cbef163b3d82, type: 2}
   platformWidth: 1.5
-  platformHeight: 1
+  platformHeight: 2
+  unsafePlatforms: 0000000007000000
   platformSpeed: 0.3
   percentOfRandomPlatforms: 0.4
   chanceForBomb: 0.1

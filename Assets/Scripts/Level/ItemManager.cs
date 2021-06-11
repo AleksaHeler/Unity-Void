@@ -24,6 +24,10 @@ public class ItemManager : MonoBehaviour
 			_instance = this;
 		}
 
+		// Set random seed
+		int seed = System.DateTime.Now.Ticks.GetHashCode();
+		UnityEngine.Random.InitState(seed);
+
 		itemsOnPlatforms = new Dictionary<Platform, ItemType>();
 	}
 

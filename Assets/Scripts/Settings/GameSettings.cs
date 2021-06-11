@@ -47,6 +47,9 @@ public class GameSettings : ScriptableObject
 	[SerializeField]
 	private float platformHeight = 1f;
 
+	[SerializeField]
+	private List<PlatformType> unsafePlatforms;
+
 	[Header("Level settings")]
 
 	[Tooltip("How fast should platforms move down")]
@@ -170,6 +173,7 @@ public class GameSettings : ScriptableObject
 	public List<PlayerAction> MovePlayerActions { get => movePlayerActions; }
 	public PlatformSettings[] PlatformSettings { get => platformSettings; }
 	public ItemSettings[] ItemSettings { get => itemSettings; }
+	public List<PlatformType> UnsafePlatforms { get => unsafePlatforms; }
 	#endregion
 
 

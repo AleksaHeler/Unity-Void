@@ -108,20 +108,38 @@ public class Row : MonoBehaviour
 
 		// Go trough the row and generate each platform
 		int i = 0;
-		foreach(Platform platform in platforms)
+		int platformsInRow = 0;
+		foreach (Platform platform in platforms)
 		{
 			float xPosition = (i - numberOfPlatforms / 2) * platformSpacing;
 			Vector2 platformPosition = new Vector2(xPosition, yPosition);
+			PlatformType platformType = PlatformType.NONE;
+
 			if (rowIsRandom)
 			{
-				platform.GeneratePlatform(platformPosition, ItemType.NONE, i);
+				platformType = SettingsReader.Instance.GameSettings.GetRandomPlatformType();
 			}
 			if (!rowIsRandom)
 			{
-				PlatformType type = SettingsReader.Instance.GameSettings.PredefinedRows[randomIndex][i];
-				platform.GeneratePlatform(platformPosition, ItemType.NONE, i, type);
+				platformType = SettingsReader.Instance.GameSettings.PredefinedRows[randomIndex][i];
 			}
+
+			if(platformType != PlatformType.NONE)
+			{
+				platformsInRow++;
+			}
+
+			platform.GeneratePlatform(platformPosition, ItemType.NONE, i, platformType);
 			i++;
+		}
+
+		// If the generated row is empty, create only one normal platform in the middle
+		if(platformsInRow == 0)
+		{
+			int platformIndex = numberOfPlatforms / 2;
+			float xPosition = (platformIndex - numberOfPlatforms / 2) * platformSpacing;
+			Vector2 platformPosition = new Vector2(xPosition, yPosition);
+			platforms[platformIndex].GeneratePlatform(platformPosition, ItemType.NONE, platformIndex, PlatformType.NORMAL);
 		}
 
 		ItemManager.Instance.GenerateItemArrayForRow(platforms);

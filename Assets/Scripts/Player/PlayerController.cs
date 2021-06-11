@@ -6,8 +6,10 @@ using UnityEngine;
 // So this script then adds a movement action to actions queue on swipe
 [RequireComponent(typeof(PlayerInput))]
 [RequireComponent(typeof(PlayerInventory))]
+//[RequireComponent(typeof(Animator))]
 public class PlayerController : MonoBehaviour
 {
+	#region Variables
 	private bool playerDied;
 	private Vector3 platformOffset;
 	private float platformSnapRange;
@@ -20,8 +22,10 @@ public class PlayerController : MonoBehaviour
 	private PlayerActionQueue actions;
 	private GameSettings gameSettings;
 	private PlayerInventory playerInventory;
+	private Animator playerAnimator;
 
 	public static event Action<int> OnPlayerDeath = delegate { };
+	#endregion // Variables
 
 	private void Start()
 	{
@@ -33,6 +37,7 @@ public class PlayerController : MonoBehaviour
 
 		gameSettings = SettingsReader.Instance.GameSettings;
 		playerInventory = GetComponent<PlayerInventory>();
+		playerAnimator = GetComponent<Animator>();
 
 		playerDied = false;
 		platformOffset = gameSettings.PlayerToPlatformOffset;
@@ -52,6 +57,11 @@ public class PlayerController : MonoBehaviour
 
 	private void Update()
 	{
+		if (Input.GetKeyDown(KeyCode.Escape))
+		{
+			Application.Quit();
+		}
+
 		if (playerDied)
 		{
 			return;
@@ -98,14 +108,17 @@ public class PlayerController : MonoBehaviour
 		// in that situation, here the platform is actually NULL
 
 		isMoving = true;
+		//playerAnimator.SetTrigger("Jump");
 
 		float elapsedTime = 0;
 		moveOriginalPosition = transform.position;
 		moveTargetPosition = moveOriginalPosition + movement;
 
+		int myFrameCount = 0;
 		// Move player in the givent direction, with animation
 		while (elapsedTime < moveAnimationDuration)
 		{
+			myFrameCount++;
 			float animationPercent = elapsedTime / moveAnimationDuration;
 
 			// If movement is on X axis, add part of the sin() wave to move so it looks like parabola
@@ -122,35 +135,31 @@ public class PlayerController : MonoBehaviour
 		}
 
 		transform.position = moveTargetPosition;
-		
+
 		if (platform != null)
 		{
 			AudioManager.Instance.PlayPlatformSound(platform.PlatformType);
 		}
-
+		
 		// If the platform here doesnt exist, it means we have jumped off the map
-		if(platform == null)
+		if (platform == null)
 		{
-			float velocity = 0;
-			float gravity = gameSettings.PlayerGravity;
-			float worldBorderBottom = gameSettings.ScreenBorderBottom;
-
-			// First animate player down then kill him
-			while (transform.position.y > worldBorderBottom)
-			{
-				velocity += gravity;
-				transform.position += Vector3.down * velocity * Time.deltaTime;
-				yield return null;
-			}
-			PlayerDie();
+			StartCoroutine(PlayerFallToVoidCoroutine());
 			yield break;
 		}
 
 		// If the platform is empty, jump there and fall
 		if (platform.PlatformType == PlatformType.NONE)
 		{
-			platform = WorldManager.Instance.GetPlatformBelowPosition(transform.position);
+			Vector3 belowOffset = Vector3.down * SettingsReader.Instance.GameSettings.PlatformSpacingY * 0.2f;
+			platform = WorldManager.Instance.GetPlatformBelowPosition(moveTargetPosition - platformOffset * 1.2f);
 			
+			if(platform == null)
+			{
+				StartCoroutine(PlayerFallToVoidCoroutine());
+				yield break;
+			}
+
 			float velocity = 0;
 			float gravity = gameSettings.PlayerGravity;
 
@@ -174,16 +183,26 @@ public class PlayerController : MonoBehaviour
 
 		isMoving = false;
 	}
+	private IEnumerator PlayerFallToVoidCoroutine() 
+	{
+		float velocity = 0;
+		float gravity = gameSettings.PlayerGravity;
+		float worldBorderBottom = gameSettings.ScreenBorderBottom;
+
+		// First animate player down then kill him
+		while (transform.position.y > worldBorderBottom)
+		{
+			velocity += gravity;
+			transform.position += Vector3.down * velocity * Time.deltaTime;
+			yield return null;
+		}
+
+		PlayerDie();
+	}
 
 	private void SnapToClosestPlatformInRange()
 	{
 		Platform platform = WorldManager.Instance.GetPlatformWithinRange(transform.position, platformSnapRange);
-		SnapToPlatform(platform);
-	}
-
-	private void SnapToClosestPlatform()
-	{
-		Platform platform = WorldManager.Instance.GetPlatformClosestToPos(transform.position);
 		SnapToPlatform(platform);
 	}
 
@@ -197,12 +216,15 @@ public class PlayerController : MonoBehaviour
 	private void SnapToPlatform(Platform platform)
 	{
 		ItemType item = ItemManager.Instance.ItemTypeAtPlatform(platform);
+
 		if (item != ItemType.NONE)
 		{
 			playerInventory.CollectItem(platform);
 		}
 
-		transform.position = platform.transform.position + platformOffset;
+		Vector3 newPosition = platform.transform.position + platformOffset;
+		transform.position = newPosition;
+
 
 		if (platform.PlatformType == PlatformType.SPIKES)
 		{
@@ -241,6 +263,7 @@ public class PlayerController : MonoBehaviour
 		Debug.LogWarning("Player died...");
 		AudioManager.Instance.PlaySound("Lose");
 		playerDied = true;
+		//playerAnimator.SetTrigger("Die");
 		GetComponent<SpriteRenderer>().sprite = null;
 		//Destroy(gameObject);
 		OnPlayerDeath(0);

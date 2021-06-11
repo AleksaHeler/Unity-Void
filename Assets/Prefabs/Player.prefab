@@ -10,8 +10,8 @@ GameObject:
   m_Component:
   - component: {fileID: 8077238381102788559}
   - component: {fileID: 8077238381102788558}
+  - component: {fileID: 4855388654078342907}
   - component: {fileID: 8077238381102788553}
-  - component: {fileID: 8077238381102788552}
   - component: {fileID: 8077238381102788556}
   m_Layer: 0
   m_Name: Player
@@ -29,7 +29,7 @@ Transform:
   m_GameObject: {fileID: 8077238381102788555}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 1, y: 1.05, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
@@ -85,6 +85,18 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &4855388654078342907
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8077238381102788555}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b5d48a0269d95554aafd96e116b2de22, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &8077238381102788553
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -97,21 +109,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 725e580d8529e994ea414c28d5e071c0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &8077238381102788552
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8077238381102788555}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b5d48a0269d95554aafd96e116b2de22, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  platformOffset: {x: 0, y: 0.42, z: 1}
-  moveAnimationSpeed: 6
-  moveAnimationOffset: 0.3
 --- !u!114 &8077238381102788556
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -124,4 +121,3 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c198c208586d95042a0073f4fc9ad408, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  minDistanceForSwipe: 80
