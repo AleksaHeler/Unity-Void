@@ -14,4 +14,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   platformType: 0
   platformSprite: {fileID: 0}
-  platformChance: 2
+  platformChance: 5

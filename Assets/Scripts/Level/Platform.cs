@@ -28,6 +28,17 @@ public class Platform : MonoBehaviour
 		SetItemSprite(item);
 	}
 
+	public void BreakGlass()
+	{
+		if(platformType != PlatformType.GLASS)
+		{
+			return;
+		}
+
+		platformType = PlatformType.NONE;
+		SetSprite(PlatformType.NONE);
+	}
+
 	// Sets sprite component of this gameobject to given platform type
 	private void SetSprite(PlatformType type)
 	{

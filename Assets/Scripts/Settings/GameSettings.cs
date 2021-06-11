@@ -221,7 +221,7 @@ public class GameSettings : ScriptableObject
 			totalChance += platformSettings[i].PlatformChance;
 		}
 
-		float random = UnityEngine.Random.Range(0, totalChance);
+		float random = UnityEngine.Random.Range(0f, totalChance);
 
 		// Subtract possibilities one by one from the random number, and as soon as that number is less than 0 return that type
 		for (int i = 0; i < platformSettings.Length; i++)
@@ -229,7 +229,7 @@ public class GameSettings : ScriptableObject
 			random -= platformSettings[i].PlatformChance;
 			if (random <= 0)
 			{
-				return (PlatformType)i;
+				return platformSettings[i].PlatformType;
 			}
 		}
 
