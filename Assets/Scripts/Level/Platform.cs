@@ -37,6 +37,7 @@ public class Platform : MonoBehaviour
 
 		platformType = PlatformType.NONE;
 		SetSprite(PlatformType.NONE);
+		AudioManager.Instance.PlaySound("Glass Breaking");
 	}
 
 	// Sets sprite component of this gameobject to given platform type

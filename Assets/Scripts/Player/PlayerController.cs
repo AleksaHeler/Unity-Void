@@ -12,8 +12,12 @@ public enum PlayerState { NOT_MOVING, MOVING, FALLING, FALLING_TO_VOID, DIED }
 [RequireComponent(typeof(Animator))]
 public class PlayerController : MonoBehaviour
 {
+	// TODO: add player physics: add gravity and velocitiy, so position changes by that
 	#region Variables
 	private PlayerState playerState;
+	private float lastFallDistance;
+	private PlayerAction lastPlayerAction;
+	private Platform currentPlatform;
 
 	private float playerSpeed;
 	private float platformSnapRange;
@@ -27,6 +31,9 @@ public class PlayerController : MonoBehaviour
 	private PlatformHandler platformHandler;
 
 	public static event Action<int> OnPlayerDeath = delegate { };
+	public float LastFallDistance { get => lastFallDistance; }
+	public PlayerAction LastPlayerAction { get => lastPlayerAction; }
+	public Platform CurrentPlatform { get => currentPlatform; }
 	#endregion // Variables
 
 	#region Start, LateUpdate & OnDestroy
@@ -43,6 +50,8 @@ public class PlayerController : MonoBehaviour
 		playerInventory = GetComponent<PlayerInventory>();
 		playerAnimator = GetComponent<Animator>();
 
+		lastFallDistance = 0;
+		lastPlayerAction = PlayerAction.NONE;
 		platformOffset = gameSettings.PlayerToPlatformOffset;
 		platformSnapRange = gameSettings.PlayerToPlatformSnapRange;
 		playerSpeed = gameSettings.PlayerSpeed;
@@ -72,6 +81,7 @@ public class PlayerController : MonoBehaviour
 		if (playerState == PlayerState.MOVING && IsCloseToMovePoint())
 		{
 			playerState = PlayerState.NOT_MOVING;
+			AudioManager.Instance.PlayPlatformSound(currentPlatform.PlatformType);
 		}
 
 		// Update players position to match wanted position
@@ -93,7 +103,7 @@ public class PlayerController : MonoBehaviour
 
 			// Handle platform action by calling specific function from PlatformHandler class
 			// Argument passed should be height from which the player has fallen
-			platformHandler.InvokeAction(currentPlatform.PlatformType, 0);
+			platformHandler.InvokeAction(currentPlatform.PlatformType, this);
 
 			// Calls function Move() when there is input
 			HandleMoveActions();
@@ -136,12 +146,23 @@ public class PlayerController : MonoBehaviour
 		playerState = PlayerState.MOVING;
 		playerAnimator.SetTrigger("Jump");
 		SnapToClosestPlatformInRange();
+
+		if(action == PlayerAction.MOVE_DOWN)
+		{
+			lastFallDistance += Mathf.Abs(movement.y);
+		}
+		else
+		{
+			lastFallDistance = 0;
+		}
+
+		lastPlayerAction = action;
 	}
 
-	private void HandlePhysics() 
+	private void HandlePhysics()
 	{
 		// TODO: add physics here
-		transform.position = Vector3.MoveTowards(transform.position, movePoint, playerSpeed * Time.deltaTime); 
+		transform.position = Vector3.MoveTowards(transform.position, movePoint, playerSpeed * Time.deltaTime);
 	}
 	#endregion // Movement
 
@@ -184,6 +205,7 @@ public class PlayerController : MonoBehaviour
 	{
 		Vector3 newPosition = platform.transform.position + platformOffset;
 		movePoint = newPosition;
+		currentPlatform = platform;
 
 		CheckForCollectible();
 	}
