@@ -12,7 +12,7 @@ public enum PlayerState { NOT_MOVING, MOVING, STUCK_IN_SLIME, DIED }
 [RequireComponent(typeof(Animator))]
 public class PlayerController : MonoBehaviour
 {
-	// TODO: add player physics: add gravity and velocitiy, so position changes by that
+	// TODO: bug -> falling trough glass on to slime made horrible sound (trying to play something every frame maybe?)
 	#region Variables
 	private PlayerState playerState;
 	private float lastFallDistance;
