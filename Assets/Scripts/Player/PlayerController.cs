@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum PlayerState { NOT_MOVING, MOVING, FALLING, FALLING_TO_VOID, STUCK_IN_SLIME, DIED }
+public enum PlayerState { NOT_MOVING, MOVING, STUCK_IN_SLIME, DIED }
 
 // Subscribes to PlayerInput scripts event system which triggers the event on detected swipe.
 // So this script then adds a movement action to actions queue on swipe
@@ -19,6 +19,8 @@ public class PlayerController : MonoBehaviour
 	private PlayerAction lastPlayerAction;
 	private Platform currentPlatform;
 
+	private Vector3 playerVelocity;
+	private float gravity;
 	private float playerSpeed;
 	private float platformSnapRange;
 	private Vector3 platformOffset;
@@ -53,6 +55,8 @@ public class PlayerController : MonoBehaviour
 
 		lastFallDistance = 0;
 		lastPlayerAction = PlayerAction.NONE;
+		playerVelocity = Vector3.zero;
+		gravity = gameSettings.PlayerGravity;
 		platformOffset = gameSettings.PlayerToPlatformOffset;
 		platformSnapRange = gameSettings.PlayerToPlatformSnapRange;
 		playerSpeed = gameSettings.PlayerSpeed;
@@ -82,6 +86,7 @@ public class PlayerController : MonoBehaviour
 		if (playerState == PlayerState.MOVING && IsCloseToMovePoint())
 		{
 			playerState = PlayerState.NOT_MOVING;
+			// TODO: BUG: the platform sound plays even when falling
 			AudioManager.Instance.PlayPlatformSound(currentPlatform.PlatformType);
 		}
 
@@ -149,8 +154,13 @@ public class PlayerController : MonoBehaviour
 
 		playerState = PlayerState.MOVING;
 		playerAnimator.SetTrigger("Jump");
-		SnapToClosestPlatformInRange();
+		Platform snappedPlatform = SnapToClosestPlatformInRange();
+		if(snappedPlatform == null)
+		{
+			actions.PushFront(PlayerAction.MOVE_DOWN);
+		}
 
+		// TODO: bug - going down two times triggers death
 		if (action == PlayerAction.MOVE_DOWN)
 		{
 			lastFallDistance += Mathf.Abs(movement.y);
@@ -163,8 +173,28 @@ public class PlayerController : MonoBehaviour
 
 	private void HandlePhysics()
 	{
-		// TODO: add physics here
-		transform.position = Vector3.MoveTowards(transform.position, movePoint, playerSpeed * Time.deltaTime);
+		Vector3 playerToDestinationVector = movePoint - transform.position;
+		float distance = playerToDestinationVector.magnitude;
+
+		// If distance is large, dont move too fast
+		playerToDestinationVector = Vector3.ClampMagnitude(playerToDestinationVector, 1.5f);
+
+		// If player is practically there, just snap to final position (too small diff)
+		if (distance < 0.05f)
+		{
+			transform.position = movePoint;
+			return;
+		}
+
+		// If nearing the destination slow down a bit
+		if(distance < 0.6f)
+		{
+			playerToDestinationVector = playerToDestinationVector.normalized * 0.6f;
+		}
+
+		// Apply motion
+		Vector3 moveDiff = playerToDestinationVector * playerSpeed * Time.deltaTime;
+		transform.position += moveDiff;
 	}
 	#endregion // Movement
 
@@ -194,16 +224,18 @@ public class PlayerController : MonoBehaviour
 		return WorldManager.Instance.GetPlatformWithinRange(movePoint, platformSnapRange);
 	}
 
-	private void SnapToClosestPlatformInRange()
+	private Platform SnapToClosestPlatformInRange()
 	{
 		Platform platform = WorldManager.Instance.GetPlatformWithinRange(movePoint, platformSnapRange);
 
 		if (platform == null)
 		{
-			return;
+			return platform;
 		}
 
 		SnapToPlatform(platform);
+
+		return platform;
 	}
 
 	private void SnapToClosestSafePlatform()
@@ -221,6 +253,7 @@ public class PlayerController : MonoBehaviour
 
 		CheckForCollectible();
 	}
+
 
 	private bool IsCloseToMovePoint()
 	{
