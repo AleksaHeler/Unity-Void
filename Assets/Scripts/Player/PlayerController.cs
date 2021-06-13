@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum PlayerState { NOT_MOVING, MOVING, FALLING, FALLING_TO_VOID, DIED }
+public enum PlayerState { NOT_MOVING, MOVING, FALLING, FALLING_TO_VOID, STUCK_IN_SLIME, DIED }
 
 // Subscribes to PlayerInput scripts event system which triggers the event on detected swipe.
 // So this script then adds a movement action to actions queue on swipe
@@ -32,8 +32,9 @@ public class PlayerController : MonoBehaviour
 
 	public static event Action<int> OnPlayerDeath = delegate { };
 	public float LastFallDistance { get => lastFallDistance; }
-	public PlayerAction LastPlayerAction { get => lastPlayerAction; }
+	public PlayerAction LastPlayerAction { get => lastPlayerAction; set => lastPlayerAction = value; }
 	public Platform CurrentPlatform { get => currentPlatform; }
+	public PlayerState PlayerState { get => playerState; }
 	#endregion // Variables
 
 	#region Start, LateUpdate & OnDestroy
@@ -89,7 +90,7 @@ public class PlayerController : MonoBehaviour
 		HandlePhysics();
 
 		// Handle different platforms
-		if (playerState == PlayerState.NOT_MOVING)
+		if (playerState == PlayerState.NOT_MOVING || playerState == PlayerState.STUCK_IN_SLIME)
 		{
 			Platform currentPlatform = GetPlatformWithinRange(transform.position);
 
@@ -126,28 +127,31 @@ public class PlayerController : MonoBehaviour
 		{
 			PlayerAction action = actions.Pop();
 
-			if (ActionIsMove(action) && playerState == PlayerState.NOT_MOVING)
+			bool notMoving = playerState == PlayerState.NOT_MOVING || playerState == PlayerState.STUCK_IN_SLIME;
+			if (ActionIsMove(action) && notMoving)
 			{
 				Move(action);
 				return;
-			}
-
-			if (ActionIsMove(action) && playerState == PlayerState.NOT_MOVING)
-			{
-				actions.PushFront(action);
 			}
 		}
 	}
 
 	private void Move(PlayerAction action)
 	{
+		lastPlayerAction = action;
+		if (playerState == PlayerState.STUCK_IN_SLIME)
+		{
+			return;
+		}
+
 		Vector3 movement = gameSettings.MovePlayerActionToVector3(action);
 		movePoint += movement;
+
 		playerState = PlayerState.MOVING;
 		playerAnimator.SetTrigger("Jump");
 		SnapToClosestPlatformInRange();
 
-		if(action == PlayerAction.MOVE_DOWN)
+		if (action == PlayerAction.MOVE_DOWN)
 		{
 			lastFallDistance += Mathf.Abs(movement.y);
 		}
@@ -155,8 +159,6 @@ public class PlayerController : MonoBehaviour
 		{
 			lastFallDistance = 0;
 		}
-
-		lastPlayerAction = action;
 	}
 
 	private void HandlePhysics()
@@ -167,6 +169,16 @@ public class PlayerController : MonoBehaviour
 	#endregion // Movement
 
 	#region Helper functions
+	public void GetStuckInSlime()
+	{
+		lastPlayerAction = PlayerAction.NONE;
+		playerState = PlayerState.STUCK_IN_SLIME;
+	}
+	public void GetUnstuckFromSlime()
+	{
+		playerState = PlayerState.NOT_MOVING;
+		actions.PushFront(lastPlayerAction);
+	}
 	private void CheckForCollectible()
 	{
 		Platform itemCheckPlatform = WorldManager.Instance.GetPlatformWithinRange(transform.position, platformSnapRange);

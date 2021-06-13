@@ -65,12 +65,51 @@ public class PlatformHandler
 		playerController.PushFrontToActionQueue(PlayerAction.MOVE_RIGHT);
 	}
 
+	private static PlayerAction getOutOfSlimeMove = PlayerAction.NONE;
+	private static int getOutOfSlimeMoveCount = 0;
 	private void PlatformCallbackSlime(PlayerController playerController)
 	{
 		if (PlayerFellToDeath(playerController))
 		{
 			playerController.PlayerDie();
 		}
+
+		if(playerController.PlayerState != PlayerState.STUCK_IN_SLIME)
+		{
+			playerController.GetStuckInSlime();
+			return;
+		}
+
+		if(playerController.LastPlayerAction != PlayerAction.NONE)
+		{ 
+			if (getOutOfSlimeMove == PlayerAction.NONE)
+			{
+				getOutOfSlimeMove = playerController.LastPlayerAction;
+				getOutOfSlimeMoveCount = 1;
+			}
+			else
+			{
+				if(getOutOfSlimeMove == playerController.LastPlayerAction)
+				{
+					getOutOfSlimeMoveCount++;
+				}
+				else
+				{
+					getOutOfSlimeMove = playerController.LastPlayerAction;
+					getOutOfSlimeMoveCount = 1;
+				}
+
+				if(getOutOfSlimeMoveCount >= 3)
+				{
+					getOutOfSlimeMoveCount = 0;
+					getOutOfSlimeMove = PlayerAction.NONE;
+					playerController.GetUnstuckFromSlime();
+					return;
+				}
+			}
+		}
+
+		playerController.LastPlayerAction = PlayerAction.NONE;
 	}
 
 	private void PlatformCallbackGlass(PlayerController playerController)
