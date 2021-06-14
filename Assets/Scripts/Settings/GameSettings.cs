@@ -97,14 +97,22 @@ public class GameSettings : ScriptableObject
 
 	#region Predefined rows
 	private PlatformType[][] predefinedRows = new PlatformType[][] {
-		new PlatformType[]{ PlatformType.NONE, PlatformType.SLIDE_LEFT, PlatformType.SPIKES, PlatformType.SLIDE_RIGHT, PlatformType.NONE},
-		new PlatformType[]{ PlatformType.NONE, PlatformType.GLASS, PlatformType.NORMAL, PlatformType.SLIME, PlatformType.NONE},
+		new PlatformType[]{ PlatformType.NORMAL, PlatformType.SLIDE_LEFT, PlatformType.NONE, PlatformType.SLIDE_RIGHT, PlatformType.NORMAL},
+		new PlatformType[]{ PlatformType.NORMAL, PlatformType.GLASS, PlatformType.SLIME, PlatformType.GLASS, PlatformType.NORMAL},
 		new PlatformType[]{ PlatformType.NORMAL, PlatformType.NONE, PlatformType.NORMAL, PlatformType.NONE, PlatformType.NORMAL},
-		new PlatformType[]{ PlatformType.SPIKES, PlatformType.SLIDE_LEFT, PlatformType.NORMAL, PlatformType.SPIKES, PlatformType.SLIDE_LEFT},
-		new PlatformType[]{ PlatformType.GLASS, PlatformType.NONE, PlatformType.GLASS, PlatformType.NONE, PlatformType.GLASS},
-		new PlatformType[]{ PlatformType.NORMAL, PlatformType.SLIME, PlatformType.SLIME, PlatformType.GLASS, PlatformType.NORMAL},
-		new PlatformType[]{ PlatformType.SLIDE_RIGHT, PlatformType.GLASS, PlatformType.GLASS, PlatformType.GLASS, PlatformType.SLIDE_LEFT},
-		new PlatformType[]{ PlatformType.NORMAL, PlatformType.SPIKES, PlatformType.NORMAL, PlatformType.SPIKES, PlatformType.NORMAL }
+		new PlatformType[]{ PlatformType.SPIKES, PlatformType.SLIDE_RIGHT, PlatformType.NORMAL, PlatformType.SLIDE_LEFT, PlatformType.SPIKES},
+		new PlatformType[]{ PlatformType.GLASS, PlatformType.GLASS, PlatformType.GLASS, PlatformType.GLASS, PlatformType.GLASS},
+		new PlatformType[]{ PlatformType.NORMAL, PlatformType.SLIME, PlatformType.GRASS, PlatformType.SLIME, PlatformType.NORMAL},
+		new PlatformType[]{ PlatformType.SLIDE_RIGHT, PlatformType.GRASS, PlatformType.GLASS, PlatformType.GRASS, PlatformType.SLIDE_LEFT},
+		new PlatformType[]{ PlatformType.NORMAL, PlatformType.SPIKES, PlatformType.GRASS, PlatformType.SPIKES, PlatformType.NORMAL },
+		new PlatformType[]{ PlatformType.GLASS, PlatformType.SLIDE_RIGHT, PlatformType.SLIME, PlatformType.SLIDE_LEFT, PlatformType.SPIKES},
+		new PlatformType[]{ PlatformType.NONE, PlatformType.NONE, PlatformType.SLIDE_RIGHT, PlatformType.NONE, PlatformType.GRASS},
+		new PlatformType[]{ PlatformType.GRASS, PlatformType.NONE, PlatformType.GLASS, PlatformType.NONE, PlatformType.NONE},
+		new PlatformType[]{ PlatformType.SPIKES, PlatformType.NONE, PlatformType.SLIDE_LEFT, PlatformType.NONE, PlatformType.NORMAL},
+		new PlatformType[]{ PlatformType.NORMAL, PlatformType.NONE, PlatformType.NONE, PlatformType.NONE, PlatformType.GRASS},
+		new PlatformType[]{ PlatformType.GRASS, PlatformType.NONE, PlatformType.NORMAL, PlatformType.NONE, PlatformType.GRASS},
+		new PlatformType[]{ PlatformType.SLIDE_LEFT, PlatformType.GRASS, PlatformType.NORMAL, PlatformType.SLIME, PlatformType.NONE},
+		new PlatformType[]{ PlatformType.NONE, PlatformType.GLASS, PlatformType.SLIDE_RIGHT, PlatformType.NORMAL, PlatformType.SLIDE_RIGHT}
 	};
 	#endregion
 
@@ -244,7 +252,7 @@ public class GameSettings : ScriptableObject
 		return PlatformType.NONE;
 	}
 
-	public Vector3 MovePlayerActionToVector3(PlayerAction action)
+	public Vector3 PlayerActionToVector3(PlayerAction action)
 	{
 		Vector3 movement = movePlayerActionToVector3[action];
 		movement.x *= PlatformSpacingX;

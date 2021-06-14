@@ -12,15 +12,12 @@ public enum PlayerState { NOT_MOVING, MOVING, STUCK_IN_SLIME, DIED }
 [RequireComponent(typeof(Animator))]
 partial class PlayerController : MonoBehaviour
 {
-	// TODO: bug -> falling trough glass on to slime made horrible sound (trying to play something every frame maybe?)
 	#region Variables
 	private PlayerState playerState;
 	private float lastFallDistance;
 	private PlayerAction lastPlayerAction;
 	private Platform currentPlatform;
 
-	private Vector3 playerVelocity;
-	private float gravity;
 	private float playerSpeed;
 	private float platformSnapRange;
 	private Vector3 platformOffset;
@@ -51,8 +48,6 @@ partial class PlayerController : MonoBehaviour
 
 		lastFallDistance = 0;
 		lastPlayerAction = PlayerAction.NONE;
-		playerVelocity = Vector3.zero;
-		gravity = gameSettings.PlayerGravity;
 		platformOffset = gameSettings.PlayerToPlatformOffset;
 		platformSnapRange = gameSettings.PlayerToPlatformSnapRange;
 		playerSpeed = gameSettings.PlayerSpeed;
@@ -79,19 +74,23 @@ partial class PlayerController : MonoBehaviour
 			return;
 		}
 
+		if (IsBelowScreenBorder())
+		{
+			PlayerDie();
+		}
+
 		if (playerState == PlayerState.MOVING && IsCloseToMovePoint())
 		{
 			playerState = PlayerState.NOT_MOVING;
 			AudioManager.Instance.PlayPlatformSound(currentPlatform.PlatformType);
-			// TODO: BUG: the platform sound plays even when falling
 		}
 
-		// Update players position to match wanted position
+		// Update players position to match target position
 		SnapToClosestPlatformInRange();
 		HandlePhysics();
 
 		// Handle different platforms
-		if (playerState == PlayerState.NOT_MOVING || playerState == PlayerState.STUCK_IN_SLIME)
+		if (PlayerIsNotMoving())
 		{
 			Platform currentPlatform = GetPlatformWithinRange(transform.position);
 
@@ -103,33 +102,22 @@ partial class PlayerController : MonoBehaviour
 				return;
 			}
 
-			// Handle platform action by calling specific function from PlatformHandler class
-			// Argument passed should be height from which the player has fallen
 			platformHandler.InvokeAction(currentPlatform.PlatformType, this);
 
 			// Calls function Move() when there is input
 			HandleMoveActions();
 		}
-
-		if (IsBelowScreenBorder())
-		{
-			PlayerDie();
-		}
 	}
 	#endregion // Start, LateUpdate & OnDestroy
 
-	Dictionary<PlatformType, Delegate> keyValuePairs;
-
 	#region Movement
-
 	private void HandleMoveActions()
 	{
 		if (actions.ActionCount > 0)
 		{
 			PlayerAction action = actions.Pop();
 
-			bool notMoving = playerState == PlayerState.NOT_MOVING || playerState == PlayerState.STUCK_IN_SLIME;
-			if (ActionIsMove(action) && notMoving)
+			if (ActionIsMove(action) && PlayerIsNotMoving())
 			{
 				Move(action);
 				return;
@@ -140,23 +128,23 @@ partial class PlayerController : MonoBehaviour
 	private void Move(PlayerAction action)
 	{
 		lastPlayerAction = action;
+
 		if (playerState == PlayerState.STUCK_IN_SLIME)
 		{
 			return;
 		}
 
-		Vector3 movement = gameSettings.MovePlayerActionToVector3(action);
+		Vector3 movement = gameSettings.PlayerActionToVector3(action);
 		movePoint += movement;
 
 		playerState = PlayerState.MOVING;
-		//playerAnimator.SetTrigger("Jump");
 		Platform snappedPlatform = SnapToClosestPlatformInRange();
+
 		if(snappedPlatform == null)
 		{
 			actions.PushFront(PlayerAction.MOVE_DOWN);
 		}
 
-		// TODO: bug - going down two times triggers death
 		if (action == PlayerAction.MOVE_DOWN)
 		{
 			lastFallDistance += Mathf.Abs(movement.y);
@@ -251,6 +239,10 @@ partial class PlayerController : MonoBehaviour
 	}
 
 
+	private bool PlayerIsNotMoving()
+	{
+		return playerState == PlayerState.NOT_MOVING || playerState == PlayerState.STUCK_IN_SLIME;
+	}
 	private bool IsCloseToMovePoint()
 	{
 		float playerCheckTolerance = gameSettings.PlayerCheckTolerance;

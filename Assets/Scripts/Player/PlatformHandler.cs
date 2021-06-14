@@ -11,6 +11,9 @@ partial class PlayerController
 	{
 		private Dictionary<PlatformType, Action<PlayerController>> platformActions;
 
+		private PlayerAction getOutOfSlimeMove = PlayerAction.NONE;
+		private int getOutOfSlimeMoveCount = 0;
+
 		public void InvokeAction(PlatformType platformType, PlayerController playerController)
 		{
 			platformActions[platformType](playerController);
@@ -57,21 +60,23 @@ partial class PlayerController
 			playerController.PushFrontToActionQueue(PlayerAction.MOVE_RIGHT);
 		}
 
-		private static PlayerAction getOutOfSlimeMove = PlayerAction.NONE;
-		private static int getOutOfSlimeMoveCount = 0;
 		private void PlatformCallbackSlime(PlayerController playerController)
 		{
 			HandleIfPlayerFellToDeath(playerController);
 
+			// First time getting stuck in slime
 			if (playerController.playerState != PlayerState.STUCK_IN_SLIME)
 			{
 				playerController.GetStuckInSlime();
 				return;
 			}
 
+			// Trying to get out of slime
 			if (playerController.lastPlayerAction != PlayerAction.NONE)
 			{
 				AudioManager.Instance.PlayPlatformSound(playerController.currentPlatform.PlatformType);
+
+				// Setting initial get out of slime move
 				if (getOutOfSlimeMove == PlayerAction.NONE)
 				{
 					getOutOfSlimeMove = playerController.lastPlayerAction;
@@ -79,28 +84,32 @@ partial class PlayerController
 				}
 				else
 				{
-
-					if (getOutOfSlimeMove == playerController.lastPlayerAction)
-					{
-						getOutOfSlimeMoveCount++;
-					}
-					else
-					{
-						getOutOfSlimeMove = playerController.lastPlayerAction;
-						getOutOfSlimeMoveCount = 1;
-					}
-
-					if (getOutOfSlimeMoveCount >= 3)
-					{
-						getOutOfSlimeMoveCount = 0;
-						getOutOfSlimeMove = PlayerAction.NONE;
-						playerController.GetUnstuckFromSlime();
-						return;
-					}
+					HandleGettingOutOfSlime(playerController);
 				}
 			}
 
 			playerController.lastPlayerAction = PlayerAction.NONE;
+		}
+
+		private void HandleGettingOutOfSlime(PlayerController playerController)
+		{
+			// Player has to make same move 3 times to escape
+			if (getOutOfSlimeMove == playerController.lastPlayerAction)
+			{
+				getOutOfSlimeMoveCount++;
+			}
+			else
+			{
+				getOutOfSlimeMove = playerController.lastPlayerAction;
+				getOutOfSlimeMoveCount = 1;
+			}
+			// If player made the right moves
+			if (getOutOfSlimeMoveCount >= 3)
+			{
+				getOutOfSlimeMoveCount = 0;
+				getOutOfSlimeMove = PlayerAction.NONE;
+				playerController.GetUnstuckFromSlime();
+			}
 		}
 
 		private void PlatformCallbackGlass(PlayerController playerController)
@@ -122,10 +131,10 @@ partial class PlayerController
 		{
 			float platformSpacingY = SettingsReader.Instance.GameSettings.PlatformSpacingY;
 			float playerFallDistance = playerController.lastFallDistance;
+
 			// Has player fallen more than one platform spacing
 			if (playerFallDistance > platformSpacingY * 1.5f)
 			{
-				Debug.Log("Player should die");
 				playerController.PlayerDie();
 			}
 
