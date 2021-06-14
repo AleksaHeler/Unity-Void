@@ -67,9 +67,6 @@ public class GameSettings : ScriptableObject
 	[SerializeField]
 	private float percentOfRandomPlatforms = 0.1f;
 
-	[SerializeField]
-	private float chanceForBomb = 0.1f;
-
 	[Tooltip("How much spacing should be on sides of level")]
 	[SerializeField]
 	private float platformSideOffset = 4f;
@@ -191,7 +188,6 @@ public class GameSettings : ScriptableObject
 	public float GlassPlatformRegenerationTime { get => glassPlatformRegenerationTime; }
 	public float PlatformSpeed { get => platformSpeed; }
 	public float PercentOfRandomPlatforms { get => percentOfRandomPlatforms; }
-	public float ChanceForBomb { get => chanceForBomb; }
 	public float ScreenBorderTop {
 		get {
 			Vector3 topRightViewport = new Vector3(1, 1, 0);

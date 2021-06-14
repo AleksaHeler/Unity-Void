@@ -12,6 +12,8 @@ public class PlayerInventory : MonoBehaviour
 	private float platformSnapRange;
 	private GameObject bombExplosionParticles;
 
+	public bool HasBomb { get => hasBomb; }
+
 	private void Awake()
 	{
 		hasBomb = false;
@@ -47,6 +49,11 @@ public class PlayerInventory : MonoBehaviour
 
 	public void PlaceBomb()
 	{
+		if(hasBomb == false)
+		{
+			return;
+		}
+
 		hasBomb = false;
 
 		float placementRange = SettingsReader.Instance.GameSettings.PlayerToPlatformSnapRange;
