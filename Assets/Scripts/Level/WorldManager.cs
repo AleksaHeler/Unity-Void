@@ -42,6 +42,12 @@ public class WorldManager : MonoBehaviour
     #endregion // Awake & Update functions
 
     #region Get platform functions
+    // Convert given platform to NORMAL type
+    public void SetPlatformToSafe(Platform platform)
+	{
+        platform.GeneratePlatform(platform.transform.position, ItemType.NONE, platform.PlatformID, PlatformType.NORMAL);
+	}
+
     // Returns closest platform that is within the range of the given position
     public Platform GetPlatformWithinRange(Vector3 position, float range)
     {

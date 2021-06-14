@@ -38,7 +38,7 @@ MonoBehaviour:
   playerToPlatformOffset: {x: 0, y: 0.45, z: 1}
   playerToPlatformSnapRange: 1.6
   playerSpeed: 12
-  playerJumpAnimationHeight: 5
+  playerJumpAnimationHeight: 6
   moveVectorMinMagnitude: 0.6
   moveVectorMaxMagnitude: 1.5
   playerCheckTolerance: 0.05

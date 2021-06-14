@@ -54,7 +54,7 @@ partial class PlayerController : MonoBehaviour
 		platformSnapRange = gameSettings.PlayerToPlatformSnapRange;
 		playerSpeed = gameSettings.PlayerSpeed;
 
-		SnapToClosestSafePlatform();
+		SnapToStartingPosition();
 	}
 
 	private void OnDestroy()
@@ -225,9 +225,19 @@ partial class PlayerController : MonoBehaviour
 		return platform;
 	}
 
-	private void SnapToClosestSafePlatform()
+	private void SnapToStartingPosition()
 	{
-		Platform platform = WorldManager.Instance.GetSafePlatformClosestToPos(movePoint);
+		float platformSpacingX = gameSettings.PlatformSpacingX;
+		float platformSpacingY = gameSettings.PlatformSpacingY;
+		float positionX = -gameSettings.PlatformsCount / 2.0f;
+		Vector3 startingPosition = new Vector3(positionX * platformSpacingX, -platformSpacingY);
+
+		Platform platform = WorldManager.Instance.GetPlatformWithinRange(startingPosition, platformSnapRange);
+		WorldManager.Instance.SetPlatformToSafe(platform);
+
+		movePoint = startingPosition;
+		transform.position = startingPosition;
+
 		SnapToPlatform(platform);
 	}
 
