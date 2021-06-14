@@ -31,7 +31,9 @@ public class PlayerInventory : MonoBehaviour
 
 		if (itemType == ItemType.BOMB_ACTIVE)
 		{
-			//Debug.Log("Im standing on the bomb");
+			AudioManager.Instance.PlaySound("Bomb Explode");
+			FindObjectOfType<PlayerController>().PlayerDie();
+			ItemManager.Instance.PlaceItemAtPlatform(platform, ItemType.NONE);
 		}
 	}
 
@@ -47,7 +49,7 @@ public class PlayerInventory : MonoBehaviour
 
 	private IEnumerator BombPrimeCountdown(Platform platform, float duration)
 	{
-		Debug.Log("Planted bomb with timer");
+		AudioManager.Instance.PlaySound("Bomb Tick");
 		ItemManager.Instance.PlaceItemAtPlatform(platform, ItemType.BOMB_PRIMING);
 
 		float elapsedTime = 0;
@@ -57,7 +59,7 @@ public class PlayerInventory : MonoBehaviour
 			yield return null;
 		}
 
-		Debug.Log("Bomb is active");
+		AudioManager.Instance.StopSound("Bomb Tick");
 		ItemManager.Instance.PlaceItemAtPlatform(platform, ItemType.BOMB_ACTIVE);
 	}
 }

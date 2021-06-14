@@ -97,7 +97,7 @@ public class GameSettings : ScriptableObject
 
 	#region Predefined rows
 	private PlatformType[][] predefinedRows = new PlatformType[][] {
-		new PlatformType[]{ PlatformType.NORMAL, PlatformType.SLIDE_LEFT, PlatformType.NONE, PlatformType.SLIDE_RIGHT, PlatformType.NORMAL},
+		new PlatformType[]{ PlatformType.NORMAL, PlatformType.SLIDE_LEFT, PlatformType.SLIME, PlatformType.SLIDE_RIGHT, PlatformType.NORMAL},
 		new PlatformType[]{ PlatformType.NORMAL, PlatformType.GLASS, PlatformType.SLIME, PlatformType.GLASS, PlatformType.NORMAL},
 		new PlatformType[]{ PlatformType.NORMAL, PlatformType.NONE, PlatformType.NORMAL, PlatformType.NONE, PlatformType.NORMAL},
 		new PlatformType[]{ PlatformType.SPIKES, PlatformType.SLIDE_RIGHT, PlatformType.NORMAL, PlatformType.SLIDE_LEFT, PlatformType.SPIKES},
