@@ -108,4 +108,49 @@ public class AudioManager : MonoBehaviour
         string soundName = SettingsReader.Instance.GameSettings.PlatformTypeToSound[platformType];
         PlaySound(soundName);
     }
+
+    public IEnumerator FadeOut(string soundName, float duration)
+    {
+        Sound sound = FindSoundInArray(soundName);
+        if (sound == null)
+        {
+            yield break;
+        }
+
+        float startVolume = sound.source.volume;
+
+        float elapsedTime = 0;
+        while (elapsedTime < duration)
+        {
+            float percent = elapsedTime / duration;
+            sound.source.volume = startVolume * (1f - percent);
+            elapsedTime += Time.deltaTime;
+            yield return null;
+        }
+
+        StopSound(soundName);
+        sound.source.volume = startVolume;
+    }
+
+    public IEnumerator FadeIn(string soundName, float duration)
+    {
+        Sound sound = FindSoundInArray(soundName);
+        if (sound == null)
+        {
+            yield break;
+        }
+
+        float targetVolume = sound.source.volume;
+        sound.source.volume = 0f;
+        PlaySound(soundName);
+
+        float elapsedTime = 0;
+        while (elapsedTime < duration)
+        {
+            float percent = elapsedTime / duration;
+            sound.source.volume = percent * targetVolume;
+            elapsedTime += Time.deltaTime;
+            yield return null;
+        }
+    }
 }

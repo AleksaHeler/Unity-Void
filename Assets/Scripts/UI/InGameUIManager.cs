@@ -25,6 +25,8 @@ public class InGameUIManager : MonoBehaviour
     void Start()
     {
         PlayerController.OnPlayerDeath += GameOver;
+
+        StartCoroutine(AudioManager.Instance.FadeIn("Game Music", transitionAnimationDuration));
     }
 
     private void OnDestroy()
@@ -69,11 +71,9 @@ public class InGameUIManager : MonoBehaviour
     IEnumerator LoadScene(int index)
     {
         sceneTransitionAnimator.SetTrigger("End");
+        StartCoroutine(AudioManager.Instance.FadeOut("Game Music", transitionAnimationDuration));
+
         yield return new WaitForSeconds(transitionAnimationDuration);
-
-        AudioManager.Instance.StopSound("Main Menu Music");
-        AudioManager.Instance.PlaySound("Game Music");
-
         SceneManager.LoadScene(index);
     }
 

@@ -17,6 +17,8 @@ public class GameOverMenuManager : MonoBehaviour
 		List<string> demotivationalQuotes = SettingsReader.Instance.GameSettings.DemotivationalQuotes;
 		int index = Random.Range(0, demotivationalQuotes.Count);
 		demotivationalText.text = demotivationalQuotes[index];
+
+		StartCoroutine(AudioManager.Instance.FadeIn("Main Menu Music", transitionAnimationDuration));
 	}
 
 	public void MainMenu()
@@ -32,11 +34,9 @@ public class GameOverMenuManager : MonoBehaviour
 	IEnumerator LoadMainMenuScene()
 	{
 		sceneTransitionAnimator.SetTrigger("FadeOut");
+		StartCoroutine(AudioManager.Instance.FadeOut("Main Menu Music", transitionAnimationDuration));
+
 		yield return new WaitForSeconds(transitionAnimationDuration);
-
-		AudioManager.Instance.StopSound("Game Music");
-		AudioManager.Instance.PlaySound("Main Menu Music");
-
 		SceneManager.LoadScene(0);
 	}
 }

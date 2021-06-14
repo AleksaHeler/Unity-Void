@@ -12,7 +12,7 @@ public class MainMenuManager : MonoBehaviour
 
 	private void Start()
 	{
-		AudioManager.Instance.PlaySound("Main Menu Music");
+		StartCoroutine(AudioManager.Instance.FadeIn("Main Menu Music", transitionAnimationDuration));
 	}
 
 	public void Play()
@@ -28,11 +28,9 @@ public class MainMenuManager : MonoBehaviour
 	IEnumerator LoadNextScene()
 	{
 		sceneTransitionAnimator.SetTrigger("FadeOut");
+		StartCoroutine(AudioManager.Instance.FadeOut("Main Menu Music", transitionAnimationDuration));
+
 		yield return new WaitForSeconds(transitionAnimationDuration);
-
-		AudioManager.Instance.StopSound("Main Menu Music");
-		AudioManager.Instance.PlaySound("Game Music");
-
 		int currentSceneIndex = SceneManager.GetActiveScene().buildIndex; 
 		SceneManager.LoadScene(currentSceneIndex + 1);
 	}
