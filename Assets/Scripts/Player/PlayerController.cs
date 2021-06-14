@@ -10,7 +10,7 @@ public enum PlayerState { NOT_MOVING, MOVING, STUCK_IN_SLIME, DIED }
 [RequireComponent(typeof(PlayerInput))]
 [RequireComponent(typeof(PlayerInventory))]
 [RequireComponent(typeof(Animator))]
-public class PlayerController : MonoBehaviour
+partial class PlayerController : MonoBehaviour
 {
 	// TODO: bug -> falling trough glass on to slime made horrible sound (trying to play something every frame maybe?)
 	#region Variables
@@ -33,10 +33,6 @@ public class PlayerController : MonoBehaviour
 	private PlatformHandler platformHandler;
 
 	public static event Action<int> OnPlayerDeath = delegate { };
-	public float LastFallDistance { get => lastFallDistance; }
-	public PlayerAction LastPlayerAction { get => lastPlayerAction; set => lastPlayerAction = value; }
-	public Platform CurrentPlatform { get => currentPlatform; }
-	public PlayerState PlayerState { get => playerState; }
 	#endregion // Variables
 
 	#region Start, LateUpdate & OnDestroy
@@ -86,8 +82,8 @@ public class PlayerController : MonoBehaviour
 		if (playerState == PlayerState.MOVING && IsCloseToMovePoint())
 		{
 			playerState = PlayerState.NOT_MOVING;
-			// TODO: BUG: the platform sound plays even when falling
 			AudioManager.Instance.PlayPlatformSound(currentPlatform.PlatformType);
+			// TODO: BUG: the platform sound plays even when falling
 		}
 
 		// Update players position to match wanted position
@@ -153,7 +149,7 @@ public class PlayerController : MonoBehaviour
 		movePoint += movement;
 
 		playerState = PlayerState.MOVING;
-		playerAnimator.SetTrigger("Jump");
+		//playerAnimator.SetTrigger("Jump");
 		Platform snappedPlatform = SnapToClosestPlatformInRange();
 		if(snappedPlatform == null)
 		{
