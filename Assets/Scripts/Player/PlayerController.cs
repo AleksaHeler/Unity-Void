@@ -3,13 +3,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+// TODO: move to game settings
 public enum PlayerState { NOT_MOVING, MOVING, STUCK_IN_SLIME, DIED }
 
 // Subscribes to PlayerInput scripts event system which triggers the event on detected swipe.
 // So this script then adds a movement action to actions queue on swipe
 [RequireComponent(typeof(PlayerInput))]
 [RequireComponent(typeof(PlayerInventory))]
-[RequireComponent(typeof(Animator))]
 partial class PlayerController : MonoBehaviour
 {
 	#region Variables
@@ -117,15 +117,17 @@ partial class PlayerController : MonoBehaviour
 	#region Movement
 	private void HandleMoveActions()
 	{
-		if (actions.ActionCount > 0)
+		if(actions.ActionCount == 0)
 		{
-			PlayerAction action = actions.Pop();
+			return;
+		}
 
-			if (ActionIsMove(action) && PlayerIsNotMoving())
-			{
-				Move(action);
-				return;
-			}
+		PlayerAction action = actions.Pop();
+
+
+		if (ActionIsMove(action) && PlayerIsNotMoving())
+		{
+			Move(action);
 		}
 	}
 
@@ -164,27 +166,19 @@ partial class PlayerController : MonoBehaviour
 	private void HandlePhysics()
 	{
 		Vector3 playerToDestinationVector = movePoint - transform.position;
-		float distance = playerToDestinationVector.magnitude;
 
-		// If distance is large, dont move too fast
-		playerToDestinationVector = Vector3.ClampMagnitude(playerToDestinationVector, moveVectorMaxMagnitude);
-
-		// If player is practically there, just snap to final position (too small diff)
-		if (distance < 0.05f)
+		// If move is on X axis (left/right)
+		Vector3 sineOffset = Vector3.zero;
+		if (playerToDestinationVector.x != 0)
 		{
-			transform.position = movePoint;
-			return;
+			float leftoverMoveDistance = playerToDestinationVector.x;
+			float totalMoveDistance = gameSettings.PlatformSpacingX;
+			float animationPercent = Mathf.Abs(leftoverMoveDistance / totalMoveDistance);
+			float sine = Mathf.Sin(animationPercent * Mathf.PI) * gameSettings.PlayerJumpAnimationHeight;
+			sineOffset = Vector3.up * sine * Time.deltaTime;
 		}
 
-		// If nearing the destination, dont slow too much
-		if (distance < moveVectorMinMagnitude)
-		{
-			playerToDestinationVector = playerToDestinationVector.normalized * moveVectorMinMagnitude;
-		}
-
-		// Apply motion
-		Vector3 moveDiff = playerToDestinationVector * playerSpeed * Time.deltaTime;
-		transform.position += moveDiff;
+		transform.position = Vector3.MoveTowards(transform.position, movePoint, playerSpeed * Time.deltaTime) + sineOffset;
 	}
 	#endregion // Movement
 
@@ -203,7 +197,7 @@ partial class PlayerController : MonoBehaviour
 	private void CheckForCollectible()
 	{
 		Platform itemCheckPlatform = WorldManager.Instance.GetPlatformWithinRange(transform.position, platformSnapRange);
-		ItemType item = ItemManager.Instance.ItemTypeAtPlatform(itemCheckPlatform);
+		ItemType item = ItemManager.Instance.GetItemTypeAtPlatform(itemCheckPlatform);
 		if (item != ItemType.NONE)
 		{
 			playerInventory.CollectItem(itemCheckPlatform);

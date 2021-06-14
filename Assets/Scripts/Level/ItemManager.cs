@@ -68,7 +68,7 @@ public class ItemManager : MonoBehaviour
 		platform.SetItemSprite(item);
 	}
 
-	public ItemType ItemTypeAtPlatform(Platform platform)
+	public ItemType GetItemTypeAtPlatform(Platform platform)
 	{
 		if(platform == null)
 		{

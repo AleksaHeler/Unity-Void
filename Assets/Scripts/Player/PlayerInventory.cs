@@ -2,13 +2,16 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+[RequireComponent(typeof(PlayerController))]
 public class PlayerInventory : MonoBehaviour
 {
     private bool hasBomb;
+	private PlayerController playerController;
 
 	private void Awake()
 	{
 		hasBomb = false;
+		playerController = GetComponentInChildren<PlayerController>();
 	}
 
 	private void Update()
@@ -21,7 +24,7 @@ public class PlayerInventory : MonoBehaviour
 
 	public void CollectItem(Platform platform)
 	{
-        ItemType itemType = ItemManager.Instance.ItemTypeAtPlatform(platform);
+        ItemType itemType = ItemManager.Instance.GetItemTypeAtPlatform(platform);
 
 		if (itemType == ItemType.BOMB_COLLECTIBLE && hasBomb == false)
 		{
@@ -32,7 +35,7 @@ public class PlayerInventory : MonoBehaviour
 		if (itemType == ItemType.BOMB_ACTIVE)
 		{
 			AudioManager.Instance.PlaySound("Bomb Explode");
-			FindObjectOfType<PlayerController>().PlayerDie();
+			playerController.PlayerDie();
 			ItemManager.Instance.RemoveItemAtPlatform(platform);
 		}
 	}

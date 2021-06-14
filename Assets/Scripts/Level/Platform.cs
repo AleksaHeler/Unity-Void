@@ -6,6 +6,7 @@ using UnityEngine;
 // The object has a SpriteRenderer component where platform image is set
 public class Platform : MonoBehaviour
 {
+	// TODO: maybe abstract class Platform? -> for breaking glass
 	[SerializeField]
 	private SpriteRenderer itemSpriteRenderer;
 	private ItemType platformItem;

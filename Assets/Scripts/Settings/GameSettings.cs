@@ -78,6 +78,9 @@ public class GameSettings : ScriptableObject
 	private float playerSpeed;
 
 	[SerializeField]
+	private float playerJumpAnimationHeight;
+
+	[SerializeField]
 	private float moveVectorMinMagnitude;
 
 	[SerializeField]
@@ -181,6 +184,7 @@ public class GameSettings : ScriptableObject
 	public float PlayerToPlatformSnapRange { get => playerToPlatformSnapRange; }
 	public Vector3 PlayerToPlatformOffset { get => playerToPlatformOffset;  }
 	public float PlayerSpeed { get => playerSpeed; }
+	public float PlayerJumpAnimationHeight { get => playerJumpAnimationHeight; }
 	public float MoveVectorMinMagnitude { get => moveVectorMinMagnitude; }
 	public float MoveVectorMaxMagnitude { get => moveVectorMaxMagnitude; }
 	public float PlayerCheckTolerance { get => playerCheckTolerance; }
