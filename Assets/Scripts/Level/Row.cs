@@ -129,7 +129,7 @@ public class Row : MonoBehaviour
 				platformsInRow++;
 			}
 
-			platform.GeneratePlatform(platformPosition, ItemType.NONE, i, platformType);
+			platform.GeneratePlatform(platformPosition, i, platformType);
 			i++;
 		}
 
@@ -139,7 +139,7 @@ public class Row : MonoBehaviour
 			int platformIndex = numberOfPlatforms / 2;
 			float xPosition = (platformIndex - numberOfPlatforms / 2) * platformSpacing;
 			Vector2 platformPosition = new Vector2(xPosition, yPosition);
-			platforms[platformIndex].GeneratePlatform(platformPosition, ItemType.NONE, platformIndex, PlatformType.NORMAL);
+			platforms[platformIndex].GeneratePlatform(platformPosition, platformIndex, PlatformType.NORMAL);
 		}
 
 		ItemManager.Instance.GenerateItemArrayForRow(platforms);

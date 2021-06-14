@@ -9,24 +9,20 @@ public class Platform : MonoBehaviour
 	// TODO: maybe abstract class Platform? -> for breaking glass
 	[SerializeField]
 	private SpriteRenderer itemSpriteRenderer;
-	private ItemType platformItem;
 	private PlatformType platformType;
 	private int platformId;
 
 	public PlatformType PlatformType { get => platformType; }
-	public ItemType PlatformItem { get => platformItem; }
 	public int PlatformID { get => platformId; }
 
 	// Generates a platform with given type at position with item on it
-	public void GeneratePlatform(Vector2 position, ItemType item, int id, PlatformType type)
+	public void GeneratePlatform(Vector2 position, int id, PlatformType type)
 	{
 		this.platformType = type;
-		this.platformItem = item;
 		platformId = id;
 		transform.position = position;
 
 		SetSprite(type);
-		SetItemSprite(item);
 	}
 
 	public void BreakGlass()
@@ -36,9 +32,7 @@ public class Platform : MonoBehaviour
 			return;
 		}
 
-		platformType = PlatformType.NONE;
-		SetSprite(PlatformType.NONE);
-		AudioManager.Instance.PlaySound("Glass Breaking");
+		StartCoroutine(GlassBreakCoroutine());
 	}
 
 	// Sets sprite component of this gameobject to given platform type
@@ -57,5 +51,23 @@ public class Platform : MonoBehaviour
 	public void SetItemSprite(Sprite sprite)
 	{
 		itemSpriteRenderer.sprite = sprite;
+	}
+
+	IEnumerator GlassBreakCoroutine()
+	{
+		platformType = PlatformType.NONE;
+		SetSprite(platformType);
+		AudioManager.Instance.PlaySound("Glass Breaking");
+
+		float elapsedTime = 0;
+		float duration = SettingsReader.Instance.GameSettings.GlassPlatformRegenerationTime;
+		while(elapsedTime < duration)
+		{
+			elapsedTime += Time.deltaTime;
+			yield return null;
+		}
+
+		platformType = PlatformType.GLASS;
+		SetSprite(platformType);
 	}
 }

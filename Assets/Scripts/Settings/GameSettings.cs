@@ -49,6 +49,9 @@ public class GameSettings : ScriptableObject
 	private float platformHeight = 1f;
 
 	[SerializeField]
+	private float glassPlatformRegenerationTime = 3f;
+
+	[SerializeField]
 	private List<PlatformType> unsafePlatforms;
 
 	[Header("Level settings")]
@@ -169,6 +172,7 @@ public class GameSettings : ScriptableObject
 	public GameObject PlatformPrefab { get => platformPrefab; }
 	public float PlatformWidth { get => platformWidth; }
 	public float PlatformHeight { get => platformHeight; }
+	public float GlassPlatformRegenerationTime { get => glassPlatformRegenerationTime; }
 	public float PlatformSpeed { get => platformSpeed; }
 	public float PercentOfRandomPlatforms { get => percentOfRandomPlatforms; }
 	public float ChanceForBomb { get => chanceForBomb; }

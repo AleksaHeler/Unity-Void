@@ -45,7 +45,7 @@ public class WorldManager : MonoBehaviour
     // Convert given platform to NORMAL type
     public void SetPlatformToSafe(Platform platform)
 	{
-        platform.GeneratePlatform(platform.transform.position, ItemType.NONE, platform.PlatformID, PlatformType.NORMAL);
+        platform.GeneratePlatform(platform.transform.position, platform.PlatformID, PlatformType.NORMAL);
 	}
 
     // Returns closest platform that is within the range of the given position

@@ -7,11 +7,19 @@ public class PlayerInventory : MonoBehaviour
 {
     private bool hasBomb;
 	private PlayerController playerController;
+	private float platformSpacingX;
+	private float platformSpacingY;
+	private float platformSnapRange;
 
 	private void Awake()
 	{
 		hasBomb = false;
 		playerController = GetComponentInChildren<PlayerController>();
+
+		GameSettings gameSettings = SettingsReader.Instance.GameSettings;
+		platformSpacingX = gameSettings.PlatformSpacingX;
+		platformSpacingY = gameSettings.PlatformSpacingY;
+		platformSnapRange = gameSettings.PlayerToPlatformSnapRange;
 	}
 
 	private void Update()
@@ -20,6 +28,8 @@ public class PlayerInventory : MonoBehaviour
 		{
 			PlaceBomb();
 		}
+
+		CheckIfBombIsInRange();
 	}
 
 	public void CollectItem(Platform platform)
@@ -29,13 +39,6 @@ public class PlayerInventory : MonoBehaviour
 		if (itemType == ItemType.BOMB_COLLECTIBLE && hasBomb == false)
 		{
 			hasBomb = true;
-			ItemManager.Instance.RemoveItemAtPlatform(platform);
-		}
-
-		if (itemType == ItemType.BOMB_ACTIVE)
-		{
-			AudioManager.Instance.PlaySound("Bomb Explode");
-			playerController.PlayerDie();
 			ItemManager.Instance.RemoveItemAtPlatform(platform);
 		}
 	}
@@ -65,5 +68,33 @@ public class PlayerInventory : MonoBehaviour
 
 		AudioManager.Instance.StopSound("Bomb Tick");
 		ItemManager.Instance.PlaceItemAtPlatform(platform, ItemType.BOMB_ACTIVE);
+	}
+
+	private void CheckIfBombIsInRange()
+	{
+		// All positions to check
+		Vector3[] offsets = { Vector3.up, Vector3.down, Vector3.left, Vector3.right };
+		
+		foreach(Vector3 offset in offsets)
+		{
+			bool xAxis = offset.x != 0;
+			float spacing = xAxis ? platformSpacingX : platformSpacingY;
+
+			Vector3 position = transform.position + offset * spacing;
+			Platform platform = WorldManager.Instance.GetPlatformWithinRange(position, platformSnapRange);
+
+			if(platform == null)
+			{
+				continue;
+			}
+
+			ItemType item = ItemManager.Instance.GetItemTypeAtPlatform(platform);
+			if (item == ItemType.BOMB_ACTIVE)
+			{
+				AudioManager.Instance.PlaySound("Bomb Explode");
+				ItemManager.Instance.RemoveItemAtPlatform(platform);
+				playerController.PlayerDie();
+			}
+		}
 	}
 }
