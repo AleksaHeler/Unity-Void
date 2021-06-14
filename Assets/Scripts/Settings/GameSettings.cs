@@ -29,8 +29,9 @@ public class GameSettings : ScriptableObject
 	[SerializeField]
 	private int height = 6;
 
-	[Header("Platform settings")]
 
+
+	[Header("Platform settings")]
 	[SerializeField]
 	private GameObject platformPrefab;
 
@@ -54,6 +55,8 @@ public class GameSettings : ScriptableObject
 	[SerializeField]
 	private List<PlatformType> unsafePlatforms;
 
+
+
 	[Header("Level settings")]
 
 	[Tooltip("How fast should platforms move down")]
@@ -70,6 +73,8 @@ public class GameSettings : ScriptableObject
 	[Tooltip("How much spacing should be on sides of level")]
 	[SerializeField]
 	private float platformSideOffset = 4f;
+
+
 
 	[Header("Player settings")]
 	[SerializeField]
@@ -101,6 +106,17 @@ public class GameSettings : ScriptableObject
 
 	[SerializeField]
 	private float bombPrimingTime;
+
+	[SerializeField]
+	private GameObject playerDeathParticles; 
+
+	[SerializeField]
+	private GameObject bombExplosionParticles;
+
+	[Header("Misc settings")]
+
+	[SerializeField]
+	private List<string> demotivationalQuotes = new List<string>();
 
 	#endregion
 
@@ -196,6 +212,8 @@ public class GameSettings : ScriptableObject
 	public float MoveAnimationCurveOffset { get => moveAnimationCurveOffset; }
 	public int MinDistanceToSwipe { get => minDistanceToSwipe; }
 	public float BombPrimingTime { get => bombPrimingTime; }
+	public GameObject BombExplosionParticles { get => bombExplosionParticles; }
+	public GameObject PlayerDeathParticles { get => playerDeathParticles; }
 	public PlatformType[][] PredefinedRows { get => predefinedRows; }
 	public Dictionary<PlatformType, string> PlatformTypeToSound { get => platformTypeToSound; }
 	public Dictionary<SwipeDirection, PlayerAction> SwipeDirectionToPlayerAction { get => swipeDirectionToPlayerAction; }
@@ -203,6 +221,7 @@ public class GameSettings : ScriptableObject
 	public PlatformSettings[] PlatformSettings { get => platformSettings; }
 	public ItemSettings[] ItemSettings { get => itemSettings; }
 	public List<PlatformType> UnsafePlatforms { get => unsafePlatforms; }
+	public List<string> DemotivationalQuotes { get => demotivationalQuotes; }
 	#endregion
 
 

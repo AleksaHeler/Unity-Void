@@ -100,7 +100,7 @@ MonoBehaviour:
     source: {fileID: 0}
   - name: Lose
     Clip: {fileID: 8300000, guid: ff7abf1966898004d9d5c8c82a4f978c, type: 3}
-    Volume: 0.6
+    Volume: 0.35
     Pitch: 1
     Loop: 0
     source: {fileID: 0}
@@ -118,7 +118,7 @@ MonoBehaviour:
     source: {fileID: 0}
   - name: Bomb Tick
     Clip: {fileID: 8300000, guid: d64abbf6139ae4f48bfe8ac22de0b24d, type: 3}
-    Volume: 1
+    Volume: 0.8
     Pitch: 1
     Loop: 1
     source: {fileID: 0}

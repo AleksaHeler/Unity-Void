@@ -10,6 +10,7 @@ public class PlayerInventory : MonoBehaviour
 	private float platformSpacingX;
 	private float platformSpacingY;
 	private float platformSnapRange;
+	private GameObject bombExplosionParticles;
 
 	private void Awake()
 	{
@@ -20,6 +21,7 @@ public class PlayerInventory : MonoBehaviour
 		platformSpacingX = gameSettings.PlatformSpacingX;
 		platformSpacingY = gameSettings.PlatformSpacingY;
 		platformSnapRange = gameSettings.PlayerToPlatformSnapRange;
+		bombExplosionParticles = gameSettings.BombExplosionParticles;
 	}
 
 	private void Update()
@@ -80,8 +82,8 @@ public class PlayerInventory : MonoBehaviour
 			bool xAxis = offset.x != 0;
 			float spacing = xAxis ? platformSpacingX : platformSpacingY;
 
-			Vector3 position = transform.position + offset * spacing;
-			Platform platform = WorldManager.Instance.GetPlatformWithinRange(position, platformSnapRange);
+			Vector3 platformPosition = transform.position + offset * spacing;
+			Platform platform = WorldManager.Instance.GetPlatformWithinRange(platformPosition, platformSnapRange);
 
 			if(platform == null)
 			{
@@ -93,6 +95,7 @@ public class PlayerInventory : MonoBehaviour
 			{
 				AudioManager.Instance.PlaySound("Bomb Explode");
 				ItemManager.Instance.RemoveItemAtPlatform(platform);
+				Instantiate(bombExplosionParticles, platformPosition, Quaternion.identity);
 				playerController.PlayerDie();
 			}
 		}

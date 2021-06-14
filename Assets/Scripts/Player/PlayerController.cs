@@ -288,6 +288,7 @@ partial class PlayerController : MonoBehaviour
 		playerState = PlayerState.DIED;
 		//playerAnimator.SetTrigger("Die");
 		GetComponent<SpriteRenderer>().sprite = null;
+		Instantiate(gameSettings.PlayerDeathParticles, transform.position, Quaternion.identity);
 		//Destroy(gameObject);
 		OnPlayerDeath(0);
 	}

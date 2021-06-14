@@ -30,6 +30,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: cfab81d631bc02d4bba333b7c1ba9b45, type: 2}
   platformWidth: 1.5
   platformHeight: 2
+  glassPlatformRegenerationTime: 3
   unsafePlatforms: 0000000007000000060000000400000005000000
   platformSpeed: 0.3
   percentOfRandomPlatforms: 0
@@ -45,3 +46,16 @@ MonoBehaviour:
   moveAnimationCurveOffset: 0.3
   minDistanceToSwipe: 50
   bombPrimingTime: 3
+  playerDeathParticles: {fileID: 8148911177897350824, guid: beaceac1990654c4aa40e55aaab2b493, type: 3}
+  bombExplosionParticles: {fileID: 6492633587015454445, guid: f2c8e7a6ed8964d4fa634f3017d91938, type: 3}
+  demotivationalQuotes:
+  - If you hate yourself remember you are not alone. A lot of people hate you too.
+  - If the life doesn't break you today, don't worry. It will try again tomorrow.
+  - Everybody sucks at something.
+  - Those who doubt your ability probably have a valid reason.
+  - It's never too late to fail.
+  - Trying is the first step toward failure.
+  - Not everything is a lesson. Sometimes you just fail.
+  - It could be that your purpose in life is to serve as a warning to others.
+  - The light at the end of the tunnel has been turned off due to budget cuts.
+  - Hope is the first step on the road to disappointment.
