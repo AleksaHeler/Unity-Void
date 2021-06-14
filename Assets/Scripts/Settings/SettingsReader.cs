@@ -15,6 +15,7 @@ public class SettingsReader : MonoBehaviour
 	private GameSettings gameSettings;
 	public GameSettings GameSettings { get => gameSettings; }
 
+
 	private void Awake()
 	{
 		instance = this;

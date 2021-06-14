@@ -18,11 +18,12 @@ partial class PlayerController : MonoBehaviour
 	private PlayerAction lastPlayerAction;
 	private Platform currentPlatform;
 
+	private float moveVectorMaxMagnitude;
+	private float moveVectorMinMagnitude;
 	private float playerSpeed;
 	private float platformSnapRange;
 	private Vector3 platformOffset;
 	private Vector3 movePoint;
-	private Animator playerAnimator;
 
 	private PlayerActionQueue actions;
 	private GameSettings gameSettings;
@@ -44,10 +45,13 @@ partial class PlayerController : MonoBehaviour
 
 		gameSettings = SettingsReader.Instance.GameSettings;
 		playerInventory = GetComponent<PlayerInventory>();
-		playerAnimator = GetComponent<Animator>();
 
 		lastFallDistance = 0;
 		lastPlayerAction = PlayerAction.NONE;
+
+
+		moveVectorMinMagnitude = gameSettings.MoveVectorMinMagnitude;
+		moveVectorMaxMagnitude = gameSettings.MoveVectorMaxMagnitude;
 		platformOffset = gameSettings.PlayerToPlatformOffset;
 		platformSnapRange = gameSettings.PlayerToPlatformSnapRange;
 		playerSpeed = gameSettings.PlayerSpeed;
@@ -140,7 +144,7 @@ partial class PlayerController : MonoBehaviour
 		playerState = PlayerState.MOVING;
 		Platform snappedPlatform = SnapToClosestPlatformInRange();
 
-		if(snappedPlatform == null)
+		if (snappedPlatform == null)
 		{
 			actions.PushFront(PlayerAction.MOVE_DOWN);
 		}
@@ -155,13 +159,15 @@ partial class PlayerController : MonoBehaviour
 		}
 	}
 
+	// Calculates difference player has to move to get to 'movePoint'
+	// and clamps the vector to some min and max values and sums that vector and position
 	private void HandlePhysics()
 	{
 		Vector3 playerToDestinationVector = movePoint - transform.position;
 		float distance = playerToDestinationVector.magnitude;
 
 		// If distance is large, dont move too fast
-		playerToDestinationVector = Vector3.ClampMagnitude(playerToDestinationVector, 1.5f);
+		playerToDestinationVector = Vector3.ClampMagnitude(playerToDestinationVector, moveVectorMaxMagnitude);
 
 		// If player is practically there, just snap to final position (too small diff)
 		if (distance < 0.05f)
@@ -170,10 +176,10 @@ partial class PlayerController : MonoBehaviour
 			return;
 		}
 
-		// If nearing the destination slow down a bit
-		if(distance < 0.6f)
+		// If nearing the destination, dont slow too much
+		if (distance < moveVectorMinMagnitude)
 		{
-			playerToDestinationVector = playerToDestinationVector.normalized * 0.6f;
+			playerToDestinationVector = playerToDestinationVector.normalized * moveVectorMinMagnitude;
 		}
 
 		// Apply motion
@@ -188,6 +194,7 @@ partial class PlayerController : MonoBehaviour
 		lastPlayerAction = PlayerAction.NONE;
 		playerState = PlayerState.STUCK_IN_SLIME;
 	}
+
 	public void GetUnstuckFromSlime()
 	{
 		playerState = PlayerState.NOT_MOVING;

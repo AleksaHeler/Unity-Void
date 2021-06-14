@@ -30,7 +30,7 @@ public class Platform : MonoBehaviour
 
 	public void BreakGlass()
 	{
-		if(platformType != PlatformType.GLASS)
+		if (platformType != PlatformType.GLASS)
 		{
 			return;
 		}

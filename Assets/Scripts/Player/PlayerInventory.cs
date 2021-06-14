@@ -33,11 +33,11 @@ public class PlayerInventory : MonoBehaviour
 		{
 			AudioManager.Instance.PlaySound("Bomb Explode");
 			FindObjectOfType<PlayerController>().PlayerDie();
-			ItemManager.Instance.PlaceItemAtPlatform(platform, ItemType.NONE);
+			ItemManager.Instance.RemoveItemAtPlatform(platform);
 		}
 	}
 
-	private void PlaceBomb()
+	public void PlaceBomb()
 	{
 		hasBomb = false;
 
@@ -52,6 +52,7 @@ public class PlayerInventory : MonoBehaviour
 		AudioManager.Instance.PlaySound("Bomb Tick");
 		ItemManager.Instance.PlaceItemAtPlatform(platform, ItemType.BOMB_PRIMING);
 
+		// Wait for given amount of time
 		float elapsedTime = 0;
 		while (elapsedTime < duration)
 		{

@@ -75,10 +75,13 @@ public class GameSettings : ScriptableObject
 	private float playerToPlatformSnapRange;
 
 	[SerializeField]
-	private float playerGravity;
+	private float playerSpeed;
 
 	[SerializeField]
-	private float playerSpeed;
+	private float moveVectorMinMagnitude;
+
+	[SerializeField]
+	private float moveVectorMaxMagnitude;
 
 	[SerializeField]
 	private float playerCheckTolerance;
@@ -177,8 +180,9 @@ public class GameSettings : ScriptableObject
 	public float PlatformSpacingX { get { return ((Camera.main.ViewportToWorldPoint(new Vector3(1, 1, 0)).x - platformSideOffset) * 2f) / width; } }
 	public float PlayerToPlatformSnapRange { get => playerToPlatformSnapRange; }
 	public Vector3 PlayerToPlatformOffset { get => playerToPlatformOffset;  }
-	public float PlayerGravity { get => playerGravity; }
 	public float PlayerSpeed { get => playerSpeed; }
+	public float MoveVectorMinMagnitude { get => moveVectorMinMagnitude; }
+	public float MoveVectorMaxMagnitude { get => moveVectorMaxMagnitude; }
 	public float PlayerCheckTolerance { get => playerCheckTolerance; }
 	public float MoveAnimationCurveOffset { get => moveAnimationCurveOffset; }
 	public int MinDistanceToSwipe { get => minDistanceToSwipe; }

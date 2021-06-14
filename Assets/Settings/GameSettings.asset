@@ -30,15 +30,16 @@ MonoBehaviour:
   - {fileID: 11400000, guid: cfab81d631bc02d4bba333b7c1ba9b45, type: 2}
   platformWidth: 1.5
   platformHeight: 2
-  unsafePlatforms: 0000000007000000
+  unsafePlatforms: 0000000007000000060000000400000005000000
   platformSpeed: 0.3
   percentOfRandomPlatforms: 0
   chanceForBomb: 0.02
   platformSideOffset: 2
   playerToPlatformOffset: {x: 0, y: 0.45, z: 1}
   playerToPlatformSnapRange: 1.6
-  playerGravity: 0.2
   playerSpeed: 10
+  moveVectorMinMagnitude: 0.6
+  moveVectorMaxMagnitude: 1.5
   playerCheckTolerance: 0.05
   moveAnimationCurveOffset: 0.3
   minDistanceToSwipe: 50
