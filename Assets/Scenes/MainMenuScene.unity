@@ -514,7 +514,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   sceneTransitionAnimator: {fileID: 393102979}
-  transitionAnimationDuration: 1
+  transitionAnimationDuration: 0.5
 --- !u!1 &498154605
 GameObject:
   m_ObjectHideFlags: 0

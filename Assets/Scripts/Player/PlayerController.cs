@@ -3,8 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-// TODO: move to game settings
-public enum PlayerState { NOT_MOVING, MOVING, STUCK_IN_SLIME, DIED }
 
 // Subscribes to PlayerInput scripts event system which triggers the event on detected swipe.
 // So this script then adds a movement action to actions queue on swipe
@@ -86,7 +84,10 @@ partial class PlayerController : MonoBehaviour
 		if (playerState == PlayerState.MOVING && IsCloseToMovePoint())
 		{
 			playerState = PlayerState.NOT_MOVING;
-			AudioManager.Instance.PlayPlatformSound(currentPlatform.PlatformType);
+			if(currentPlatform != null)
+			{
+				AudioManager.Instance.PlayPlatformSound(currentPlatform.PlatformType);
+			}
 		}
 
 		// Update players position to match target position
@@ -149,6 +150,7 @@ partial class PlayerController : MonoBehaviour
 		if (snappedPlatform == null)
 		{
 			actions.PushFront(PlayerAction.MOVE_DOWN);
+			currentPlatform = null;
 		}
 
 		if (action == PlayerAction.MOVE_DOWN)

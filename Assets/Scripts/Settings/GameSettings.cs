@@ -13,6 +13,7 @@ public enum PlayerAction { NONE, MOVE_UP, MOVE_DOWN, MOVE_LEFT, MOVE_RIGHT }
 
 public enum SwipeDirection { UP, DOWN, LEFT, RIGHT }
 
+public enum PlayerState { NOT_MOVING, MOVING, STUCK_IN_SLIME, DIED }
 #endregion
 
 
