@@ -1,4 +1,5 @@
 using System;
+using Photon.Pun;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -27,6 +28,7 @@ partial class PlayerController : MonoBehaviour
 	private GameSettings gameSettings;
 	private PlayerInventory playerInventory;
 	private PlatformHandler platformHandler;
+	private PhotonView photonView;
 
 	public static event Action<int> OnPlayerDeath = delegate { };
 	#endregion // Variables
@@ -43,6 +45,7 @@ partial class PlayerController : MonoBehaviour
 
 		gameSettings = SettingsReader.Instance.GameSettings;
 		playerInventory = GetComponent<PlayerInventory>();
+		photonView = GetComponent<PhotonView>();
 
 		lastFallDistance = 0;
 		lastPlayerAction = PlayerAction.NONE;

@@ -51,7 +51,7 @@ public class PhotonRoom : MonoBehaviourPunCallbacks, IInRoomCallbacks
         readyToCount = false;
         readyToStart = false;
         lessThanMaxPlayers = startingTime;
-        atMaxPlayers = 6;
+        atMaxPlayers = 3;
         timeToStart = startingTime;
     }
 
@@ -182,7 +182,7 @@ public class PhotonRoom : MonoBehaviourPunCallbacks, IInRoomCallbacks
 	{
         lessThanMaxPlayers = startingTime;
         timeToStart = startingTime;
-        atMaxPlayers = 6;
+        atMaxPlayers = 3;
         readyToCount = false;
         readyToStart = false;
 	}
@@ -194,14 +194,14 @@ public class PhotonRoom : MonoBehaviourPunCallbacks, IInRoomCallbacks
 
         // Make sure not to create duplicate players
         if(playersInGame == PhotonNetwork.PlayerList.Length)
-		{
+        {
             photonView.RPC("RPC_CreatePlayer", RpcTarget.All);
-		}
+        }
 	}
 
     [PunRPC]
     private void RPC_CreatePlayer()
-	{
+    {
         PhotonNetwork.Instantiate(Path.Combine("PhotonPrefabs", "PhotonNetworkPlayer"), transform.position, Quaternion.identity, 0);
-	}
+    }
 }
