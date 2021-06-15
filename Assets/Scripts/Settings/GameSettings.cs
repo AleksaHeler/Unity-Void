@@ -7,13 +7,6 @@ using UnityEngine;
 #region Global defines
 public enum ItemType { NONE, BOMB_COLLECTIBLE, BOMB_PRIMING, BOMB_ACTIVE }
 
-public enum PlatformType { NONE, GLASS, GRASS, NORMAL, SLIDE_LEFT, SLIDE_RIGHT, SLIME, SPIKES }
-
-public enum PlayerAction { NONE, MOVE_UP, MOVE_DOWN, MOVE_LEFT, MOVE_RIGHT }
-
-public enum SwipeDirection { UP, DOWN, LEFT, RIGHT }
-
-public enum PlayerState { NOT_MOVING, MOVING, STUCK_IN_SLIME, DIED }
 #endregion
 
 
@@ -29,7 +22,9 @@ public class GameSettings : ScriptableObject
 	[SerializeField]
 	private int height = 6;
 
-
+	[SerializeField]
+	private float platformSpacingX = 2;
+	private float platformSpacingY = 2;
 
 	[Header("Platform settings")]
 	[SerializeField]
@@ -66,10 +61,6 @@ public class GameSettings : ScriptableObject
 	[Tooltip("How many platforms sould be random vs predetermined")]
 	[SerializeField]
 	private float percentOfRandomPlatforms = 0.1f;
-
-	[Tooltip("How much spacing should be on sides of level")]
-	[SerializeField]
-	private float platformSideOffset = 4f;
 
 
 
@@ -180,8 +171,8 @@ public class GameSettings : ScriptableObject
 
 
 	#region Access modifiers (getters)
-	public int PlatformsCount { get => width; }
-	public int RowsCount { get => height; }
+	public int Width { get => width; }
+	public int Height { get => height; }
 	public GameObject PlatformPrefab { get => platformPrefab; }
 	public float PlatformWidth { get => platformWidth; }
 	public float PlatformHeight { get => platformHeight; }
@@ -196,8 +187,8 @@ public class GameSettings : ScriptableObject
 		}
 	}
 	public float ScreenBorderBottom { get => -ScreenBorderTop; }
-	public float PlatformSpacingY { get { return (ScreenBorderTop * 2f) / height; } }
-	public float PlatformSpacingX { get { return ((Camera.main.ViewportToWorldPoint(new Vector3(1, 1, 0)).x - platformSideOffset) * 2f) / width; } }
+	public float PlatformSpacingX { get => platformSpacingX; }
+	public float PlatformSpacingY { get => platformSpacingY; }
 	public float PlayerToPlatformSnapRange { get => playerToPlatformSnapRange; }
 	public Vector3 PlayerToPlatformOffset { get => playerToPlatformOffset;  }
 	public float PlayerSpeed { get => playerSpeed; }

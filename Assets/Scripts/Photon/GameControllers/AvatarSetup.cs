@@ -19,7 +19,6 @@ public class AvatarSetup : MonoBehaviour
             photonView.RPC("RPC_AddCharacter", RpcTarget.AllBuffered, PlayerInfo.Instance.mySelectedCharacter);
 		}
     }
-
     
     [PunRPC]
     void RPC_AddCharacter(CharacterType characterType)

@@ -1,8 +1,10 @@
+using Photon.Pun;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum SwipeDirection { UP, DOWN, LEFT, RIGHT }
 
 // Detects swipes and triggers an event on each swipe
 // Event passes SwipeData as parameter to delegate functions
@@ -11,22 +13,32 @@ public class PlayerInput : MonoBehaviour
 	private Vector2 mouseDownPosition;
 	private Vector2 mouseUpPosition;
 
+	private PhotonView photonView;
+
 	// After a swipe is registered fire an event
 	public static event Action<SwipeDirection> OnSwipe = delegate { };
 
+	private void Start()
+	{
+		photonView = GetComponent<PhotonView>();
+	}
+
 	public void Update()
 	{
-		// Begin/end swipes based on mouse clicks
-		if (Input.GetMouseButtonDown(0))
+		if (photonView.IsMine)
 		{
-			mouseDownPosition = Input.mousePosition;
-			mouseUpPosition = Input.mousePosition;
-		} 
+			// Begin/end swipes based on mouse clicks
+			if (Input.GetMouseButtonDown(0))
+			{
+				mouseDownPosition = Input.mousePosition;
+				mouseUpPosition = Input.mousePosition;
+			}
 
-		if (Input.GetMouseButtonUp(0))
-		{
-			mouseDownPosition = Input.mousePosition;
-			DetectSwipe();
+			if (Input.GetMouseButtonUp(0))
+			{
+				mouseDownPosition = Input.mousePosition;
+				DetectSwipe();
+			}
 		}
 	}
 

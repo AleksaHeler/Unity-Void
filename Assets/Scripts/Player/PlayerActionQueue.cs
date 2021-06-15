@@ -2,10 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-/// <summary>
-/// Custom data structure containing PlayerActions
-/// Available operations: Push, PushFront and Pop
-/// </summary>
+public enum PlayerAction { NONE, MOVE_UP, MOVE_DOWN, MOVE_LEFT, MOVE_RIGHT }
+
+// Custom data structure containing PlayerActions
+// Available operations: Push, PushFront and Pop
 public class PlayerActionQueue
 {
 	private List<PlayerAction> actions;
