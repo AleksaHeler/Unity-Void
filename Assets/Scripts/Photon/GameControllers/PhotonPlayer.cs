@@ -4,6 +4,7 @@ using Photon.Pun;
 using System.IO;
 using UnityEngine;
 
+// This creates player at random spawn point
 public class PhotonPlayer : MonoBehaviour
 {
     private PhotonView photonView;
@@ -14,20 +15,14 @@ public class PhotonPlayer : MonoBehaviour
     {
         photonView = GetComponent<PhotonView>();
 
-        int spawnPointCount = GameSetup.Instance.spawnPoints.Length;
-        int spawnPicker = Random.Range(0, spawnPointCount);
+        int spawnPositionIndex = photonView.Controller.ActorNumber - 1;
 
 		if (photonView.IsMine)
         {
-            Transform spawnTransform = GameSetup.Instance.spawnPoints[spawnPicker];
+            Transform spawnTransform = GameSetup.Instance.playerSpawnPoints[spawnPositionIndex];
             Vector3 position = spawnTransform.position;
             Quaternion rotation = spawnTransform.rotation;
             myAvatar = PhotonNetwork.Instantiate(Path.Combine("PhotonPrefabs", "PlayerAvatar"), position, rotation, 0);
 		}
-    }
-
-    void Update()
-    {
-        
     }
 }

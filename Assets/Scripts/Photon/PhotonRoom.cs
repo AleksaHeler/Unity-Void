@@ -190,18 +190,31 @@ public class PhotonRoom : MonoBehaviourPunCallbacks, IInRoomCallbacks
     [PunRPC]
     private void RPC_LoadedGameScene()
 	{
+        // This block only executes on host -> calls function on all clients
         playersInGame++;
 
         // Make sure not to create duplicate players
         if(playersInGame == PhotonNetwork.PlayerList.Length)
         {
             photonView.RPC("RPC_CreatePlayer", RpcTarget.All);
+
+            // TODO: Step 1) Here call RPC_CreateWorld only on master/host
+            photonView.RPC("RPC_CreateWorld", RpcTarget.MasterClient);
         }
-	}
+
+    }
 
     [PunRPC]
     private void RPC_CreatePlayer()
     {
         PhotonNetwork.Instantiate(Path.Combine("PhotonPrefabs", "PhotonNetworkPlayer"), transform.position, Quaternion.identity, 0);
     }
+
+    [PunRPC]
+    private void RPC_CreateWorld()
+    {
+        // TODO: Step 2) This creates a network world prefab
+        PhotonNetwork.Instantiate(Path.Combine("PhotonPrefabs", "PhotonNetworkWorld"), transform.position, Quaternion.identity, 0);
+    }
+
 }

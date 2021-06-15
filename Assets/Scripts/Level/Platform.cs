@@ -1,73 +1,42 @@
+using Photon.Pun;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
-
-// This script is located on a prefab GameObject that represents a platform
-// The object has a SpriteRenderer component where platform image is set
 public class Platform : MonoBehaviour
 {
-	// TODO: maybe abstract class Platform? -> for breaking glass
-	[SerializeField]
-	private SpriteRenderer itemSpriteRenderer;
-	private PlatformType platformType;
-	private int platformId;
+	PhotonView photonView;
 
-	public PlatformType PlatformType { get => platformType; }
-	public int PlatformID { get => platformId; }
+	GameSettings gameSettings;
+	float platformSpeed;
+	float topBorder;
+	float bottomBorder;
 
-	// Generates a platform with given type at position with item on it
-	public void GeneratePlatform(Vector2 position, int id, PlatformType type)
+	void Start()
 	{
-		this.platformType = type;
-		platformId = id;
-		transform.position = position;
-
-		SetSprite(type);
+		photonView = GetComponent<PhotonView>();
+		 
+		gameSettings = SettingsReader.Instance.GameSettings;
+		platformSpeed = gameSettings.PlatformSpeed;
+		topBorder = gameSettings.ScreenBorderTop;
+		bottomBorder = gameSettings.ScreenBorderBottom;
 	}
 
-	public void BreakGlass()
+	// Move platform down and if it is all the way down, regenerate it up above the screen
+	void Update()
 	{
-		if (platformType != PlatformType.GLASS)
+		if (!photonView.IsMine)
 		{
 			return;
 		}
 
-		StartCoroutine(GlassBreakCoroutine());
-	}
+		transform.position += Vector3.down * Time.deltaTime * platformSpeed;
 
-	// Sets sprite component of this gameobject to given platform type
-	private void SetSprite(PlatformType type)
-	{
-		Sprite platformSprite = SettingsReader.Instance.GameSettings.PlatformTypeToSprite(type);
-		GetComponent<SpriteRenderer>().sprite = platformSprite;
-	}
-
-	public void SetItemSprite(ItemType itemType)
-	{
-		Sprite sprite = SettingsReader.Instance.GameSettings.ItemTypeToSprite(itemType);
-		SetItemSprite(sprite);
-	}
-
-	public void SetItemSprite(Sprite sprite)
-	{
-		itemSpriteRenderer.sprite = sprite;
-	}
-
-	IEnumerator GlassBreakCoroutine()
-	{
-		platformType = PlatformType.NONE;
-		SetSprite(platformType);
-		AudioManager.Instance.PlaySound("Glass Breaking");
-
-		float elapsedTime = 0;
-		float duration = SettingsReader.Instance.GameSettings.GlassPlatformRegenerationTime;
-		while(elapsedTime < duration)
+		if(transform.position.y < bottomBorder)
 		{
-			elapsedTime += Time.deltaTime;
-			yield return null;
+			Vector3 newPos = transform.position;
+			newPos.y = topBorder;
+			transform.position = newPos;
 		}
-
-		platformType = PlatformType.GLASS;
-		SetSprite(platformType);
 	}
 }

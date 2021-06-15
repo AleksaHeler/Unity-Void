@@ -4,6 +4,8 @@ using UnityEngine;
 
 public enum CharacterType { CACTUS, TIM, ROBOTO, PILLOWY, MARSHMELLOW, HAPPY }
 
+// This script is located in main menu on a gameobject that persists trough scene
+// It just keeps track of what CharacterType the local player has picked (it is accessed from...AvatarSetup)
 public class PlayerInfo : MonoBehaviour
 {  
 	// Singleton

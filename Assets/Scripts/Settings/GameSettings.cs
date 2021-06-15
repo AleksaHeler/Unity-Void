@@ -41,6 +41,9 @@ public class GameSettings : ScriptableObject
 	[SerializeField]
 	private ItemSettings[] itemSettings;
 
+	[SerializeField]
+	private float platformSpacingX;
+
 	[Tooltip("Horizontal size of platform sprite")]
 	[SerializeField]
 	private float platformWidth = 1.5f;
@@ -180,8 +183,8 @@ public class GameSettings : ScriptableObject
 
 
 	#region Access modifiers (getters)
-	public int PlatformsCount { get => width; }
-	public int RowsCount { get => height; }
+	public int Width { get => width; }
+	public int Height { get => height; }
 	public GameObject PlatformPrefab { get => platformPrefab; }
 	public float PlatformWidth { get => platformWidth; }
 	public float PlatformHeight { get => platformHeight; }
@@ -197,7 +200,7 @@ public class GameSettings : ScriptableObject
 	}
 	public float ScreenBorderBottom { get => -ScreenBorderTop; }
 	public float PlatformSpacingY { get { return (ScreenBorderTop * 2f) / height; } }
-	public float PlatformSpacingX { get { return ((Camera.main.ViewportToWorldPoint(new Vector3(1, 1, 0)).x - platformSideOffset) * 2f) / width; } }
+	public float PlatformSpacingX { get => platformSpacingX; }
 	public float PlayerToPlatformSnapRange { get => playerToPlatformSnapRange; }
 	public Vector3 PlayerToPlatformOffset { get => playerToPlatformOffset;  }
 	public float PlayerSpeed { get => playerSpeed; }

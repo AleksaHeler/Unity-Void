@@ -3,11 +3,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+// This script just creates sprite image for player
 public class AvatarSetup : MonoBehaviour
 {
     private PhotonView photonView;
     public GameObject characterPrefab;
     public CharacterType characterValue;
+    [HideInInspector]
     public GameObject myCharacter;
 
     void Start()

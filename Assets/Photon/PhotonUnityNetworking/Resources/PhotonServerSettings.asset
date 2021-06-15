@@ -42,6 +42,8 @@ MonoBehaviour:
   - RPC_LoadedGameScene
   - RPC_CreateLevel
   - RPC_AddCharacter
+  - RPC_CreatePlatform
+  - RPC_CreateWorld
   DisableAutoOpenWizard: 1
   ShowSettings: 0
   DevRegionSetOnce: 1

@@ -1,3 +1,4 @@
+using Photon.Pun;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -11,11 +12,23 @@ public class PlayerInput : MonoBehaviour
 	private Vector2 mouseDownPosition;
 	private Vector2 mouseUpPosition;
 
+	private PhotonView photonView;
+
 	// After a swipe is registered fire an event
 	public static event Action<SwipeDirection> OnSwipe = delegate { };
 
+	private void Start()
+	{
+		photonView = GetComponent<PhotonView>();
+	}
+
 	public void Update()
 	{
+		if (!photonView.IsMine)
+		{
+			return;
+		}
+
 		// Begin/end swipes based on mouse clicks
 		if (Input.GetMouseButtonDown(0))
 		{

@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+// This script just contains data about settings (player count and scene build index)
 public class MultiplayerSettings : MonoBehaviour
 {
     private static MultiplayerSettings instance;

@@ -12,7 +12,8 @@ GameObject:
   - component: {fileID: 6571864766708415615}
   - component: {fileID: 8654842154543520739}
   - component: {fileID: 4403309172167767224}
-  - component: {fileID: -3262674679216704357}
+  - component: {fileID: 352171220351125776}
+  - component: {fileID: 2527790576126763847}
   m_Layer: 0
   m_Name: PlayerAvatar
   m_TagString: Untagged
@@ -88,7 +89,7 @@ MonoBehaviour:
   characterPrefab: {fileID: 8077238381102788555, guid: 61734854cb8936242b85c2bc2560b3cd, type: 3}
   characterValue: 0
   myCharacter: {fileID: 0}
---- !u!114 &-3262674679216704357
+--- !u!114 &352171220351125776
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -97,6 +98,18 @@ MonoBehaviour:
   m_GameObject: {fileID: 4021727223803735160}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 24145f6819d44114b8ce87303b257f9d, type: 3}
+  m_Script: {fileID: 11500000, guid: c198c208586d95042a0073f4fc9ad408, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &2527790576126763847
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4021727223803735160}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 56b1821fb3a80b3479f27099928a4673, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 

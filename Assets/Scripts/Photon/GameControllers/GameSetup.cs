@@ -4,17 +4,22 @@ using UnityEngine;
 
 public class GameSetup : MonoBehaviour
 {
-    // Singleton
-    private static GameSetup instance;
-    public static GameSetup Instance { get => instance; }
+	private static GameSetup instance;
+	public static GameSetup Instance { get => instance; }
 
-    public Transform[] spawnPoints;
+	public Transform[] playerSpawnPoints;
 
 	private void OnEnable()
 	{
-		if(instance == null)
-		{
+        // Singleton
+        if (instance != null && instance != this)
+        {
+            Destroy(this.gameObject);
+        }
+        else
+        {
             instance = this;
-		}
-	}
+            DontDestroyOnLoad(this);
+        }
+    }
 }
