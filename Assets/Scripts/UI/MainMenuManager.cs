@@ -25,6 +25,15 @@ public class MainMenuManager : MonoBehaviour
 		Application.Quit();
 	}
 
+	public void OnCharacterSelect(int characterType)
+	{
+		if(PlayerInfo.Instance != null)
+		{
+			PlayerInfo.Instance.mySelectedCharacter = (CharacterType)characterType;
+			PlayerPrefs.SetInt("MyCharacter", characterType);
+		}
+	}
+
 	IEnumerator LoadNextScene()
 	{
 		sceneTransitionAnimator.SetTrigger("FadeOut");
