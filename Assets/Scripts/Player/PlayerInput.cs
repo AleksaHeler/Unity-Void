@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum SwipeDirection { UP, DOWN, LEFT, RIGHT }
 
 // Detects swipes and triggers an event on each swipe
 // Event passes SwipeData as parameter to delegate functions

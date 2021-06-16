@@ -4,26 +4,30 @@ using Photon.Pun;
 using System.IO;
 using UnityEngine;
 
-// This creates player at random spawn point
+// This script instantiates "PlayerAvatar" prefab at random spawn point
+// This is located on "PhotonNetworkPlayer" GameObject
 public class PhotonPlayer : MonoBehaviour
 {
     private PhotonView photonView;
 
-    [HideInInspector]
-    public GameObject myAvatar;
+    private GameObject myAvatar;
 
-    void Start()
+    private void Awake()
     {
         photonView = GetComponent<PhotonView>();
+    }
 
-        int spawnPositionIndex = photonView.Controller.ActorNumber - 1;
-
-		if (photonView.IsMine)
+    private void Start()
+    {
+        if (!photonView.IsMine) 
         {
-            Transform spawnTransform = GameSetup.Instance.PlayerSpawnPoints[spawnPositionIndex];
-            Vector3 position = spawnTransform.position;
-            Quaternion rotation = spawnTransform.rotation;
-            myAvatar = PhotonNetwork.Instantiate(Path.Combine("PhotonPrefabs", "PlayerAvatar"), position, rotation, 0);
-		}
+            return;
+        }
+
+        int spawnPositionIndex = PhotonNetwork.IsMasterClient ? 1 : 0;
+        Transform spawnTransform = GameSetup.Instance.PlayerSpawnPoints[spawnPositionIndex];
+        Vector3 position = spawnTransform.position;
+        Quaternion rotation = spawnTransform.rotation;
+        myAvatar = PhotonNetwork.Instantiate(Path.Combine("PhotonPrefabs", "PlayerAvatar"), position, rotation, 0);
     }
 }

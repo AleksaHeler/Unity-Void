@@ -7,6 +7,11 @@ using UnityEngine.SceneManagement;
 
 public class GameOverMenuManager : MonoBehaviour
 {
+	private const string mainMenuMusicName = "Main Menu Music";
+	private const string animatorTriggerString = "FadeOut";
+	private const string winText= "YOU WIN";
+	private const string loseText = "YOU LOSE";
+
 	[SerializeField]
 	private TMPro.TextMeshProUGUI titleText;
 	[SerializeField]
@@ -16,39 +21,49 @@ public class GameOverMenuManager : MonoBehaviour
 	[SerializeField]
 	private float transitionAnimationDuration;
 
-	private bool win = false;
-
 	private void Start()
+	{
+		DisplayDemotivationalQuote();
+
+		StartCoroutine(AudioManager.Instance.FadeIn(mainMenuMusicName, transitionAnimationDuration));
+
+		if (IsLocalPlayerWinner())
+		{
+			titleText.text = winText;
+			demotivationalText.gameObject.SetActive(false);
+		}
+		else
+		{
+			titleText.text = loseText;
+		}
+	}
+
+	private void DisplayDemotivationalQuote()
 	{
 		List<string> demotivationalQuotes = SettingsReader.Instance.GameSettings.DemotivationalQuotes;
 		int index = Random.Range(0, demotivationalQuotes.Count);
 		demotivationalText.text = demotivationalQuotes[index];
+	}
 
-		StartCoroutine(AudioManager.Instance.FadeIn("Main Menu Music", transitionAnimationDuration));
-
+	private bool IsLocalPlayerWinner()
+	{
 		GameObject[] playerGameObjects = GameObject.FindGameObjectsWithTag("Player");
+		bool win = false;
 
-		win = false;
 		foreach (GameObject player in playerGameObjects)
 		{
 			if (player.GetComponent<PhotonView>().IsMine)
 			{
-				if (player.GetComponent<PhotonView>().Controller.ActorNumber == PhotonRoom.Instance.WinningPlayer)
+				int playerActorNumber = player.GetComponent<PhotonView>().Controller.ActorNumber;
+				int winningActorNumber = PhotonRoom.Instance.WinningPlayer;
+				if (playerActorNumber == winningActorNumber)
 				{
 					win = true;
 				}
 			}
 		}
 
-		if (win)
-		{
-			titleText.text = "YOU WIN";
-			demotivationalText.gameObject.SetActive(false);
-		}
-		else
-		{
-			titleText.text = "YOU LOSE";
-		}
+		return win;
 	}
 
 	public void MainMenu()
@@ -63,10 +78,11 @@ public class GameOverMenuManager : MonoBehaviour
 
 	IEnumerator LoadMainMenuScene()
 	{
-		sceneTransitionAnimator.SetTrigger("FadeOut");
-		StartCoroutine(AudioManager.Instance.FadeOut("Main Menu Music", transitionAnimationDuration));
+		sceneTransitionAnimator.SetTrigger(animatorTriggerString);
+		StartCoroutine(AudioManager.Instance.FadeOut(mainMenuMusicName, transitionAnimationDuration));
 
 		yield return new WaitForSeconds(transitionAnimationDuration);
+
 		SceneManager.LoadScene(0);
 	}
 }

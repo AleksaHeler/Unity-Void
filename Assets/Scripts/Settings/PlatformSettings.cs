@@ -2,6 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum PlatformType { NONE, GLASS, GRASS, NORMAL, SLIDE_LEFT, SLIDE_RIGHT, SLIME, SPIKES }
+
 [CreateAssetMenu(menuName = "PlatformSettings")]
 public class PlatformSettings : ScriptableObject
 {

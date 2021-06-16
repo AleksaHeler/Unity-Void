@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   width: 5
   height: 6
-  platformPrefab: {fileID: 8512226233930854249, guid: 483c6cc6c408bec4d9037d652ee29ec3, type: 3}
+  platformSpeed: 0.1
   platformSettings:
   - {fileID: 11400000, guid: 6f3b2f79f042e3b4e84f859a7643d187, type: 2}
   - {fileID: 11400000, guid: 9895a6ef84a26ec48b3c298f0756eb46, type: 2}
@@ -28,24 +28,16 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 8ad0a5e88e1226942ad5cbef163b3d82, type: 2}
   - {fileID: 11400000, guid: 06b0f0a98186cc241bbc9f6ac9cdade4, type: 2}
   - {fileID: 11400000, guid: cfab81d631bc02d4bba333b7c1ba9b45, type: 2}
-  platformSpacingX: 2
-  platformWidth: 1.5
+  platformSpacingHorizontal: 2
   platformHeight: 2
   glassPlatformRegenerationTime: 3
-  unsafePlatforms: 0000000007000000060000000400000005000000
-  platformSpeed: 0.1
-  percentOfRandomPlatforms: 0
-  platformSideOffset: 2
+  playerSpeed: 12
   playerToPlatformOffset: {x: 0, y: 0.45, z: 1}
   playerToPlatformSnapRange: 1.8
-  playerSpeed: 12
   playerJumpAnimationHeight: 6
-  moveVectorMinMagnitude: 0.6
-  moveVectorMaxMagnitude: 1.5
-  playerCheckTolerance: 0.05
-  moveAnimationCurveOffset: 0.3
-  minDistanceToSwipe: 50
+  playerDeathCheckTolerance: 0
   bombPrimingTime: 3
+  minDistanceToSwipe: 50
   playerDeathParticles: {fileID: 8148911177897350824, guid: beaceac1990654c4aa40e55aaab2b493, type: 3}
   bombExplosionParticles: {fileID: 6492633587015454445, guid: f2c8e7a6ed8964d4fa634f3017d91938, type: 3}
   demotivationalQuotes:

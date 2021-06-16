@@ -4,9 +4,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
+public enum PlayerState { NOT_MOVING, MOVING, STUCK_IN_SLIME, DIED }
+
 // This is the main player script
 [RequireComponent(typeof(PlayerInput))]
-partial class CharacterController : MonoBehaviour
+partial class PlayerController : MonoBehaviour
 {
 
 	private PhotonView photonView;
@@ -23,8 +25,6 @@ partial class CharacterController : MonoBehaviour
 	private PlayerAction lastPlayerAction;
 	private GameObject currentPlatform;
 	private PlatformHandler platformHandler;
-
-	// TODO: ADd PLAYER INVENTORY
 
 	void Start()
 	{
@@ -60,11 +60,6 @@ partial class CharacterController : MonoBehaviour
 
 	void LateUpdate()
 	{
-		if (Input.GetKeyDown(KeyCode.Escape))
-		{
-			Application.Quit();
-		}
-
 		if (!photonView.IsMine)
 		{
 			return;
@@ -86,7 +81,7 @@ partial class CharacterController : MonoBehaviour
 			playerState = PlayerState.NOT_MOVING;
 			if (currentPlatform != null)
 			{
-				AudioManager.Instance.PlayPlatformSound(currentPlatform.GetComponent<PlatformSetup>().platformType);
+				AudioManager.Instance.PlayPlatformSound(currentPlatform.GetComponent<PlatformSetup>().PlatformType);
 			}
 		}
 
@@ -103,7 +98,7 @@ partial class CharacterController : MonoBehaviour
 				return;
 			}
 
-			platformHandler.InvokeAction(currentPlatform.GetComponent<PlatformSetup>().platformType, this);
+			platformHandler.InvokeAction(currentPlatform.GetComponent<PlatformSetup>().PlatformType, this);
 
 			// Calls function Move() when there is input
 			HandleMoveActions();
@@ -169,7 +164,7 @@ partial class CharacterController : MonoBehaviour
 		if (playerToDestinationVector.x != 0)
 		{
 			float leftoverMoveDistance = playerToDestinationVector.x;
-			float totalMoveDistance = gameSettings.PlatformSpacingX;
+			float totalMoveDistance = gameSettings.PlatformSpacingHorizontal;
 			float animationPercent = Mathf.Abs(leftoverMoveDistance / totalMoveDistance);
 			float sine = Mathf.Sin(animationPercent * Mathf.PI) * gameSettings.PlayerJumpAnimationHeight;
 			sineOffset = Vector3.up * sine * Time.deltaTime;
@@ -214,14 +209,14 @@ partial class CharacterController : MonoBehaviour
 	}
 	private bool IsCloseToMovePoint()
 	{
-		float playerCheckTolerance = gameSettings.PlayerCheckTolerance;
+		float playerCheckTolerance = gameSettings.PlayerDeathCheckTolerance;
 		float distance = Vector3.Distance(transform.position, movePoint);
 		return distance < playerCheckTolerance;
 	}
 
 	private bool IsBelowScreenBorder()
 	{
-		float playerCheckTolerance = gameSettings.PlayerCheckTolerance;
+		float playerCheckTolerance = gameSettings.PlayerDeathCheckTolerance;
 		float checkPositionY = gameSettings.ScreenBorderBottom + playerCheckTolerance;
 		return transform.position.y < checkPositionY;
 	}
@@ -248,13 +243,13 @@ partial class CharacterController : MonoBehaviour
 		if(scene.buildIndex == 2)
 		{
 			playerState = PlayerState.DIED;
-			GetComponent<AvatarSetup>().myCharacter.GetComponent<SpriteRenderer>().sprite = null;
+			GetComponent<AvatarSetup>().MyCharacter.GetComponent<SpriteRenderer>().sprite = null;
 		}
 	}
 
 	[PunRPC]
 	void RPC_DisableSprite()
 	{
-		GetComponent<AvatarSetup>().myCharacter.GetComponent<SpriteRenderer>().sprite = null;
+		GetComponent<AvatarSetup>().MyCharacter.GetComponent<SpriteRenderer>().sprite = null;
 	}
 }

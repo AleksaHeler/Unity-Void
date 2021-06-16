@@ -15,7 +15,7 @@ public class PlayerSettings : MonoBehaviour
 
 
 	private CharacterType mySelectedCharacter;
-	public CharacterType MySelectedCharacter { get => mySelectedCharacter; set => mySelectedCharacter = value; }
+	public CharacterType MySelectedCharacter { get => mySelectedCharacter; }
 
 	private Sprite[] allCharacters;
 	public Sprite[] AllCharacters { get => allCharacters; }
@@ -37,6 +37,12 @@ public class PlayerSettings : MonoBehaviour
 	private void Start()
 	{
 		LoadCharacterSelectionFromPlayerPrefs();
+	}
+
+	public void SetSelectedCharacter(CharacterType characterType)
+	{
+		mySelectedCharacter = characterType;
+		PlayerPrefs.SetInt(playerPrefsCharacterSelectKey, (int)characterType);
 	}
 
 	private void LoadCharacterSelectionFromPlayerPrefs()

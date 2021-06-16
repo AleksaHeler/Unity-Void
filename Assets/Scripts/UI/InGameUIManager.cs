@@ -19,26 +19,16 @@ public class InGameUIManager : MonoBehaviour
     private GameObject bombButton;
 
 
-    // Start is called before the first frame update
-    void Start()
+    private void Start()
     {
         StartCoroutine(AudioManager.Instance.FadeIn("Game Music", transitionAnimationDuration));
     }
 
-    // TODO: this has to be called when player dies
-    private void GameOver(int param)
+	private void Update()
 	{
-        int currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
-        StartCoroutine(LoadScene(currentSceneIndex + 1));
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            Application.Quit();
+        }
     }
-
-    IEnumerator LoadScene(int index)
-    {
-        sceneTransitionAnimator.SetTrigger("End");
-        StartCoroutine(AudioManager.Instance.FadeOut("Game Music", transitionAnimationDuration));
-
-        yield return new WaitForSeconds(transitionAnimationDuration);
-        SceneManager.LoadScene(index);
-    }
-
 }

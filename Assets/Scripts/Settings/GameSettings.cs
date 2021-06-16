@@ -4,117 +4,59 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-#region Global defines
-public enum ItemType { NONE, BOMB_COLLECTIBLE, BOMB_PRIMING, BOMB_ACTIVE }
-
-public enum PlatformType { NONE, GLASS, GRASS, NORMAL, SLIDE_LEFT, SLIDE_RIGHT, SLIME, SPIKES }
-
-public enum PlayerAction { NONE, MOVE_UP, MOVE_DOWN, MOVE_LEFT, MOVE_RIGHT }
-
-public enum SwipeDirection { UP, DOWN, LEFT, RIGHT }
-
-public enum PlayerState { NOT_MOVING, MOVING, STUCK_IN_SLIME, DIED }
-#endregion
-
-
 [CreateAssetMenu(menuName = "GameSettings")]
 public class GameSettings : ScriptableObject
 {
 
 	#region Private members for editor
+
 	[Header("World size (# of platforms)")]
 	[SerializeField]
 	private int width = 5;
-
 	[SerializeField]
 	private int height = 6;
 
 
-
-	[Header("Platform settings")]
-	[SerializeField]
-	private GameObject platformPrefab;
-
-	[SerializeField]
-	private PlatformSettings[] platformSettings;
-
-	[SerializeField]
-	private ItemSettings[] itemSettings;
-
-	[SerializeField]
-	private float platformSpacingX;
-
-	[Tooltip("Horizontal size of platform sprite")]
-	[SerializeField]
-	private float platformWidth = 1.5f;
-
-	[Tooltip("Vertical size of platform sprite")]
-	[SerializeField]
-	private float platformHeight = 1f;
-
-	[SerializeField]
-	private float glassPlatformRegenerationTime = 3f;
-
-	[SerializeField]
-	private List<PlatformType> unsafePlatforms;
-
-
-
 	[Header("Level settings")]
-
-	[Tooltip("How fast should platforms move down")]
 	[SerializeField]
 	private float platformSpeed = 0.2f;
-
-	[Tooltip("How many platforms sould be random vs predetermined")]
 	[SerializeField]
-	private float percentOfRandomPlatforms = 0.1f;
-
-	[Tooltip("How much spacing should be on sides of level")]
+	private PlatformSettings[] platformSettings;
 	[SerializeField]
-	private float platformSideOffset = 4f;
-
+	private ItemSettings[] itemSettings;
+	[SerializeField]
+	private float platformSpacingHorizontal = 2;
+	[SerializeField]
+	private float platformHeight = 2f;
+	[SerializeField]
+	private float glassPlatformRegenerationTime = 3f;
 
 
 	[Header("Player settings")]
 	[SerializeField]
-	private Vector3 playerToPlatformOffset;
-
+	private float playerSpeed = 12;
 	[SerializeField]
-	private float playerToPlatformSnapRange;
-
+	private Vector3 playerToPlatformOffset = new Vector3(0, 0.45f, 1);
 	[SerializeField]
-	private float playerSpeed;
-
+	private float playerToPlatformSnapRange = 1.8f;
 	[SerializeField]
-	private float playerJumpAnimationHeight;
-
+	private float playerJumpAnimationHeight = 6;
 	[SerializeField]
-	private float moveVectorMinMagnitude;
-
+	private float playerDeathCheckTolerance = 0;
 	[SerializeField]
-	private float moveVectorMaxMagnitude;
-
+	private float bombPrimingTime = 3;
 	[SerializeField]
-	private float playerCheckTolerance;
+	private int minDistanceToSwipe = 50;
 
+
+	[Header("Particles")]
 	[SerializeField]
-	private float moveAnimationCurveOffset;
-
-	[SerializeField]
-	private int minDistanceToSwipe;
-
-	[SerializeField]
-	private float bombPrimingTime;
-
-	[SerializeField]
-	private GameObject playerDeathParticles; 
-
+	private GameObject playerDeathParticles;
 	[SerializeField]
 	private GameObject bombExplosionParticles;
 
-	[Header("Misc settings")]
 
+	[Header("Menu settings")]
 	[SerializeField]
 	private List<string> demotivationalQuotes = new List<string>();
 
@@ -185,12 +127,8 @@ public class GameSettings : ScriptableObject
 	#region Access modifiers (getters)
 	public int Width { get => width; }
 	public int Height { get => height; }
-	public GameObject PlatformPrefab { get => platformPrefab; }
-	public float PlatformWidth { get => platformWidth; }
-	public float PlatformHeight { get => platformHeight; }
 	public float GlassPlatformRegenerationTime { get => glassPlatformRegenerationTime; }
 	public float PlatformSpeed { get => platformSpeed; }
-	public float PercentOfRandomPlatforms { get => percentOfRandomPlatforms; }
 	public float ScreenBorderTop {
 		get {
 			Vector3 topRightViewport = new Vector3(1, 1, 0);
@@ -199,16 +137,13 @@ public class GameSettings : ScriptableObject
 		}
 	}
 	public float ScreenBorderBottom { get => -ScreenBorderTop; }
-	public float PlatformSpacingY { get { return (ScreenBorderTop * 2f) / (float)height; } }
-	public float PlatformSpacingX { get => platformSpacingX; }
+	public float PlatformSpacingVertical { get { return (ScreenBorderTop * 2f) / (float)height; } }
+	public float PlatformSpacingHorizontal { get => platformSpacingHorizontal; }
 	public float PlayerToPlatformSnapRange { get => playerToPlatformSnapRange; }
 	public Vector3 PlayerToPlatformOffset { get => playerToPlatformOffset;  }
 	public float PlayerSpeed { get => playerSpeed; }
 	public float PlayerJumpAnimationHeight { get => playerJumpAnimationHeight; }
-	public float MoveVectorMinMagnitude { get => moveVectorMinMagnitude; }
-	public float MoveVectorMaxMagnitude { get => moveVectorMaxMagnitude; }
-	public float PlayerCheckTolerance { get => playerCheckTolerance; }
-	public float MoveAnimationCurveOffset { get => moveAnimationCurveOffset; }
+	public float PlayerDeathCheckTolerance { get => playerDeathCheckTolerance; }
 	public int MinDistanceToSwipe { get => minDistanceToSwipe; }
 	public float BombPrimingTime { get => bombPrimingTime; }
 	public GameObject BombExplosionParticles { get => bombExplosionParticles; }
@@ -217,9 +152,7 @@ public class GameSettings : ScriptableObject
 	public Dictionary<PlatformType, string> PlatformTypeToSound { get => platformTypeToSound; }
 	public Dictionary<SwipeDirection, PlayerAction> SwipeDirectionToPlayerAction { get => swipeDirectionToPlayerAction; }
 	public List<PlayerAction> MovePlayerActions { get => movePlayerActions; }
-	public PlatformSettings[] PlatformSettings { get => platformSettings; }
 	public ItemSettings[] ItemSettings { get => itemSettings; }
-	public List<PlatformType> UnsafePlatforms { get => unsafePlatforms; }
 	public List<string> DemotivationalQuotes { get => demotivationalQuotes; }
 	#endregion
 
@@ -286,8 +219,8 @@ public class GameSettings : ScriptableObject
 	public Vector3 PlayerActionToVector3(PlayerAction action)
 	{
 		Vector3 movement = movePlayerActionToVector3[action];
-		movement.x *= PlatformSpacingX;
-		movement.y *= PlatformSpacingY;
+		movement.x *= PlatformSpacingHorizontal;
+		movement.y *= PlatformSpacingVertical;
 		return movement;
 	}
 	#endregion

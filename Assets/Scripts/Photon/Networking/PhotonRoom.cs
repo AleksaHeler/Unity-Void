@@ -52,11 +52,12 @@ public class PhotonRoom : MonoBehaviourPunCallbacks, IInRoomCallbacks
             instance = this;
             DontDestroyOnLoad(this.gameObject);
         }
+
+        photonView = GetComponent<PhotonView>();
     }
 
 	private void Start()
 	{
-        photonView = GetComponent<PhotonView>();
         readyToCount = false;
         readyToStart = false;
         atMaxPlayers = startDelayWhenAllConnected;

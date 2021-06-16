@@ -5,6 +5,9 @@ using UnityEngine.SceneManagement;
 
 public class MainMenuManager : MonoBehaviour
 {
+	private const string mainMenuMusicName = "Main Menu Music";
+	private const string animatorTriggerString = "FadeOut";
+
 	[SerializeField]
 	private Animator sceneTransitionAnimator;
 	[SerializeField]
@@ -12,34 +15,34 @@ public class MainMenuManager : MonoBehaviour
 
 	private void Start()
 	{
-		StartCoroutine(AudioManager.Instance.FadeIn("Main Menu Music", transitionAnimationDuration));
+		StartCoroutine(AudioManager.Instance.FadeIn(mainMenuMusicName, transitionAnimationDuration));
 	}
 
-	public void Play()
+	public void PlayButtonClick()
 	{
 		StartCoroutine(LoadNextScene());
 	}
 
-	public void Quit()
+	public void QuitButtonClick()
 	{
 		Application.Quit();
 	}
 
-	public void OnCharacterSelect(int characterType)
+	public void OnCharacterSelectButtonClick(int characterType)
 	{
 		if(PlayerSettings.Instance != null)
 		{
-			PlayerSettings.Instance.MySelectedCharacter = (CharacterType)characterType;
-			PlayerPrefs.SetInt("MyCharacter", characterType);
+			PlayerSettings.Instance.SetSelectedCharacter((CharacterType)characterType);
 		}
 	}
 
 	IEnumerator LoadNextScene()
 	{
-		sceneTransitionAnimator.SetTrigger("FadeOut");
-		StartCoroutine(AudioManager.Instance.FadeOut("Main Menu Music", transitionAnimationDuration));
+		sceneTransitionAnimator.SetTrigger(animatorTriggerString);
+		StartCoroutine(AudioManager.Instance.FadeOut(mainMenuMusicName, transitionAnimationDuration));
 
 		yield return new WaitForSeconds(transitionAnimationDuration);
+
 		int currentSceneIndex = SceneManager.GetActiveScene().buildIndex; 
 		SceneManager.LoadScene(currentSceneIndex + 1);
 	}
