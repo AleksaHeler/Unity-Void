@@ -16,6 +16,7 @@ public class PhotonRoom : MonoBehaviourPunCallbacks, IInRoomCallbacks
     private PhotonView photonView;
     public bool isGameLoaded;
     public int currentScene;
+    public int winningPlayer;
 
     // Player info
     private Player[] photonPlayers;
@@ -162,20 +163,31 @@ public class PhotonRoom : MonoBehaviourPunCallbacks, IInRoomCallbacks
 
             photonView.RPC("RPC_LoadedGameScene", RpcTarget.MasterClient);
 		}
-	}
+    }
 
     private void StartGame()
-	{
+    {
         isGameLoaded = true;
 
-		if (!PhotonNetwork.IsMasterClient)
-		{
+        if (!PhotonNetwork.IsMasterClient)
+        {
             return;
-		}
+        }
 
         PhotonNetwork.CurrentRoom.IsOpen = false;
         PhotonNetwork.LoadLevel(MultiplayerSettings.Instance.MultiplayerScene);
-	}
+    }
+
+    [PunRPC]
+    private void RPC_GameOver(int losingPlayer)
+    {
+        if (!PhotonNetwork.IsMasterClient)
+        {
+            return;
+        }
+        winningPlayer = 3 - losingPlayer;
+        PhotonNetwork.LoadLevel(MultiplayerSettings.Instance.MultiplayerScene + 1);
+    }
 
     private void RestartTimer()
 	{

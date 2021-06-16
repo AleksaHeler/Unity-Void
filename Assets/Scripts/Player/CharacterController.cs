@@ -2,6 +2,7 @@ using Photon.Pun;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 // This is the main player script
 [RequireComponent(typeof(PlayerInput))]
@@ -27,6 +28,8 @@ partial class CharacterController : MonoBehaviour
 
 	void Start()
 	{
+		DontDestroyOnLoad(this.gameObject);
+
 		photonView = GetComponent<PhotonView>();
 		actions = new PlayerActionQueue();
 		platformHandler = new PlatformHandler();
@@ -46,6 +49,8 @@ partial class CharacterController : MonoBehaviour
 		PlayerInput.OnSwipe += OnSwipe;
 		movePoint = transform.position;
 		SnapToClosestPlatformInRange();
+
+		SceneManager.sceneLoaded += OnSceneFinishedLoading;
 	}
 	private void OnDestroy()
 	{
@@ -223,12 +228,29 @@ partial class CharacterController : MonoBehaviour
 
 	private void PlayerDie()
 	{
+		if (playerState == PlayerState.DIED)
+		{
+			return;
+		}
+		playerState = PlayerState.DIED;
 		Debug.Log("Player is dead now!");
+		GetComponent<AvatarSetup>().myCharacter.GetComponent<SpriteRenderer>().sprite = null;
+		PhotonRoom.Room.photonView.RPC("RPC_GameOver", RpcTarget.All, photonView.Controller.ActorNumber);
+		//PhotonRoom.Room.GameOver(photonView.Controller.ActorNumber);
 	}
 
 	private void OnSwipe(SwipeDirection swipeDirection)
 	{
 		PlayerAction action = gameSettings.SwipeDirectionToPlayerAction[swipeDirection];
 		actions.Push(action);
+	}
+
+	private void OnSceneFinishedLoading(Scene scene, LoadSceneMode mode)
+	{
+		if(scene.buildIndex == 2)
+		{
+			playerState = PlayerState.DIED;
+			GetComponent<AvatarSetup>().myCharacter.GetComponent<SpriteRenderer>().sprite = null;
+		}
 	}
 }

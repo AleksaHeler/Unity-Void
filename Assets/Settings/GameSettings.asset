@@ -33,7 +33,7 @@ MonoBehaviour:
   platformHeight: 2
   glassPlatformRegenerationTime: 3
   unsafePlatforms: 0000000007000000060000000400000005000000
-  platformSpeed: 0.3
+  platformSpeed: 0.1
   percentOfRandomPlatforms: 0
   platformSideOffset: 2
   playerToPlatformOffset: {x: 0, y: 0.45, z: 1}

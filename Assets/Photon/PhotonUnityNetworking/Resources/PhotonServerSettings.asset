@@ -50,6 +50,7 @@ MonoBehaviour:
   - RPC_SetPlatformType
   - RPC_MovePlatformDown
   - RPC_BreakGlass
+  - RPC_GameOver
   DisableAutoOpenWizard: 1
   ShowSettings: 0
   DevRegionSetOnce: 1

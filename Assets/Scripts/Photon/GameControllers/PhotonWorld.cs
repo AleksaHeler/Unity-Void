@@ -61,7 +61,6 @@ public class PhotonWorld : MonoBehaviour
 		{
 			for (int y = 0; y < height; y++)
 			{
-				Debug.Log(" ########  Trying to create another platform");
 				float xPos = ((float)x - width / 2f + 0.5f) * spacingX;
 				float yPos = ((float)y - height / 2f + 0.5f) * spacingY;
 				Vector3 position = new Vector3(xPos, yPos);
@@ -81,6 +80,8 @@ public class PhotonWorld : MonoBehaviour
 				platforms[x, y].GetComponent<PhotonView>().RPC("RPC_SetPlatformType", RpcTarget.All, predefinedRow[x]);
 			}
 		}
+
+		SetStartingPlatformsToNormal();
 	}
 
 	private void Update()
@@ -186,6 +187,16 @@ public class PhotonWorld : MonoBehaviour
 		}
 	}
 
-	// Set given platform to normal (for starting)
-	// GameSetup.Instance.playerSpawnPoints[] contains Transform for positions that should be set to normal (with get closest platform)
+	private void SetStartingPlatformsToNormal()
+	{
+		foreach(Transform spawnPoint in GameSetup.Instance.playerSpawnPoints)
+		{
+			GameObject platform = GetPlatformClosestToPosition(spawnPoint.position);
+			if(platform == null)
+			{
+				continue;
+			}
+			platform.GetComponent<PhotonView>().RPC("RPC_SetPlatformType", RpcTarget.All, PlatformType.NORMAL);
+		}
+	}
 }
