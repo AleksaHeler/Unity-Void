@@ -49,6 +49,7 @@ MonoBehaviour:
   - RPC_SetPlatformParent
   - RPC_SetPlatformType
   - RPC_MovePlatformDown
+  - RPC_BreakGlass
   DisableAutoOpenWizard: 1
   ShowSettings: 0
   DevRegionSetOnce: 1

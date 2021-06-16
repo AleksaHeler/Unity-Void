@@ -5,24 +5,35 @@ using UnityEngine;
 
 // This is the main player script
 [RequireComponent(typeof(PlayerInput))]
-public class CharacterController : MonoBehaviour
+partial class CharacterController : MonoBehaviour
 {
 
 	private PhotonView photonView;
 	private GameSettings gameSettings;
 	private PlayerActionQueue actions;
+	private PlayerState playerState;
 
 	private Vector3 movePoint;
 	private Vector3 platformOffset;
 	private float snapDistance;
 	private float playerSpeed;
 
+	private float lastFallDistance;
+	private PlayerAction lastPlayerAction;
+	private GameObject currentPlatform;
+	private PlatformHandler platformHandler;
+
+	// TODO: ADd PLAYER INVENTORY
+
 	void Start()
 	{
 		photonView = GetComponent<PhotonView>();
 		actions = new PlayerActionQueue();
+		platformHandler = new PlatformHandler();
 		gameSettings = SettingsReader.Instance.GameSettings;
 
+		lastFallDistance = 0;
+		lastPlayerAction = PlayerAction.NONE;
 		snapDistance = gameSettings.PlayerToPlatformSnapRange;
 		playerSpeed = gameSettings.PlayerSpeed;
 		platformOffset = gameSettings.PlayerToPlatformOffset;
@@ -35,6 +46,11 @@ public class CharacterController : MonoBehaviour
 		PlayerInput.OnSwipe += OnSwipe;
 		movePoint = transform.position;
 		SnapToClosestPlatformInRange();
+	}
+	private void OnDestroy()
+	{
+		// Unsubscribe from events
+		PlayerInput.OnSwipe -= OnSwipe;
 	}
 
 	void LateUpdate()
@@ -49,7 +65,45 @@ public class CharacterController : MonoBehaviour
 			return;
 		}
 
-		HandleMoveActions();
+		if (playerState == PlayerState.DIED)
+		{
+			return;
+		}
+
+		if (IsBelowScreenBorder())
+		{
+			PlayerDie();
+		}
+
+		// Transition from MOVING state to NOT_MOVING
+		if (playerState == PlayerState.MOVING && IsCloseToMovePoint())
+		{
+			playerState = PlayerState.NOT_MOVING;
+			if (currentPlatform != null)
+			{
+				AudioManager.Instance.PlayPlatformSound(currentPlatform.GetComponent<PlatformSetup>().platformType);
+			}
+		}
+
+		// Handle different platforms
+		if (PlayerIsNotMoving())
+		{
+			GameObject currentPlatform = PhotonWorld.Instance.GetPlatformPositionWithinRange(transform.position, snapDistance);
+
+			// Fall into the void
+			if (currentPlatform == null)
+			{
+				actions.PushFront(PlayerAction.MOVE_DOWN);
+				HandleMoveActions();
+				return;
+			}
+
+			platformHandler.InvokeAction(currentPlatform.GetComponent<PlatformSetup>().platformType, this);
+
+			// Calls function Move() when there is input
+			HandleMoveActions();
+		}
+
 		HandlePhysics();
 		SnapToClosestPlatformInRange();
 	}
@@ -72,14 +126,32 @@ public class CharacterController : MonoBehaviour
 
 	private void Move(PlayerAction action)
 	{
+		lastPlayerAction = action;
+
+		if (playerState == PlayerState.STUCK_IN_SLIME)
+		{
+			return;
+		}
+
 		Vector3 movement = gameSettings.PlayerActionToVector3(action);
 		movePoint += movement;
 
+		playerState = PlayerState.MOVING;
 		GameObject snappedPlatform = SnapToClosestPlatformInRange();
 
 		if (snappedPlatform == null)
 		{
-			//actions.PushFront(PlayerAction.MOVE_DOWN);
+			actions.PushFront(PlayerAction.MOVE_DOWN);
+			currentPlatform = null;
+		}
+
+		if (action == PlayerAction.MOVE_DOWN)
+		{
+			lastFallDistance += Mathf.Abs(movement.y);
+		}
+		else
+		{
+			lastFallDistance = 0;
 		}
 	}
 
@@ -111,9 +183,48 @@ public class CharacterController : MonoBehaviour
 		}
 
 		movePoint = platform.transform.position + platformOffset;
-		Debug.Log("New position: " + movePoint);
+		currentPlatform = platform;
+		//CheckForCollectible();
 		return platform;
-	}	
+	}
+
+	private void PushToFrontOfActionQueue(PlayerAction action)
+	{
+		actions.PushFront(action);
+	}
+
+	private void GetStuckInSlime()
+	{
+		lastPlayerAction = PlayerAction.NONE;
+		playerState = PlayerState.STUCK_IN_SLIME;
+	}
+	public void GetUnstuckFromSlime()
+	{
+		playerState = PlayerState.NOT_MOVING;
+		actions.PushFront(lastPlayerAction);
+	}
+	private bool PlayerIsNotMoving()
+	{
+		return playerState == PlayerState.NOT_MOVING || playerState == PlayerState.STUCK_IN_SLIME;
+	}
+	private bool IsCloseToMovePoint()
+	{
+		float playerCheckTolerance = gameSettings.PlayerCheckTolerance;
+		float distance = Vector3.Distance(transform.position, movePoint);
+		return distance < playerCheckTolerance;
+	}
+
+	private bool IsBelowScreenBorder()
+	{
+		float playerCheckTolerance = gameSettings.PlayerCheckTolerance;
+		float checkPositionY = gameSettings.ScreenBorderBottom + playerCheckTolerance;
+		return transform.position.y < checkPositionY;
+	}
+
+	private void PlayerDie()
+	{
+		Debug.Log("Player is dead now!");
+	}
 
 	private void OnSwipe(SwipeDirection swipeDirection)
 	{

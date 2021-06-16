@@ -121,7 +121,6 @@ public class PhotonWorld : MonoBehaviour
 	// get closest platform to position
 	private GameObject GetPlatformClosestToPosition(Vector3 position)
 	{
-
 		GameObject closestPlatform = null;
 		float closestDistance = Mathf.Infinity;
 

@@ -19,6 +19,14 @@ public class PlatformSetup : MonoBehaviour
     }
 
     [PunRPC]
+    void RPC_BreakGlass()
+    {
+        platformType = PlatformType.NONE;
+        myPlatform.GetComponent<SpriteRenderer>().sprite = SettingsReader.Instance.GameSettings.PlatformTypeToSprite(platformType);
+        // TODO: add coroutine that will regenerate the glass once more
+    }
+
+    [PunRPC]
     void RPC_AddPlatform()
     {
         platformType = PlatformType.NONE;
@@ -29,6 +37,7 @@ public class PlatformSetup : MonoBehaviour
     [PunRPC]
     void RPC_SetPlatformType(PlatformType type)
     {
+        platformType = type;
         myPlatform.GetComponent<SpriteRenderer>().sprite = SettingsReader.Instance.GameSettings.PlatformTypeToSprite(type);
     }
 
