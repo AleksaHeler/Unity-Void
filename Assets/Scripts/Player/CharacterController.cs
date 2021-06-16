@@ -233,10 +233,8 @@ partial class CharacterController : MonoBehaviour
 			return;
 		}
 		playerState = PlayerState.DIED;
-		Debug.Log("Player is dead now!");
-		GetComponent<AvatarSetup>().myCharacter.GetComponent<SpriteRenderer>().sprite = null;
-		PhotonRoom.Room.photonView.RPC("RPC_GameOver", RpcTarget.All, photonView.Controller.ActorNumber);
-		//PhotonRoom.Room.GameOver(photonView.Controller.ActorNumber);
+		photonView.RPC("RPC_DisableSprite", RpcTarget.All);
+		PhotonRoom.Instance.photonView.RPC("RPC_GameOver", RpcTarget.All, photonView.Controller.ActorNumber);
 	}
 
 	private void OnSwipe(SwipeDirection swipeDirection)
@@ -252,5 +250,11 @@ partial class CharacterController : MonoBehaviour
 			playerState = PlayerState.DIED;
 			GetComponent<AvatarSetup>().myCharacter.GetComponent<SpriteRenderer>().sprite = null;
 		}
+	}
+
+	[PunRPC]
+	void RPC_DisableSprite()
+	{
+		GetComponent<AvatarSetup>().myCharacter.GetComponent<SpriteRenderer>().sprite = null;
 	}
 }

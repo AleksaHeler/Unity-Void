@@ -189,7 +189,7 @@ public class PhotonWorld : MonoBehaviour
 
 	private void SetStartingPlatformsToNormal()
 	{
-		foreach(Transform spawnPoint in GameSetup.Instance.playerSpawnPoints)
+		foreach(Transform spawnPoint in GameSetup.Instance.PlayerSpawnPoints)
 		{
 			GameObject platform = GetPlatformClosestToPosition(spawnPoint.position);
 			if(platform == null)

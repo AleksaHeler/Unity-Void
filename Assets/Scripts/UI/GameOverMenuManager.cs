@@ -28,17 +28,13 @@ public class GameOverMenuManager : MonoBehaviour
 
 		GameObject[] playerGameObjects = GameObject.FindGameObjectsWithTag("Player");
 
-		Debug.Log("This is game over");
 		win = false;
 		foreach (GameObject player in playerGameObjects)
 		{
 			if (player.GetComponent<PhotonView>().IsMine)
 			{
-				Debug.Log("Found my player");
-				Debug.Log("( player: " + player.GetComponent<PhotonView>().Controller.ActorNumber + ", winner: " + PhotonRoom.Room.winningPlayer + " )");
-				if (player.GetComponent<PhotonView>().Controller.ActorNumber == PhotonRoom.Room.winningPlayer)
+				if (player.GetComponent<PhotonView>().Controller.ActorNumber == PhotonRoom.Instance.WinningPlayer)
 				{
-					Debug.Log("His ID is same as win ID");
 					win = true;
 				}
 			}

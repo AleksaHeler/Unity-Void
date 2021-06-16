@@ -20,7 +20,7 @@ public class PhotonPlayer : MonoBehaviour
 
 		if (photonView.IsMine)
         {
-            Transform spawnTransform = GameSetup.Instance.playerSpawnPoints[spawnPositionIndex];
+            Transform spawnTransform = GameSetup.Instance.PlayerSpawnPoints[spawnPositionIndex];
             Vector3 position = spawnTransform.position;
             Quaternion rotation = spawnTransform.rotation;
             myAvatar = PhotonNetwork.Instantiate(Path.Combine("PhotonPrefabs", "PlayerAvatar"), position, rotation, 0);

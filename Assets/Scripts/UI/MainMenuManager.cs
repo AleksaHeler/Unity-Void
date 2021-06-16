@@ -27,9 +27,9 @@ public class MainMenuManager : MonoBehaviour
 
 	public void OnCharacterSelect(int characterType)
 	{
-		if(PlayerInfo.Instance != null)
+		if(PlayerSettings.Instance != null)
 		{
-			PlayerInfo.Instance.mySelectedCharacter = (CharacterType)characterType;
+			PlayerSettings.Instance.MySelectedCharacter = (CharacterType)characterType;
 			PlayerPrefs.SetInt("MyCharacter", characterType);
 		}
 	}

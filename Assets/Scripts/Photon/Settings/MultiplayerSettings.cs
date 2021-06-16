@@ -2,9 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-// This script just contains data about settings (player count and scene build index)
+// This script just contains data about multiplayers settings (player count and scene build index)
 public class MultiplayerSettings : MonoBehaviour
 {
+    // Singleton
     private static MultiplayerSettings instance;
     public static MultiplayerSettings Instance { get => instance; }
 
@@ -13,8 +14,8 @@ public class MultiplayerSettings : MonoBehaviour
     public int MaxPlayers { get => maxPlayers; }
 
     [SerializeField]
-    private int multiplayerScene;
-    public int MultiplayerScene { get => multiplayerScene; }
+    private int multiplayerSceneBuildIndex;
+    public int MultiplayerSceneBuildIndex { get => multiplayerSceneBuildIndex; }
 
     private void Awake()
     {

@@ -18,7 +18,7 @@ public class AvatarSetup : MonoBehaviour
 
 		if (photonView.IsMine)
 		{
-            photonView.RPC("RPC_AddCharacter", RpcTarget.AllBuffered, PlayerInfo.Instance.mySelectedCharacter);
+            photonView.RPC("RPC_AddCharacter", RpcTarget.AllBuffered, PlayerSettings.Instance.MySelectedCharacter);
 		}
     }
 
@@ -27,6 +27,6 @@ public class AvatarSetup : MonoBehaviour
     {
         characterValue = characterType;
         myCharacter = Instantiate(characterPrefab, transform.position, transform.rotation, transform);
-        myCharacter.GetComponent<SpriteRenderer>().sprite = PlayerInfo.Instance.allCharacters[(int)characterType];
+        myCharacter.GetComponent<SpriteRenderer>().sprite = PlayerSettings.Instance.AllCharacters[(int)characterType];
     }
 }
