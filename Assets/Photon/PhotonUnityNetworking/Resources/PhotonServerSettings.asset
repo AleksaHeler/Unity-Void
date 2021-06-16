@@ -44,6 +44,11 @@ MonoBehaviour:
   - RPC_AddCharacter
   - RPC_CreatePlatform
   - RPC_CreateWorld
+  - RPC_AddPlatform
+  - RPC_SetPlatformActive
+  - RPC_SetPlatformParent
+  - RPC_SetPlatformType
+  - RPC_MovePlatformDown
   DisableAutoOpenWizard: 1
   ShowSettings: 0
   DevRegionSetOnce: 1

@@ -75,7 +75,6 @@ public class PhotonRoom : MonoBehaviourPunCallbacks, IInRoomCallbacks
                 timeToStart = lessThanMaxPlayers;
 			}
 
-            Debug.Log("time to start: " + timeToStart);
             if(timeToStart <= 0)
 			{
                 StartGame();

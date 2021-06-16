@@ -199,7 +199,7 @@ public class GameSettings : ScriptableObject
 		}
 	}
 	public float ScreenBorderBottom { get => -ScreenBorderTop; }
-	public float PlatformSpacingY { get { return (ScreenBorderTop * 2f) / height; } }
+	public float PlatformSpacingY { get { return (ScreenBorderTop * 2f) / (float)height; } }
 	public float PlatformSpacingX { get => platformSpacingX; }
 	public float PlayerToPlatformSnapRange { get => playerToPlatformSnapRange; }
 	public Vector3 PlayerToPlatformOffset { get => playerToPlatformOffset;  }

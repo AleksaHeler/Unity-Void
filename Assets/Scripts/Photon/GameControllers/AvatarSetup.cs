@@ -12,7 +12,7 @@ public class AvatarSetup : MonoBehaviour
     [HideInInspector]
     public GameObject myCharacter;
 
-    void Start()
+    void Awake()
     {
         photonView = GetComponent<PhotonView>();
 
@@ -22,7 +22,6 @@ public class AvatarSetup : MonoBehaviour
 		}
     }
 
-    
     [PunRPC]
     void RPC_AddCharacter(CharacterType characterType)
     {

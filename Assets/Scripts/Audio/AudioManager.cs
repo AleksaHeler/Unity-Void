@@ -14,20 +14,20 @@ public class AudioManager : MonoBehaviour
     public Sound[] Sounds;
 
     // Singleton
-    private static AudioManager _instance;
-    public static AudioManager Instance { get { return _instance; } }
+    private static AudioManager instance;
+    public static AudioManager Instance { get { return instance; } }
 
 
     private void Awake()
     {
         // Singleton
-        if (_instance != null && _instance != this)
+        if (instance != null && instance != this)
         {
             Destroy(this.gameObject);
         }
         else
         {
-            _instance = this;
+            instance = this;
             DontDestroyOnLoad(this);
         }
 

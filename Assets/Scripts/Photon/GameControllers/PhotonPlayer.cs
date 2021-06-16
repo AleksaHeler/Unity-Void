@@ -9,6 +9,7 @@ public class PhotonPlayer : MonoBehaviour
 {
     private PhotonView photonView;
 
+    [HideInInspector]
     public GameObject myAvatar;
 
     void Start()

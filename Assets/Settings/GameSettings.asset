@@ -29,7 +29,6 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 06b0f0a98186cc241bbc9f6ac9cdade4, type: 2}
   - {fileID: 11400000, guid: cfab81d631bc02d4bba333b7c1ba9b45, type: 2}
   platformSpacingX: 2
-  platformSpacingY: 2
   platformWidth: 1.5
   platformHeight: 2
   glassPlatformRegenerationTime: 3
@@ -38,7 +37,7 @@ MonoBehaviour:
   percentOfRandomPlatforms: 0
   platformSideOffset: 2
   playerToPlatformOffset: {x: 0, y: 0.45, z: 1}
-  playerToPlatformSnapRange: 1.6
+  playerToPlatformSnapRange: 1.8
   playerSpeed: 12
   playerJumpAnimationHeight: 6
   moveVectorMinMagnitude: 0.6
