@@ -1094,6 +1094,8 @@ MonoBehaviour:
   demotivationalText: {fileID: 1066579931}
   sceneTransitionAnimator: {fileID: 2525315862643679995}
   transitionAnimationDuration: 0.5
+  mainMenuButton: {fileID: 960982121}
+  quitButton: {fileID: 985157399}
 --- !u!1001 &1279920231
 PrefabInstance:
   m_ObjectHideFlags: 0

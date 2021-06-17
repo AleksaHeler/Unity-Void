@@ -28,7 +28,7 @@ public class PlatformSetup : MonoBehaviour
 	{
 		itemType = type;
 		Sprite newSprite = SettingsReader.Instance.GameSettings.ItemTypeToSprite(itemType);
-		myPlatform.GetComponentInChildren<SpriteRenderer>().sprite = newSprite;
+		myPlatform.transform.Find("Item").GetComponent<SpriteRenderer>().sprite = newSprite;
 	}
 
 	private void SetPlatformType(PlatformType type)
@@ -56,7 +56,7 @@ public class PlatformSetup : MonoBehaviour
 		float elapsedTime = 0;
 		float duration = SettingsReader.Instance.GameSettings.GlassPlatformRegenerationTime;
 
-		while(elapsedTime < duration)
+		while (elapsedTime < duration)
 		{
 			elapsedTime += Time.deltaTime;
 			yield return null;

@@ -164,9 +164,30 @@ public class PhotonRoom : MonoBehaviourPunCallbacks, IInRoomCallbacks
 		}
 	}
 
+	public override void OnPlayerLeftRoom(Player otherPlayer)
+	{
+		base.OnPlayerLeftRoom(otherPlayer);
+
+		playersInRoom--;
+		isHostWinner = PhotonNetwork.IsMasterClient;
+		SceneManager.LoadScene(MultiplayerSettings.Instance.MultiplayerSceneBuildIndex + 1);
+	}
+
 	private void OnSceneFinishedLoading(Scene scene, LoadSceneMode mode)
 	{
+
 		currentScene = scene.buildIndex;
+
+		if (currentScene == 0)
+		{
+			readyToCount = false;
+			readyToStart = false;
+			isGameLoaded = false;
+			atMaxPlayers = startDelayWhenAllConnected;
+			startingTime = 10;
+			lessThanMaxPlayers = startingTime;
+			timeToStart = startingTime;
+		}
 
 		if (currentScene == MultiplayerSettings.Instance.MultiplayerSceneBuildIndex)
 		{

@@ -21,6 +21,11 @@ public class GameOverMenuManager : MonoBehaviour
 	[SerializeField]
 	private float transitionAnimationDuration;
 
+	[SerializeField]
+	private GameObject mainMenuButton;
+	[SerializeField]
+	private GameObject quitButton;
+
 	private void Start()
 	{
 		DisplayDemotivationalQuote();
@@ -36,6 +41,24 @@ public class GameOverMenuManager : MonoBehaviour
 		{
 			titleText.text = loseText;
 		}
+
+		StartCoroutine(Disconnect());
+	}
+
+	IEnumerator Disconnect()
+	{
+		mainMenuButton.SetActive(false);
+		quitButton.SetActive(false);
+		PhotonNetwork.Disconnect();
+
+		// Wait until we disconnect
+		while (PhotonNetwork.IsConnected)
+		{
+			yield return null;
+		}
+
+		mainMenuButton.SetActive(true);
+		quitButton.SetActive(true);
 	}
 
 	private void DisplayDemotivationalQuote()
@@ -77,6 +100,14 @@ public class GameOverMenuManager : MonoBehaviour
 
 	IEnumerator LoadMainMenuScene()
 	{
+		if (PhotonLobby.Instance != null)
+		{
+			Destroy(PhotonLobby.Instance.gameObject);
+		}
+		if (PhotonRoom.Instance != null)
+		{
+			Destroy(PhotonRoom.Instance.gameObject);
+		}
 		sceneTransitionAnimator.SetTrigger(animatorTriggerString);
 		StartCoroutine(AudioManager.Instance.FadeOut(mainMenuMusicName, transitionAnimationDuration));
 

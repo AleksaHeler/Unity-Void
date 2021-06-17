@@ -1,3 +1,4 @@
+using Photon.Pun;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -24,11 +25,38 @@ public class InGameUIManager : MonoBehaviour
         StartCoroutine(AudioManager.Instance.FadeIn("Game Music", transitionAnimationDuration));
     }
 
+   
 	private void Update()
 	{
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            Application.Quit();
+            DisconnectPlayer();
         }
     }
+
+    public void DisconnectPlayer()
+	{
+        StartCoroutine(DisconnectAndLoad());
+	}
+
+    IEnumerator DisconnectAndLoad()
+	{
+        PhotonNetwork.Disconnect();
+
+        // Wait until we disconnect
+		while (PhotonNetwork.IsConnected)
+		{
+            yield return null;
+		}
+
+        if (PhotonLobby.Instance != null)
+        {
+            Destroy(PhotonLobby.Instance.gameObject);
+        }
+        if (PhotonRoom.Instance != null)
+        {
+            Destroy(PhotonRoom.Instance.gameObject);
+        }
+        SceneManager.LoadScene(0);
+	}
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Photon.Pun;
 using Photon.Realtime;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 // This script handles cnnecting to master server and creating/joining rooms
 public class PhotonLobby : MonoBehaviourPunCallbacks
@@ -33,16 +34,13 @@ public class PhotonLobby : MonoBehaviourPunCallbacks
 			instance = this;
 		}
 	}
-
-
-	private void Start()
+	public void Start()
 	{
 		PhotonNetwork.ConnectUsingSettings();
 		playButton.SetActive(false);
 		cancelButton.SetActive(false);
 		connectingButton.SetActive(true);
 	}
-
 
 	public override void OnConnectedToMaster()
 	{
