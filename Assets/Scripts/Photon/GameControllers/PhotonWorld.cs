@@ -5,7 +5,7 @@ using Photon.Realtime;
 using System.IO;
 using UnityEngine;
 
-// This is the script that contains all the world data and platforms
+// This is the script that contains all the world data and platforms, and instantiates "PlatformAvatar"
 // This is located on "PhotonNetworkWorld" GameObject
 public class PhotonWorld : MonoBehaviour
 {
@@ -75,6 +75,18 @@ public class PhotonWorld : MonoBehaviour
 				platforms[x, y] = PhotonNetwork.Instantiate(Path.Combine("PhotonPrefabs", "PlatformAvatar"), position, rotation, 0);
 				platforms[x, y].GetComponent<PhotonView>().RPC("RPC_AddPlatform", RpcTarget.All);
 				platforms[x, y].GetComponent<PhotonView>().RPC("RPC_SetPlatformType", RpcTarget.All, predefinedRow[x]);
+
+				// Find some item to place
+				ItemSettings[] itemSettingsArray = gameSettings.ItemSettings;
+				foreach (ItemSettings itemSettings in itemSettingsArray)
+				{
+					float randomNumber = Random.Range(0f, 1f);
+					if (randomNumber < itemSettings.ItemChance)
+					{
+						platforms[x, y].GetComponent<PhotonView>().RPC("RPC_SetItemType", RpcTarget.All, itemSettings.ItemType);
+						break;
+					}
+				}
 			}
 		}
 
@@ -111,6 +123,21 @@ public class PhotonWorld : MonoBehaviour
 		}
 	}
 
+	public void PlaceItemAtPlatform(GameObject platform, ItemType type)
+	{
+		platform.GetComponent<PhotonView>().RPC("RPC_SetItemType", RpcTarget.All, type);
+	}
+
+	public ItemType GetItemTypeAtPlatform(GameObject platform)
+	{
+		return platform.GetComponent<PlatformSetup>().ItemType;
+	}
+
+	public void RemoveItemAtPlatform(GameObject platform)
+	{
+		platform.GetComponent<PhotonView>().RPC("RPC_SetItemType", RpcTarget.All, ItemType.NONE);
+	}
+
 	// Moves platforms to top of the screen and sets their types to predefined row
 	private void RespawnRow(int y)
 	{
@@ -124,6 +151,18 @@ public class PhotonWorld : MonoBehaviour
 			newPos.y = topWorldBorder;
 			platforms[x, y].transform.position = newPos;
 			platforms[x, y].GetComponent<PhotonView>().RPC("RPC_SetPlatformType", RpcTarget.All, predefinedRow[x]);
+
+			// Find some item to place
+			ItemSettings[] itemSettingsArray = SettingsReader.Instance.GameSettings.ItemSettings;
+			foreach (ItemSettings itemSettings in itemSettingsArray)
+			{
+				float randomNumber = Random.Range(0f, 1f);
+				if (randomNumber < itemSettings.ItemChance)
+				{
+					platforms[x, y].GetComponent<PhotonView>().RPC("RPC_SetItemType", RpcTarget.All, itemSettings.ItemType);
+					break;
+				}
+			}
 		}
 	}
 
@@ -162,7 +201,7 @@ public class PhotonWorld : MonoBehaviour
 	}
 
 	// Finds closest platform, and if it is within range returns it, else returns null
-	public GameObject GetPlatformPositionWithinRange(Vector3 position, float range)
+	public GameObject GetPlatformWithinRange(Vector3 position, float range)
 	{
 		GameObject platform = GetPlatformClosestToPosition(position);
 

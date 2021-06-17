@@ -12,14 +12,30 @@ public class PlatformSetup : MonoBehaviour
 	[SerializeField]
 	private GameObject platformPrefab;
 	private PlatformType platformType;
+	private ItemType itemType;
 	private GameObject myPlatform;
 
 	public PlatformType PlatformType { get => platformType; }
+	public ItemType ItemType { get => itemType; }
 
 
 	void Awake()
 	{
 		photonView = GetComponent<PhotonView>();
+	}
+
+	private void SetItemType(ItemType type)
+	{
+		itemType = type;
+		Sprite newSprite = SettingsReader.Instance.GameSettings.ItemTypeToSprite(itemType);
+		myPlatform.GetComponentInChildren<SpriteRenderer>().sprite = newSprite;
+	}
+
+	private void SetPlatformType(PlatformType type)
+	{
+		platformType = type;
+		Sprite newSprite = SettingsReader.Instance.GameSettings.PlatformTypeToSprite(platformType);
+		myPlatform.GetComponent<SpriteRenderer>().sprite = newSprite;
 	}
 
 
@@ -31,29 +47,45 @@ public class PlatformSetup : MonoBehaviour
 		{
 			return;
 		}
-		platformType = PlatformType.NONE;
-		Sprite newSprite = SettingsReader.Instance.GameSettings.PlatformTypeToSprite(platformType);
-		myPlatform.GetComponent<SpriteRenderer>().sprite = newSprite;
-		// TODO: add coroutine that will regenerate the glass once more
+		SetPlatformType(PlatformType.NONE);
+		StartCoroutine(RegenerateGlassCoroutine());
+	}
+
+	IEnumerator RegenerateGlassCoroutine()
+	{
+		float elapsedTime = 0;
+		float duration = SettingsReader.Instance.GameSettings.GlassPlatformRegenerationTime;
+
+		while(elapsedTime < duration)
+		{
+			elapsedTime += Time.deltaTime;
+			yield return null;
+		}
+
+		SetPlatformType(PlatformType.GLASS);
 	}
 
 	[PunRPC]
 	// Spawn platform prefab and set its sprite to none
 	void RPC_AddPlatform()
 	{
-		platformType = PlatformType.NONE;
 		myPlatform = Instantiate(platformPrefab, transform.position, transform.rotation, transform);
-		Sprite newSprite = SettingsReader.Instance.GameSettings.PlatformTypeToSprite(PlatformType.NONE);
-		myPlatform.GetComponent<SpriteRenderer>().sprite = newSprite;
+		SetPlatformType(PlatformType.NONE);
+		SetItemType(ItemType.NONE);
 	}
 
 	[PunRPC]
 	// Change platform sprite to match its type
 	void RPC_SetPlatformType(PlatformType type)
 	{
-		platformType = type;
-		Sprite newSprite = SettingsReader.Instance.GameSettings.PlatformTypeToSprite(type);
-		myPlatform.GetComponent<SpriteRenderer>().sprite = newSprite;
+		SetPlatformType(type);
+	}
+
+	[PunRPC]
+	// Change platform sprite to match its type
+	void RPC_SetItemType(ItemType type)
+	{
+		SetItemType(type);
 	}
 
 	[PunRPC]

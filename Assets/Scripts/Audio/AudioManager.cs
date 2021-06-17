@@ -49,7 +49,10 @@ public class AudioManager : MonoBehaviour
     /// <param name="name">Name of the source clip, same as in audio manager</param>
     public void PlaySound(string name)
     {
+        // TODO: remove this
+        return;
         Sound sound = FindSoundInArray(name);
+
 
         if (sound == null)
         {

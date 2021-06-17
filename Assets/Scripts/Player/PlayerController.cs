@@ -8,12 +8,14 @@ public enum PlayerState { NOT_MOVING, MOVING, STUCK_IN_SLIME, DIED, NOT_LOADED }
 
 // This is the main player script
 [RequireComponent(typeof(PlayerInput))]
+[RequireComponent(typeof(PlayerInventory))]
 partial class PlayerController : MonoBehaviour
 {
 
 	private PhotonView photonView;
 	private GameSettings gameSettings;
 	private PlayerActionQueue actions;
+	private PlayerInventory playerInventory;
 	private PlayerState playerState;
 
 	private Vector3 movePoint;
@@ -31,6 +33,7 @@ partial class PlayerController : MonoBehaviour
 		DontDestroyOnLoad(this.gameObject);
 
 		photonView = GetComponent<PhotonView>();
+		playerInventory = GetComponent<PlayerInventory>();
 		actions = new PlayerActionQueue();
 		platformHandler = new PlatformHandler();
 		gameSettings = SettingsReader.Instance.GameSettings;
@@ -95,7 +98,7 @@ partial class PlayerController : MonoBehaviour
 		// Handle different platforms
 		if (PlayerIsNotMoving())
 		{
-			GameObject currentPlatform = PhotonWorld.Instance.GetPlatformPositionWithinRange(transform.position, snapDistance);
+			GameObject currentPlatform = PhotonWorld.Instance.GetPlatformWithinRange(transform.position, snapDistance);
 
 			// Fall into the void
 			if (currentPlatform == null)
@@ -181,7 +184,7 @@ partial class PlayerController : MonoBehaviour
 
 	private GameObject SnapToClosestPlatformInRange()
 	{
-		GameObject platform = PhotonWorld.Instance.GetPlatformPositionWithinRange(movePoint, snapDistance);
+		GameObject platform = PhotonWorld.Instance.GetPlatformWithinRange(movePoint, snapDistance);
 
 		if (platform == null)
 		{
@@ -195,8 +198,22 @@ partial class PlayerController : MonoBehaviour
 
 		movePoint = platform.transform.position + platformOffset;
 		currentPlatform = platform;
-		//CheckForCollectible();
+		CheckForCollectible();
 		return platform;
+	}
+
+	private void CheckForCollectible()
+	{
+		GameObject itemCheckPlatform = PhotonWorld.Instance.GetPlatformWithinRange(transform.position, snapDistance);
+		if(itemCheckPlatform == null)
+		{
+			return;
+		}
+		ItemType item = PhotonWorld.Instance.GetItemTypeAtPlatform(itemCheckPlatform);
+		if (item != ItemType.NONE)
+		{
+			playerInventory.CollectItem(itemCheckPlatform);
+		}
 	}
 
 	private void PushToFrontOfActionQueue(PlayerAction action)
@@ -232,7 +249,7 @@ partial class PlayerController : MonoBehaviour
 		return transform.position.y < checkPositionY;
 	}
 
-	private void PlayerDie()
+	public void PlayerDie()
 	{
 		if (playerState == PlayerState.DIED)
 		{

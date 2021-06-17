@@ -14,4 +14,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itemType: 1
   itemSprite: {fileID: 21300000, guid: 68c66fb3078b7ea4c852ed2a67ef489c, type: 3}
-  itemChance: 0.05
+  itemChance: 0.2

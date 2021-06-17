@@ -54,6 +54,10 @@ MonoBehaviour:
   - RPC_DisableSprite
   - RPC_DieAndDisableSprite
   - RPC_SpawnPlayerDeathParticles
+  - RPC_AddItem
+  - RPC_MoveItemDown
+  - RPC_SetItemType
+  - RPC_SpawnBombExplosionParticles
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1
