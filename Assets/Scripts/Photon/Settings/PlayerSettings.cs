@@ -14,9 +14,10 @@ public class PlayerSettings : MonoBehaviour
 	public static PlayerSettings Instance { get { return instance; } }
 
 
-	private CharacterType mySelectedCharacter;
+	private CharacterType mySelectedCharacter = (CharacterType)0;
 	public CharacterType MySelectedCharacter { get => mySelectedCharacter; }
 
+	[SerializeField]
 	private Sprite[] allCharacters;
 	public Sprite[] AllCharacters { get => allCharacters; }
 
@@ -32,17 +33,8 @@ public class PlayerSettings : MonoBehaviour
 			instance = this;
 			DontDestroyOnLoad(this);
 		}
-	}
 
-	private void Start()
-	{
 		LoadCharacterSelectionFromPlayerPrefs();
-	}
-
-	public void SetSelectedCharacter(CharacterType characterType)
-	{
-		mySelectedCharacter = characterType;
-		PlayerPrefs.SetInt(playerPrefsCharacterSelectKey, (int)characterType);
 	}
 
 	private void LoadCharacterSelectionFromPlayerPrefs()
@@ -56,5 +48,10 @@ public class PlayerSettings : MonoBehaviour
 			mySelectedCharacter = (CharacterType)0;
 			PlayerPrefs.SetInt(playerPrefsCharacterSelectKey, (int)mySelectedCharacter);
 		}
+	}
+	public void SetSelectedCharacter(CharacterType characterType)
+	{
+		mySelectedCharacter = characterType;
+		PlayerPrefs.SetInt(playerPrefsCharacterSelectKey, (int)characterType);
 	}
 }

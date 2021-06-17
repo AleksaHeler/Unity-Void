@@ -18,11 +18,6 @@ public class MainMenuManager : MonoBehaviour
 		StartCoroutine(AudioManager.Instance.FadeIn(mainMenuMusicName, transitionAnimationDuration));
 	}
 
-	public void PlayButtonClick()
-	{
-		StartCoroutine(LoadNextScene());
-	}
-
 	public void QuitButtonClick()
 	{
 		Application.Quit();

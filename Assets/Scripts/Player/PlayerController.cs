@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public enum PlayerState { NOT_MOVING, MOVING, STUCK_IN_SLIME, DIED }
+public enum PlayerState { NOT_MOVING, MOVING, STUCK_IN_SLIME, DIED, NOT_LOADED }
 
 // This is the main player script
 [RequireComponent(typeof(PlayerInput))]
@@ -37,6 +37,7 @@ partial class PlayerController : MonoBehaviour
 
 		lastFallDistance = 0;
 		lastPlayerAction = PlayerAction.NONE;
+		playerState = PlayerState.NOT_LOADED;
 		snapDistance = gameSettings.PlayerToPlatformSnapRange;
 		playerSpeed = gameSettings.PlayerSpeed;
 		platformOffset = gameSettings.PlayerToPlatformOffset;
@@ -62,6 +63,12 @@ partial class PlayerController : MonoBehaviour
 	{
 		if (!photonView.IsMine)
 		{
+			return;
+		}
+
+		if(playerState == PlayerState.NOT_LOADED)
+		{
+			SnapToClosestPlatformInRange();
 			return;
 		}
 
@@ -116,7 +123,6 @@ partial class PlayerController : MonoBehaviour
 		}
 
 		PlayerAction action = actions.Pop();
-
 
 		if (action != PlayerAction.NONE)
 		{
@@ -182,6 +188,11 @@ partial class PlayerController : MonoBehaviour
 			return null;
 		}
 
+		if(playerState == PlayerState.NOT_LOADED)
+		{
+			playerState = PlayerState.NOT_MOVING;
+		}
+
 		movePoint = platform.transform.position + platformOffset;
 		currentPlatform = platform;
 		//CheckForCollectible();
@@ -209,14 +220,14 @@ partial class PlayerController : MonoBehaviour
 	}
 	private bool IsCloseToMovePoint()
 	{
-		float playerCheckTolerance = gameSettings.PlayerDeathCheckTolerance;
+		float playerEndMovingCheckDistance = gameSettings.PlayerEndMovingCheckDistance;
 		float distance = Vector3.Distance(transform.position, movePoint);
-		return distance < playerCheckTolerance;
+		return distance < playerEndMovingCheckDistance;
 	}
 
 	private bool IsBelowScreenBorder()
 	{
-		float playerCheckTolerance = gameSettings.PlayerDeathCheckTolerance;
+		float playerCheckTolerance = gameSettings.PlayerEndMovingCheckDistance;
 		float checkPositionY = gameSettings.ScreenBorderBottom + playerCheckTolerance;
 		return transform.position.y < checkPositionY;
 	}
@@ -227,9 +238,11 @@ partial class PlayerController : MonoBehaviour
 		{
 			return;
 		}
+
 		playerState = PlayerState.DIED;
-		photonView.RPC("RPC_DisableSprite", RpcTarget.All);
-		PhotonRoom.Instance.photonView.RPC("RPC_GameOver", RpcTarget.All, photonView.Controller.ActorNumber);
+		photonView.RPC("RPC_SpawnPlayerDeathParticles", RpcTarget.All, transform.position);
+		photonView.RPC("RPC_DieAndDisableSprite", RpcTarget.All);
+		PhotonRoom.Instance.photonView.RPC("RPC_GameOver", RpcTarget.All, PhotonNetwork.IsMasterClient);
 	}
 
 	private void OnSwipe(SwipeDirection swipeDirection)
@@ -240,16 +253,23 @@ partial class PlayerController : MonoBehaviour
 
 	private void OnSceneFinishedLoading(Scene scene, LoadSceneMode mode)
 	{
-		if(scene.buildIndex == 2)
+		if (scene.buildIndex == 2)
 		{
-			playerState = PlayerState.DIED;
-			GetComponent<AvatarSetup>().MyCharacter.GetComponent<SpriteRenderer>().sprite = null;
+			photonView.RPC("RPC_DieAndDisableSprite", RpcTarget.All);
 		}
 	}
 
 	[PunRPC]
-	void RPC_DisableSprite()
+	void RPC_DieAndDisableSprite()
 	{
+		playerState = PlayerState.DIED;
 		GetComponent<AvatarSetup>().MyCharacter.GetComponent<SpriteRenderer>().sprite = null;
 	}
+
+	[PunRPC]
+	void RPC_SpawnPlayerDeathParticles(Vector3 position)
+	{
+		Instantiate(gameSettings.PlayerDeathParticles, position, Quaternion.identity);
+	}
+	
 }

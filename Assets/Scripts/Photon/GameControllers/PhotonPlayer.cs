@@ -8,26 +8,28 @@ using UnityEngine;
 // This is located on "PhotonNetworkPlayer" GameObject
 public class PhotonPlayer : MonoBehaviour
 {
-    private PhotonView photonView;
+	private PhotonView photonView;
 
-    private GameObject myAvatar;
+	private GameObject myAvatar;
 
-    private void Awake()
-    {
-        photonView = GetComponent<PhotonView>();
-    }
+	private void Awake()
+	{
+		photonView = GetComponent<PhotonView>();
+	}
 
-    private void Start()
-    {
-        if (!photonView.IsMine) 
-        {
-            return;
-        }
+	private void Start()
+	{
+		if (!photonView.IsMine)
+		{
+			return;
+		}
 
-        int spawnPositionIndex = PhotonNetwork.IsMasterClient ? 1 : 0;
-        Transform spawnTransform = GameSetup.Instance.PlayerSpawnPoints[spawnPositionIndex];
-        Vector3 position = spawnTransform.position;
-        Quaternion rotation = spawnTransform.rotation;
-        myAvatar = PhotonNetwork.Instantiate(Path.Combine("PhotonPrefabs", "PlayerAvatar"), position, rotation, 0);
-    }
+		int spawnPositionIndex = PhotonNetwork.IsMasterClient ? 0 : 1;
+		Transform spawnTransform = GameSetup.Instance.PlayerSpawnPoints[spawnPositionIndex];
+
+		Vector3 position = spawnTransform.position;
+		Quaternion rotation = spawnTransform.rotation;
+
+		myAvatar = PhotonNetwork.Instantiate(Path.Combine("PhotonPrefabs", "PlayerAvatar"), position, rotation, 0);
+	}
 }

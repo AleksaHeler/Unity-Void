@@ -69,7 +69,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_SynchronizePosition: 1
-  m_SynchronizeRotation: 1
+  m_SynchronizeRotation: 0
   m_SynchronizeScale: 0
   m_UseLocal: 1
 --- !u!114 &-7163695700253648074
@@ -85,5 +85,3 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   platformPrefab: {fileID: 6414087614570491438, guid: cdcafc4a1ce7e884ebe5d470aebdf742, type: 3}
-  platformType: 0
-  myPlatform: {fileID: 0}

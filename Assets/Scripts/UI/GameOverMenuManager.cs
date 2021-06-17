@@ -48,22 +48,21 @@ public class GameOverMenuManager : MonoBehaviour
 	private bool IsLocalPlayerWinner()
 	{
 		GameObject[] playerGameObjects = GameObject.FindGameObjectsWithTag("Player");
-		bool win = false;
 
 		foreach (GameObject player in playerGameObjects)
 		{
 			if (player.GetComponent<PhotonView>().IsMine)
 			{
-				int playerActorNumber = player.GetComponent<PhotonView>().Controller.ActorNumber;
-				int winningActorNumber = PhotonRoom.Instance.WinningPlayer;
-				if (playerActorNumber == winningActorNumber)
+				bool iAmHost = PhotonNetwork.IsMasterClient;
+				bool isHostWinner = PhotonRoom.Instance.IsHostWinner;
+				if (iAmHost == isHostWinner)
 				{
-					win = true;
+					return true;
 				}
 			}
 		}
 
-		return win;
+		return false;
 	}
 
 	public void MainMenu()

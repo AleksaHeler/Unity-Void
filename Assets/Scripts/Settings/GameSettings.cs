@@ -42,7 +42,7 @@ public class GameSettings : ScriptableObject
 	[SerializeField]
 	private float playerJumpAnimationHeight = 6;
 	[SerializeField]
-	private float playerDeathCheckTolerance = 0;
+	private float playerEndMovingCheckDistance = 0.1f;
 	[SerializeField]
 	private float bombPrimingTime = 3;
 	[SerializeField]
@@ -143,7 +143,7 @@ public class GameSettings : ScriptableObject
 	public Vector3 PlayerToPlatformOffset { get => playerToPlatformOffset;  }
 	public float PlayerSpeed { get => playerSpeed; }
 	public float PlayerJumpAnimationHeight { get => playerJumpAnimationHeight; }
-	public float PlayerDeathCheckTolerance { get => playerDeathCheckTolerance; }
+	public float PlayerEndMovingCheckDistance { get => playerEndMovingCheckDistance; }
 	public int MinDistanceToSwipe { get => minDistanceToSwipe; }
 	public float BombPrimingTime { get => bombPrimingTime; }
 	public GameObject BombExplosionParticles { get => bombExplosionParticles; }

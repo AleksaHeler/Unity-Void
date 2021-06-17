@@ -49,9 +49,8 @@ MonoBehaviour:
   prefixField: -1
   Synchronization: 3
   OwnershipTransfer: 0
-  observableSearch: 0
-  ObservedComponents:
-  - {fileID: 0}
+  observableSearch: 2
+  ObservedComponents: []
   sceneViewId: 0
   InstantiationId: 0
   isRuntimeInstantiated: 0
@@ -67,4 +66,3 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6783149b5be797e4a9498564789eaef4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  myAvatar: {fileID: 4021727223803735160, guid: 226a5b1c5bb5cf342aa4c9fc4d7ea2a5, type: 3}

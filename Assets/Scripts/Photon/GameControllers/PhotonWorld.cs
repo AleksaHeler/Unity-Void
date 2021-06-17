@@ -59,14 +59,14 @@ public class PhotonWorld : MonoBehaviour
 		platforms = new GameObject[width, height];
 
 		// Instantiate all platform avatars, and have them spawn sprites and set them based on platform types
-		for (int x = 0; x < width; x++)
+		for (int y = 0; y < height; y++)
 		{
 			// Get a random predefined row
 			int predefinedRowsCount = SettingsReader.Instance.GameSettings.PredefinedRows.Length;
 			int randomRowIndex = Random.Range(0, predefinedRowsCount);
 			PlatformType[] predefinedRow = SettingsReader.Instance.GameSettings.PredefinedRows[randomRowIndex];
 
-			for (int y = 0; y < height; y++)
+			for (int x = 0; x < width; x++)
 			{
 				float xPos = ((float)x - width / 2f + 0.5f) * gameSettings.PlatformSpacingHorizontal;
 				float yPos = ((float)y - height / 2f + 0.5f) * gameSettings.PlatformSpacingVertical;
@@ -89,7 +89,6 @@ public class PhotonWorld : MonoBehaviour
 			return;
 		}
 
-		// TODO: check if we need CollectExistingPlatformsInArray() function
 		if (platforms == null)
 		{
 			CollectExistingPlatformsInArray();
@@ -134,15 +133,23 @@ public class PhotonWorld : MonoBehaviour
 		GameObject closestPlatform = null;
 		float closestDistance = Mathf.Infinity;
 
-		// TODO: check if we need CollectExistingPlatformsInArray() function
 		if (platforms == null || platforms.Length == 0)
 		{
 			CollectExistingPlatformsInArray();
 		}
 
-		// Go trough all platforms to find closest one
-		foreach(GameObject platform in platforms)
+		if(platforms == null)
 		{
+			return null;
+		}
+
+		// Go trough all platforms to find closest one
+		foreach (GameObject platform in platforms)
+		{
+			if(platform == null)
+			{
+				continue;
+			}
 			float distance = Vector3.Distance(position, platform.transform.position);
 			if (distance < closestDistance)
 			{
@@ -174,7 +181,6 @@ public class PhotonWorld : MonoBehaviour
 		return platform;
 	}
 
-	// TODO: check if we need CollectExistingPlatformsInArray() function
 	// Finds all platform objects and stores them in the platforms array
 	private void CollectExistingPlatformsInArray()
 	{
@@ -200,11 +206,11 @@ public class PhotonWorld : MonoBehaviour
 	// For all spawn points find closest platform and set it to normal type
 	private void SetStartingPlatformsAsNormal()
 	{
-		foreach(Transform spawnPoint in GameSetup.Instance.PlayerSpawnPoints)
+		foreach (Transform spawnPoint in GameSetup.Instance.PlayerSpawnPoints)
 		{
 			GameObject platform = GetPlatformClosestToPosition(spawnPoint.position);
 
-			if(platform == null)
+			if (platform == null)
 			{
 				continue;
 			}

@@ -35,7 +35,7 @@ public class PlayerInput : MonoBehaviour
 		{
 			mouseDownPosition = Input.mousePosition;
 			mouseUpPosition = Input.mousePosition;
-		} 
+		}
 
 		if (Input.GetMouseButtonUp(0))
 		{

@@ -1,238 +1,239 @@
-using System.Collections;
-using System.Collections.Generic;
-using Photon.Realtime;
 using Photon.Pun;
-using UnityEngine.SceneManagement;
-using UnityEngine;
+using Photon.Realtime;
 using System.IO;
+using UnityEngine;
+using UnityEngine.SceneManagement;
 
 // This script handles players connecting to the room and starting the game on countdown timer
 public class PhotonRoom : MonoBehaviourPunCallbacks, IInRoomCallbacks
 {
-    // Singleton
-    private static PhotonRoom instance;
-    public static PhotonRoom Instance { get => instance; }
+	// Singleton
+	private static PhotonRoom instance;
+	public static PhotonRoom Instance { get => instance; }
 
-    [SerializeField]
-    private TMPro.TextMeshProUGUI statusText;
+	[SerializeField]
+	private TMPro.TextMeshProUGUI statusText;
 
-    // Room info
-    private PhotonView photonView;
-    private bool isGameLoaded;
-    private int currentScene;
-    private int winningPlayer;
+	// Room info
+	private PhotonView photonView;
+	private bool isGameLoaded;
+	private int currentScene;
+	private bool isHostWinner;
 
-    // Player info
-    private Player[] photonPlayers;
-    private int playersInRoom;
-    private int myNumberInRoom;
-    private int playersInGame;
+	// Player info
+	private Player[] photonPlayers;
+	private int playersInRoom;
+	private int myNumberInRoom;
+	private int playersInGame;
 
-    // Delayed start
-    [SerializeField]
-    private float startDelayWhenAllConnected;
-    private bool readyToCount;
-    private bool readyToStart;
-    private float startingTime;
-    private float lessThanMaxPlayers;
-    private float atMaxPlayers;
-    private float timeToStart;
+	// Delayed start
+	[SerializeField]
+	private float startDelayWhenAllConnected;
+	private bool readyToCount;
+	private bool readyToStart;
+	private float startingTime;
+	private float lessThanMaxPlayers;
+	private float atMaxPlayers;
+	private float timeToStart;
 
-    public int WinningPlayer { get => winningPlayer; }
+	public bool IsHostWinner { get => isHostWinner; }
 
-    private void Awake()
-    {
-        // Singleton
-        if (instance != null && instance != this)
-        {
-            Destroy(this.gameObject);
-        }
-        else
-        {
-            instance = this;
-            DontDestroyOnLoad(this.gameObject);
-        }
+	private void Awake()
+	{
+		// Singleton
+		if (instance != null && instance != this)
+		{
+			Destroy(this.gameObject);
+		}
+		else
+		{
+			instance = this;
+			DontDestroyOnLoad(this.gameObject);
+		}
 
-        photonView = GetComponent<PhotonView>();
-    }
+		photonView = GetComponent<PhotonView>();
+	}
 
 	private void Start()
 	{
-        readyToCount = false;
-        readyToStart = false;
-        atMaxPlayers = startDelayWhenAllConnected;
-        lessThanMaxPlayers = startingTime;
-        timeToStart = startingTime;
-    }
+		readyToCount = false;
+		readyToStart = false;
+		isGameLoaded = false;
+		atMaxPlayers = startDelayWhenAllConnected;
+		startingTime = 10;
+		lessThanMaxPlayers = startingTime;
+		timeToStart = startingTime;
+	}
 
 	private void Update()
 	{
-        // Don't do anything if we are the only one in the room
-        if(playersInRoom == 1)
+		// Don't do anything if we are the only one in the room
+		if (playersInRoom == 1)
 		{
-            RestartTimer();
+			RestartTimer();
 		}
 
 		if (!isGameLoaded)
 		{
 			if (readyToStart)
 			{
-                atMaxPlayers -= Time.deltaTime;
-                lessThanMaxPlayers = atMaxPlayers;
-                timeToStart = atMaxPlayers;
-                statusText.text = "Starting in " + ((int)timeToStart + 1) + "...";
-            }
-            else if (readyToCount)
+				atMaxPlayers -= Time.deltaTime;
+				lessThanMaxPlayers = atMaxPlayers;
+				timeToStart = atMaxPlayers;
+				statusText.text = "Starting in " + ((int)timeToStart + 1) + "...";
+			}
+			else if (readyToCount)
 			{
-                lessThanMaxPlayers -= Time.deltaTime;
-                timeToStart = lessThanMaxPlayers;
+				lessThanMaxPlayers -= Time.deltaTime;
+				timeToStart = lessThanMaxPlayers;
 			}
 
-            if(timeToStart <= 0)
+			if (timeToStart <= 0)
 			{
-                StartGame();
+				StartGame();
 			}
 		}
 	}
 
 	public override void OnEnable()
-    {
-        base.OnEnable();
-        // Subscribe to callbacks
-        PhotonNetwork.AddCallbackTarget(this);
-        SceneManager.sceneLoaded += OnSceneFinishedLoading;
-    }
+	{
+		base.OnEnable();
+		// Subscribe to callbacks
+		PhotonNetwork.AddCallbackTarget(this);
+		SceneManager.sceneLoaded += OnSceneFinishedLoading;
+	}
 
-    public override void OnDisable()
-    {
-        base.OnDisable();
-        // Unsubscribe from callbacks
-        PhotonNetwork.RemoveCallbackTarget(this);
-        SceneManager.sceneLoaded -= OnSceneFinishedLoading;
-    }
+	public override void OnDisable()
+	{
+		base.OnDisable();
+		// Unsubscribe from callbacks
+		PhotonNetwork.RemoveCallbackTarget(this);
+		SceneManager.sceneLoaded -= OnSceneFinishedLoading;
+	}
 
-    public override void OnJoinedRoom()
-    {
-        base.OnJoinedRoom();
-        photonPlayers = PhotonNetwork.PlayerList;
-        playersInRoom = photonPlayers.Length;
-        myNumberInRoom = playersInRoom;
-        PhotonNetwork.NickName = myNumberInRoom.ToString();
-        statusText.text = "Waiting for another player...";
+	public override void OnJoinedRoom()
+	{
+		base.OnJoinedRoom();
+		photonPlayers = PhotonNetwork.PlayerList;
+		playersInRoom = photonPlayers.Length;
+		myNumberInRoom = playersInRoom;
+		PhotonNetwork.NickName = myNumberInRoom.ToString();
+		statusText.text = "Waiting for another player...";
 
-        if (playersInRoom > 1)
+		if (playersInRoom > 1)
 		{
-            readyToCount = true;
+			readyToCount = true;
 		}
 
-        // Is the room full?
-        if(playersInRoom == MultiplayerSettings.Instance.MaxPlayers)
+		// Is the room full?
+		if (playersInRoom == MultiplayerSettings.Instance.MaxPlayers)
 		{
-            readyToStart = true;
+			readyToStart = true;
 
-            // If we are not the master client -> close the room
+			// If we are not the master client -> close the room
 			if (PhotonNetwork.IsMasterClient)
-            {
-                PhotonNetwork.CurrentRoom.IsOpen = false;
-            }
+			{
+				PhotonNetwork.CurrentRoom.IsOpen = false;
+			}
 		}
-    }
+	}
 
 	public override void OnPlayerEnteredRoom(Player newPlayer)
 	{
 		base.OnPlayerEnteredRoom(newPlayer);
 
-        photonPlayers = PhotonNetwork.PlayerList;
-        playersInRoom++;
-        statusText.text = "Another player has joined room";
+		photonPlayers = PhotonNetwork.PlayerList;
+		playersInRoom++;
+		statusText.text = "Another player has joined room";
 
-        if (playersInRoom > 1)
+		if (playersInRoom > 1)
 		{
-            readyToCount = true;
-        }
+			readyToCount = true;
+		}
 
-        if (playersInRoom == MultiplayerSettings.Instance.MaxPlayers)
+		if (playersInRoom == MultiplayerSettings.Instance.MaxPlayers)
 		{
-            readyToStart = true;
+			readyToStart = true;
+
 			if (!PhotonNetwork.IsMasterClient)
 			{
-                return;
+				return;
 			}
 
-            PhotonNetwork.CurrentRoom.IsOpen = false;
+			PhotonNetwork.CurrentRoom.IsOpen = false;
 		}
-    }
+	}
 
-    private void OnSceneFinishedLoading(Scene scene, LoadSceneMode mode)
+	private void OnSceneFinishedLoading(Scene scene, LoadSceneMode mode)
 	{
-        currentScene = scene.buildIndex;
+		currentScene = scene.buildIndex;
 
-        if(currentScene == MultiplayerSettings.Instance.MultiplayerSceneBuildIndex)
+		if (currentScene == MultiplayerSettings.Instance.MultiplayerSceneBuildIndex)
 		{
-            isGameLoaded = true;
-            photonView.RPC("RPC_LoadedGameScene", RpcTarget.MasterClient);
+			isGameLoaded = true;
+			photonView.RPC("RPC_LoadedGameScene", RpcTarget.MasterClient);
 		}
-    }
+	}
 
-    private void RestartTimer()
-    {
-        lessThanMaxPlayers = startingTime;
-        timeToStart = startingTime;
-        atMaxPlayers = startDelayWhenAllConnected;
-        readyToCount = false;
-        readyToStart = false;
-    }
-
-    private void StartGame()
-    {
-        isGameLoaded = true;
-
-        if (!PhotonNetwork.IsMasterClient)
-        {
-            return;
-        }
-
-        PhotonNetwork.CurrentRoom.IsOpen = false;
-        PhotonNetwork.LoadLevel(MultiplayerSettings.Instance.MultiplayerSceneBuildIndex);
-    }
-
-    [PunRPC]
-    // This changes scene to GameOverScene and keeps track of who won/lost
-    private void RPC_GameOver(int losingPlayer)
-    {
-        if (!PhotonNetwork.IsMasterClient)
-        {
-            return;
-        }
-        // TODO: Make game over win/lose check the nickname, not the ID or whatever
-        winningPlayer = 3 - losingPlayer;
-        PhotonNetwork.LoadLevel(MultiplayerSettings.Instance.MultiplayerSceneBuildIndex + 1);
-    }
-
-    [PunRPC]
-    // This code only executes on host and calls function on all clients (spawn world and players)
-    private void RPC_LoadedGameScene()
+	private void RestartTimer()
 	{
-        playersInGame++;
+		lessThanMaxPlayers = startingTime;
+		timeToStart = startingTime;
+		atMaxPlayers = startDelayWhenAllConnected;
+		readyToCount = false;
+		readyToStart = false;
+	}
 
-        if(playersInGame == PhotonNetwork.PlayerList.Length)
-        {
-            photonView.RPC("RPC_CreatePlayer", RpcTarget.All);
-            photonView.RPC("RPC_CreateWorld", RpcTarget.MasterClient);
-        }
+	private void StartGame()
+	{
+		isGameLoaded = true;
 
-    }
+		if (!PhotonNetwork.IsMasterClient)
+		{
+			return;
+		}
 
-    [PunRPC]
-    private void RPC_CreatePlayer()
-    {
-        PhotonNetwork.Instantiate(Path.Combine("PhotonPrefabs", "PhotonNetworkPlayer"), transform.position, Quaternion.identity, 0);
-    }
+		PhotonNetwork.CurrentRoom.IsOpen = false;
+		PhotonNetwork.LoadLevel(MultiplayerSettings.Instance.MultiplayerSceneBuildIndex);
+	}
 
-    [PunRPC]
-    private void RPC_CreateWorld()
-    {
-        PhotonNetwork.Instantiate(Path.Combine("PhotonPrefabs", "PhotonNetworkWorld"), transform.position, Quaternion.identity, 0);
-    }
+	[PunRPC]
+	// This changes scene to GameOverScene and keeps track of who won/lost
+	private void RPC_GameOver(bool isHostLoser)
+	{
+		if (!PhotonNetwork.IsMasterClient)
+		{
+			return;
+		}
+
+		isHostWinner = !isHostLoser;
+		PhotonNetwork.LoadLevel(MultiplayerSettings.Instance.MultiplayerSceneBuildIndex + 1);
+	}
+
+	[PunRPC]
+	// This code only executes on host and calls function on all clients (spawn world and players)
+	private void RPC_LoadedGameScene()
+	{
+		playersInGame++;
+
+		if (playersInGame == PhotonNetwork.PlayerList.Length)
+		{
+			photonView.RPC("RPC_CreatePlayer", RpcTarget.All);
+			photonView.RPC("RPC_CreateWorld", RpcTarget.MasterClient);
+		}
+
+	}
+
+	[PunRPC]
+	private void RPC_CreatePlayer()
+	{
+		PhotonNetwork.Instantiate(Path.Combine("PhotonPrefabs", "PhotonNetworkPlayer"), transform.position, Quaternion.identity, 0);
+	}
+
+	[PunRPC]
+	private void RPC_CreateWorld()
+	{
+		PhotonNetwork.Instantiate(Path.Combine("PhotonPrefabs", "PhotonNetworkWorld"), transform.position, Quaternion.identity, 0);
+	}
 
 }

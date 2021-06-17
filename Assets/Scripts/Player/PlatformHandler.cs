@@ -34,62 +34,62 @@ partial class PlayerController
 			platformActions.Add(PlatformType.GLASS, PlatformCallbackGlass);
 		}
 
-		private void PlatformCallbackNone(PlayerController characterController)
+		private void PlatformCallbackNone(PlayerController playerController)
 		{
-			characterController.PushToFrontOfActionQueue(PlayerAction.MOVE_DOWN);
+			playerController.PushToFrontOfActionQueue(PlayerAction.MOVE_DOWN);
 		}
 
-		private void PlatformCallbackNormal(PlayerController characterController)
+		private void PlatformCallbackNormal(PlayerController playerController)
 		{
-			HandleIfPlayerFellToDeath(characterController);
+			HandleIfPlayerFellToDeath(playerController);
 		}
 
-		private void PlatformCallbackSpikes(PlayerController characterController)
+		private void PlatformCallbackSpikes(PlayerController playerController)
 		{
-			characterController.PlayerDie();
+			playerController.PlayerDie();
 		}
 
-		private void PlatformCallbackSlideLeft(PlayerController characterController)
+		private void PlatformCallbackSlideLeft(PlayerController playerController)
 		{
-			HandleIfPlayerFellToDeath(characterController);
-			characterController.PushToFrontOfActionQueue(PlayerAction.MOVE_LEFT);
+			HandleIfPlayerFellToDeath(playerController);
+			playerController.PushToFrontOfActionQueue(PlayerAction.MOVE_LEFT);
 		}
 
-		private void PlatformCallbackSlideRight(PlayerController characterController)
+		private void PlatformCallbackSlideRight(PlayerController playerController)
 		{
-			HandleIfPlayerFellToDeath(characterController);
-			characterController.PushToFrontOfActionQueue(PlayerAction.MOVE_RIGHT);
+			HandleIfPlayerFellToDeath(playerController);
+			playerController.PushToFrontOfActionQueue(PlayerAction.MOVE_RIGHT);
 		}
 
-		private void PlatformCallbackSlime(PlayerController characterController)
+		private void PlatformCallbackSlime(PlayerController playerController)
 		{
-			HandleIfPlayerFellToDeath(characterController);
+			HandleIfPlayerFellToDeath(playerController);
 
 			// First time getting stuck in slime
-			if (characterController.playerState != PlayerState.STUCK_IN_SLIME)
+			if (playerController.playerState != PlayerState.STUCK_IN_SLIME)
 			{
-				characterController.GetStuckInSlime();
+				playerController.GetStuckInSlime();
 				return;
 			}
 
 			// Trying to get out of slime
-			if (characterController.lastPlayerAction != PlayerAction.NONE)
+			if (playerController.lastPlayerAction != PlayerAction.NONE)
 			{
-				AudioManager.Instance.PlayPlatformSound(characterController.currentPlatform.GetComponent<PlatformSetup>().PlatformType);
+				AudioManager.Instance.PlayPlatformSound(playerController.currentPlatform.GetComponent<PlatformSetup>().PlatformType);
 
 				// Setting initial get out of slime move
 				if (getOutOfSlimeMove == PlayerAction.NONE)
 				{
-					getOutOfSlimeMove = characterController.lastPlayerAction;
+					getOutOfSlimeMove = playerController.lastPlayerAction;
 					getOutOfSlimeMoveCount = 1;
 				}
 				else
 				{
-					HandleGettingOutOfSlime(characterController);
+					HandleGettingOutOfSlime(playerController);
 				}
 			}
 
-			characterController.lastPlayerAction = PlayerAction.NONE;
+			playerController.lastPlayerAction = PlayerAction.NONE;
 		}
 
 		private void HandleGettingOutOfSlime(PlayerController playerController)
