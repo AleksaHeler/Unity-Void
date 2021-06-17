@@ -311,7 +311,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Navigation:
-    m_Mode: 3
+    m_Mode: -1
     m_WrapAround: 0
     m_SelectOnUp: {fileID: 0}
     m_SelectOnDown: {fileID: 0}
@@ -344,7 +344,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 441319373}
         m_TargetAssemblyTypeName: MainMenuManager, Assembly-CSharp
-        m_MethodName: OnCharacterSelect
+        m_MethodName: OnCharacterSelectButtonClick
         m_Mode: 3
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -912,8 +912,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9f7f13aee8c85f24faf610ec941013cc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sceneTransitionAnimator: {fileID: 393102979}
-  transitionAnimationDuration: 0.5
 --- !u!1 &451970618
 GameObject:
   m_ObjectHideFlags: 0
@@ -1425,7 +1423,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Navigation:
-    m_Mode: 3
+    m_Mode: -1
     m_WrapAround: 0
     m_SelectOnUp: {fileID: 0}
     m_SelectOnDown: {fileID: 0}
@@ -1458,7 +1456,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 441319373}
         m_TargetAssemblyTypeName: MainMenuManager, Assembly-CSharp
-        m_MethodName: OnCharacterSelect
+        m_MethodName: OnCharacterSelectButtonClick
         m_Mode: 3
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -1715,6 +1713,14 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 3586658568221629736, guid: b8581f20cd1696e4ca1f7f3800c99334, type: 3}
+      propertyPath: Sounds.Array.data[0].Volume
+      value: 0.4
+      objectReference: {fileID: 0}
+    - target: {fileID: 3586658568221629736, guid: b8581f20cd1696e4ca1f7f3800c99334, type: 3}
+      propertyPath: Sounds.Array.data[1].Volume
+      value: 0.4
+      objectReference: {fileID: 0}
     - target: {fileID: 3586658568221629737, guid: b8581f20cd1696e4ca1f7f3800c99334, type: 3}
       propertyPath: m_RootOrder
       value: 1
@@ -1884,7 +1890,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Navigation:
-    m_Mode: 3
+    m_Mode: -1
     m_WrapAround: 0
     m_SelectOnUp: {fileID: 0}
     m_SelectOnDown: {fileID: 0}
@@ -1917,7 +1923,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 441319373}
         m_TargetAssemblyTypeName: MainMenuManager, Assembly-CSharp
-        m_MethodName: OnCharacterSelect
+        m_MethodName: OnCharacterSelectButtonClick
         m_Mode: 3
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -2037,7 +2043,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Navigation:
-    m_Mode: 3
+    m_Mode: -1
     m_WrapAround: 0
     m_SelectOnUp: {fileID: 0}
     m_SelectOnDown: {fileID: 0}
@@ -2070,7 +2076,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 441319373}
         m_TargetAssemblyTypeName: MainMenuManager, Assembly-CSharp
-        m_MethodName: OnCharacterSelect
+        m_MethodName: OnCharacterSelectButtonClick
         m_Mode: 3
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -2190,7 +2196,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Navigation:
-    m_Mode: 3
+    m_Mode: -1
     m_WrapAround: 0
     m_SelectOnUp: {fileID: 0}
     m_SelectOnDown: {fileID: 0}
@@ -2223,7 +2229,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 441319373}
         m_TargetAssemblyTypeName: MainMenuManager, Assembly-CSharp
-        m_MethodName: OnCharacterSelect
+        m_MethodName: OnCharacterSelectButtonClick
         m_Mode: 3
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -2801,7 +2807,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Navigation:
-    m_Mode: 3
+    m_Mode: -1
     m_WrapAround: 0
     m_SelectOnUp: {fileID: 0}
     m_SelectOnDown: {fileID: 0}
@@ -2834,7 +2840,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 441319373}
         m_TargetAssemblyTypeName: MainMenuManager, Assembly-CSharp
-        m_MethodName: OnCharacterSelect
+        m_MethodName: OnCharacterSelectButtonClick
         m_Mode: 3
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

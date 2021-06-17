@@ -7,10 +7,11 @@ using UnityEngine.UI;
 
 public class InGameUIManager : MonoBehaviour
 {
+    private const string gameMusicName = "Game Music";
+    private const float transitionAnimationDuration = 0.4f;
+
     [SerializeField]
     private Animator sceneTransitionAnimator;
-    [SerializeField]
-    private float transitionAnimationDuration;
 
     [SerializeField]
     private GameObject pauseButton;
@@ -22,7 +23,7 @@ public class InGameUIManager : MonoBehaviour
 
     private void Start()
     {
-        StartCoroutine(AudioManager.Instance.FadeIn("Game Music", transitionAnimationDuration));
+        StartCoroutine(AudioManager.Instance.FadeIn(gameMusicName, transitionAnimationDuration));
     }
 
    
@@ -57,6 +58,7 @@ public class InGameUIManager : MonoBehaviour
         {
             Destroy(PhotonRoom.Instance.gameObject);
         }
+        AudioManager.Instance.StopAllSounds();
         SceneManager.LoadScene(0);
 	}
 }

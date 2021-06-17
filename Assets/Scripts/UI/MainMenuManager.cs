@@ -6,12 +6,7 @@ using UnityEngine.SceneManagement;
 public class MainMenuManager : MonoBehaviour
 {
 	private const string mainMenuMusicName = "Main Menu Music";
-	private const string animatorTriggerString = "FadeOut";
-
-	[SerializeField]
-	private Animator sceneTransitionAnimator;
-	[SerializeField]
-	private float transitionAnimationDuration;
+	private const float transitionAnimationDuration = 0.4f;
 
 	private void Start()
 	{
@@ -29,16 +24,5 @@ public class MainMenuManager : MonoBehaviour
 		{
 			PlayerSettings.Instance.SetSelectedCharacter((CharacterType)characterType);
 		}
-	}
-
-	IEnumerator LoadNextScene()
-	{
-		sceneTransitionAnimator.SetTrigger(animatorTriggerString);
-		StartCoroutine(AudioManager.Instance.FadeOut(mainMenuMusicName, transitionAnimationDuration));
-
-		yield return new WaitForSeconds(transitionAnimationDuration);
-
-		int currentSceneIndex = SceneManager.GetActiveScene().buildIndex; 
-		SceneManager.LoadScene(currentSceneIndex + 1);
 	}
 }

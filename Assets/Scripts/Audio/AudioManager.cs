@@ -49,10 +49,7 @@ public class AudioManager : MonoBehaviour
     /// <param name="name">Name of the source clip, same as in audio manager</param>
     public void PlaySound(string name)
     {
-        // TODO: remove this
-        return;
         Sound sound = FindSoundInArray(name);
-
 
         if (sound == null)
         {
@@ -112,6 +109,14 @@ public class AudioManager : MonoBehaviour
         PlaySound(soundName);
     }
 
+    public void StopAllSounds()
+	{
+        foreach(Sound sound in Sounds)
+		{
+            sound.source.Stop();
+		}
+	}
+
     public IEnumerator FadeOut(string soundName, float duration)
     {
         Sound sound = FindSoundInArray(soundName);
@@ -155,5 +160,13 @@ public class AudioManager : MonoBehaviour
             elapsedTime += Time.deltaTime;
             yield return null;
         }
+    }
+
+    public void FadeOutAllSounds(float duration)
+	{
+        foreach(Sound sound in Sounds)
+		{
+            StartCoroutine(FadeOut(sound.name, duration));
+		}
     }
 }

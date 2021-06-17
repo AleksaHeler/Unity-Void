@@ -7,6 +7,9 @@ using UnityEngine.SceneManagement;
 // This script handles players connecting to the room and starting the game on countdown timer
 public class PhotonRoom : MonoBehaviourPunCallbacks, IInRoomCallbacks
 {
+	private const string mainMenuMusicName = "Main Menu Music";
+	private const float sceneTransitionDuration = 0.4f;
+
 	// Singleton
 	private static PhotonRoom instance;
 	public static PhotonRoom Instance { get => instance; }
@@ -213,8 +216,9 @@ public class PhotonRoom : MonoBehaviourPunCallbacks, IInRoomCallbacks
 		{
 			return;
 		}
-
+		
 		PhotonNetwork.CurrentRoom.IsOpen = false;
+		AudioManager.Instance.StopAllSounds();
 		PhotonNetwork.LoadLevel(MultiplayerSettings.Instance.MultiplayerSceneBuildIndex);
 	}
 
@@ -228,6 +232,7 @@ public class PhotonRoom : MonoBehaviourPunCallbacks, IInRoomCallbacks
 		}
 
 		isHostWinner = !isHostLoser;
+		AudioManager.Instance.StopAllSounds();
 		PhotonNetwork.LoadLevel(MultiplayerSettings.Instance.MultiplayerSceneBuildIndex + 1);
 	}
 

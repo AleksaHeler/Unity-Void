@@ -113,6 +113,7 @@ public class GameOverMenuManager : MonoBehaviour
 
 		yield return new WaitForSeconds(transitionAnimationDuration);
 
+		AudioManager.Instance.StopAllSounds();
 		SceneManager.LoadScene(0);
 	}
 }

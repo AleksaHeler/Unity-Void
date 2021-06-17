@@ -74,6 +74,7 @@ public class PhotonLobby : MonoBehaviourPunCallbacks
 	// Click on UI button to stop searching for a game
 	public void OnCancelButtonClicked()
 	{
+		statusText.text = "We are now connected to " + PhotonNetwork.CloudRegion.ToUpper() + " server!";
 		PhotonNetwork.LeaveRoom();
 		playButton.SetActive(true);
 		cancelButton.SetActive(false);

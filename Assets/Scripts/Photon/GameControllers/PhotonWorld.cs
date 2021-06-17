@@ -18,6 +18,7 @@ public class PhotonWorld : MonoBehaviour
 
 	// World data
 	private GameObject[,] platforms;
+	private GameSettings gameSettings;
 	private int width;
 	private int height;
 	private float platformSpeed;
@@ -42,7 +43,7 @@ public class PhotonWorld : MonoBehaviour
 
 	private void Start()
 	{
-		GameSettings gameSettings = SettingsReader.Instance.GameSettings;
+		gameSettings = SettingsReader.Instance.GameSettings;
 
 		// Get data from settings
 		width = gameSettings.Width;
@@ -51,6 +52,7 @@ public class PhotonWorld : MonoBehaviour
 		bottomWorldBorder = gameSettings.ScreenBorderBottom;
 		topWorldBorder = gameSettings.ScreenBorderTop;
 
+		// Generate world only if we are the master
 		if (!PhotonNetwork.IsMasterClient)
 		{
 			return;
@@ -62,31 +64,18 @@ public class PhotonWorld : MonoBehaviour
 		for (int y = 0; y < height; y++)
 		{
 			// Get a random predefined row
-			int predefinedRowsCount = SettingsReader.Instance.GameSettings.PredefinedRows.Length;
-			int randomRowIndex = Random.Range(0, predefinedRowsCount);
-			PlatformType[] predefinedRow = SettingsReader.Instance.GameSettings.PredefinedRows[randomRowIndex];
+			PlatformType[] predefinedRow = GetRandomPredefinedRow();
 
 			for (int x = 0; x < width; x++)
 			{
 				float xPos = ((float)x - width / 2f + 0.5f) * gameSettings.PlatformSpacingHorizontal;
 				float yPos = ((float)y - height / 2f + 0.5f) * gameSettings.PlatformSpacingVertical;
-				Vector3 position = new Vector3(xPos, yPos);
-				Quaternion rotation = Quaternion.identity;
-				platforms[x, y] = PhotonNetwork.Instantiate(Path.Combine("PhotonPrefabs", "PlatformAvatar"), position, rotation, 0);
-				platforms[x, y].GetComponent<PhotonView>().RPC("RPC_AddPlatform", RpcTarget.All);
-				platforms[x, y].GetComponent<PhotonView>().RPC("RPC_SetPlatformType", RpcTarget.All, predefinedRow[x]);
 
-				// Find some item to place
-				ItemSettings[] itemSettingsArray = gameSettings.ItemSettings;
-				foreach (ItemSettings itemSettings in itemSettingsArray)
-				{
-					float randomNumber = Random.Range(0f, 1f);
-					if (randomNumber < itemSettings.ItemChance)
-					{
-						platforms[x, y].GetComponent<PhotonView>().RPC("RPC_SetItemType", RpcTarget.All, itemSettings.ItemType);
-						break;
-					}
-				}
+				Vector3 position = new Vector3(xPos, yPos);
+
+				InstantiatePlatformAvatar(x, y, position);
+				SetPlatformType(platforms[x, y], predefinedRow[x]);
+				PlaceRandomItemAtPlatform(platforms[x, y]);
 			}
 		}
 
@@ -123,6 +112,39 @@ public class PhotonWorld : MonoBehaviour
 		}
 	}
 
+	private PlatformType[] GetRandomPredefinedRow()
+	{
+		int predefinedRowsCount = SettingsReader.Instance.GameSettings.PredefinedRows.Length;
+		int randomRowIndex = Random.Range(0, predefinedRowsCount);
+		return SettingsReader.Instance.GameSettings.PredefinedRows[randomRowIndex];
+	}
+
+	private void InstantiatePlatformAvatar(int x, int y, Vector3 position)
+	{
+		Quaternion rotation = Quaternion.identity;
+		platforms[x, y] = PhotonNetwork.Instantiate(Path.Combine("PhotonPrefabs", "PlatformAvatar"), position, rotation, 0);
+		platforms[x, y].GetComponent<PhotonView>().RPC("RPC_AddPlatform", RpcTarget.All);
+	}
+
+	private void SetPlatformType(GameObject platform, PlatformType platformType)
+	{
+		platform.GetComponent<PhotonView>().RPC("RPC_SetPlatformType", RpcTarget.All, platformType);
+	}
+
+	private void PlaceRandomItemAtPlatform(GameObject platform)
+	{
+		ItemSettings[] itemSettingsArray = gameSettings.ItemSettings;
+		foreach (ItemSettings itemSettings in itemSettingsArray)
+		{
+			float randomNumber = Random.Range(0f, 1f);
+			if (randomNumber < itemSettings.ItemChance)
+			{
+				PlaceItemAtPlatform(platform, itemSettings.ItemType);
+				return;
+			}
+		}
+	}
+
 	public void PlaceItemAtPlatform(GameObject platform, ItemType type)
 	{
 		platform.GetComponent<PhotonView>().RPC("RPC_SetItemType", RpcTarget.All, type);
@@ -141,28 +163,19 @@ public class PhotonWorld : MonoBehaviour
 	// Moves platforms to top of the screen and sets their types to predefined row
 	private void RespawnRow(int y)
 	{
-		int predefinedRowsCount = SettingsReader.Instance.GameSettings.PredefinedRows.Length;
-		int randomRowIndex = Random.Range(0, predefinedRowsCount);
-		PlatformType[] predefinedRow = SettingsReader.Instance.GameSettings.PredefinedRows[randomRowIndex];
+		PlatformType[] predefinedRow = GetRandomPredefinedRow();
 
 		for (int x = 0; x < width; x++)
 		{
+			// Move up above screen
 			Vector3 newPos = platforms[x, y].transform.position;
 			newPos.y = topWorldBorder;
 			platforms[x, y].transform.position = newPos;
-			platforms[x, y].GetComponent<PhotonView>().RPC("RPC_SetPlatformType", RpcTarget.All, predefinedRow[x]);
 
-			// Find some item to place
-			ItemSettings[] itemSettingsArray = SettingsReader.Instance.GameSettings.ItemSettings;
-			foreach (ItemSettings itemSettings in itemSettingsArray)
-			{
-				float randomNumber = Random.Range(0f, 1f);
-				if (randomNumber < itemSettings.ItemChance)
-				{
-					platforms[x, y].GetComponent<PhotonView>().RPC("RPC_SetItemType", RpcTarget.All, itemSettings.ItemType);
-					break;
-				}
-			}
+			SetPlatformType(platforms[x, y], predefinedRow[x]);
+
+			RemoveItemAtPlatform(platforms[x, y]);
+			PlaceRandomItemAtPlatform(platforms[x, y]);
 		}
 	}
 
@@ -242,7 +255,7 @@ public class PhotonWorld : MonoBehaviour
 		}
 	}
 
-	// For all spawn points find closest platform and set it to normal type
+	// For all spawn points find closest platform and set it to type NORMAL
 	private void SetStartingPlatformsAsNormal()
 	{
 		foreach (Transform spawnPoint in GameSetup.Instance.PlayerSpawnPoints)
