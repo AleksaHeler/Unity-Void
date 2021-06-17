@@ -232,6 +232,7 @@ public class PhotonRoom : MonoBehaviourPunCallbacks, IInRoomCallbacks
 		}
 
 		isHostWinner = !isHostLoser;
+		// TODO: USE: player photon view ID
 		AudioManager.Instance.StopAllSounds();
 		PhotonNetwork.LoadLevel(MultiplayerSettings.Instance.MultiplayerSceneBuildIndex + 1);
 	}

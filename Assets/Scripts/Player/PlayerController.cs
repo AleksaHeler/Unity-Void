@@ -64,6 +64,8 @@ partial class PlayerController : MonoBehaviour
 
 	void LateUpdate()
 	{
+		Debug.Log("Player fall distance: " + lastFallDistance);
+
 		if (!photonView.IsMine)
 		{
 			return;
