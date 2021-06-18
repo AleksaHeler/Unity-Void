@@ -30,6 +30,6 @@ public class PhotonPlayer : MonoBehaviour
 		Vector3 position = spawnTransform.position;
 		Quaternion rotation = spawnTransform.rotation;
 
-		myAvatar = PhotonNetwork.Instantiate(Path.Combine("PhotonPrefabs", "PlayerAvatar"), position, rotation, 0);
+		myAvatar = PhotonNetwork.Instantiate(Path.Combine("PhotonPrefabs", "Player"), position, rotation, 0);
 	}
 }

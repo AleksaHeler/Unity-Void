@@ -45,6 +45,14 @@ public class GameOverMenuManager : MonoBehaviour
 		StartCoroutine(Disconnect());
 	}
 
+	private void Update()
+	{
+		if (Input.GetKeyDown(KeyCode.Escape))
+		{
+			Application.Quit();
+		}
+	}
+
 	IEnumerator Disconnect()
 	{
 		mainMenuButton.SetActive(false);
@@ -76,9 +84,9 @@ public class GameOverMenuManager : MonoBehaviour
 		{
 			if (player.GetComponent<PhotonView>().IsMine)
 			{
-				bool iAmHost = PhotonNetwork.IsMasterClient;
-				bool isHostWinner = PhotonRoom.Instance.IsHostWinner;
-				if (iAmHost == isHostWinner)
+				int myID = player.GetComponent<PhotonView>().ViewID;
+				int loserID = PhotonRoom.Instance.LoserID;
+				if (myID != loserID)
 				{
 					return true;
 				}

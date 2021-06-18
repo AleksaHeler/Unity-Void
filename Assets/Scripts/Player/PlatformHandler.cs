@@ -75,7 +75,7 @@ partial class PlayerController
 			// Trying to get out of slime
 			if (playerController.lastPlayerAction != PlayerAction.NONE)
 			{
-				AudioManager.Instance.PlayPlatformSound(playerController.currentPlatform.GetComponent<PlatformSetup>().PlatformType);
+				AudioManager.Instance.PlayPlatformSound(playerController.currentPlatform.GetComponent<PlatformController>().PlatformType);
 
 				// Setting initial get out of slime move
 				if (getOutOfSlimeMove == PlayerAction.NONE)

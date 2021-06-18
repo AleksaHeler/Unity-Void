@@ -93,7 +93,7 @@ GameObject:
   - component: {fileID: 6731410252382250223}
   - component: {fileID: 17478916610212684}
   m_Layer: 0
-  m_Name: Platform
+  m_Name: PlatformSprite
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

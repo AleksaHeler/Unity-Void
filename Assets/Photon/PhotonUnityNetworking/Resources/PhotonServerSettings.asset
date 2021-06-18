@@ -58,6 +58,11 @@ MonoBehaviour:
   - RPC_MoveItemDown
   - RPC_SetItemType
   - RPC_SpawnBombExplosionParticles
+  - RPC_DisableSpriteTemporarily
+  - RPC_PlaySound
+  - RPC_StopSound
+  - RPC_StopAllSounds
+  - RPC_FadeOutAllSounds
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1

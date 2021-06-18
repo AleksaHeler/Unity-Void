@@ -69,7 +69,7 @@ public class PlayerInventory : MonoBehaviour
             ItemType item = PhotonWorld.Instance.GetItemTypeAtPlatform(platform);
             if (item == ItemType.BOMB_ACTIVE)
             {
-                AudioManager.Instance.PlaySound("Bomb Explode");
+                AudioManager.Instance.PhotonView.RPC("RPC_PlaySound", RpcTarget.All, "Bomb Explode");
                 PhotonWorld.Instance.RemoveItemAtPlatform(platform);
                 photonView.RPC("RPC_SpawnPlayerDeathParticles", RpcTarget.All, transform.position);
                 playerController.PlayerDie();
@@ -94,7 +94,7 @@ public class PlayerInventory : MonoBehaviour
 
     private IEnumerator BombPrimeCountdown(GameObject platform, float duration)
     {
-        AudioManager.Instance.PlaySound("Bomb Tick");
+        AudioManager.Instance.PhotonView.RPC("RPC_PlaySound", RpcTarget.All, "Bomb Tick");
         PhotonWorld.Instance.PlaceItemAtPlatform(platform, ItemType.BOMB_PRIMING);
 
         // Wait for given amount of time
@@ -105,6 +105,7 @@ public class PlayerInventory : MonoBehaviour
             yield return null;
         }
 
+        AudioManager.Instance.PhotonView.RPC("RPC_StopSound", RpcTarget.All, "Bomb Tick");
         PhotonWorld.Instance.PlaceItemAtPlatform(platform, ItemType.BOMB_ACTIVE);
     }
 

@@ -1,5 +1,6 @@
 using Photon.Pun;
 using Photon.Realtime;
+using System;
 using System.IO;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -21,7 +22,7 @@ public class PhotonRoom : MonoBehaviourPunCallbacks, IInRoomCallbacks
 	private PhotonView photonView;
 	private bool isGameLoaded;
 	private int currentScene;
-	private bool isHostWinner;
+	private int loserID;
 
 	// Player info
 	private Player[] photonPlayers;
@@ -39,7 +40,7 @@ public class PhotonRoom : MonoBehaviourPunCallbacks, IInRoomCallbacks
 	private float atMaxPlayers;
 	private float timeToStart;
 
-	public bool IsHostWinner { get => isHostWinner; }
+	public int LoserID { get => loserID; }
 
 	private void Awake()
 	{
@@ -172,7 +173,14 @@ public class PhotonRoom : MonoBehaviourPunCallbacks, IInRoomCallbacks
 		base.OnPlayerLeftRoom(otherPlayer);
 
 		playersInRoom--;
-		isHostWinner = PhotonNetwork.IsMasterClient;
+		if (int.TryParse(otherPlayer.UserId, out int j))
+		{
+			loserID = j;
+		}
+		else
+		{
+			loserID = 0;
+		}
 		SceneManager.LoadScene(MultiplayerSettings.Instance.MultiplayerSceneBuildIndex + 1);
 	}
 
@@ -218,22 +226,21 @@ public class PhotonRoom : MonoBehaviourPunCallbacks, IInRoomCallbacks
 		}
 		
 		PhotonNetwork.CurrentRoom.IsOpen = false;
-		AudioManager.Instance.StopAllSounds();
+		AudioManager.Instance.PhotonView.RPC("RPC_FadeOutAllSounds", RpcTarget.All);
 		PhotonNetwork.LoadLevel(MultiplayerSettings.Instance.MultiplayerSceneBuildIndex);
 	}
 
 	[PunRPC]
 	// This changes scene to GameOverScene and keeps track of who won/lost
-	private void RPC_GameOver(bool isHostLoser)
+	private void RPC_GameOver(int loserID)
 	{
 		if (!PhotonNetwork.IsMasterClient)
 		{
 			return;
 		}
 
-		isHostWinner = !isHostLoser;
-		// TODO: USE: player photon view ID
-		AudioManager.Instance.StopAllSounds();
+		this.loserID = loserID;
+		AudioManager.Instance.PhotonView.RPC("RPC_FadeOutAllSounds", RpcTarget.All);
 		PhotonNetwork.LoadLevel(MultiplayerSettings.Instance.MultiplayerSceneBuildIndex + 1);
 	}
 

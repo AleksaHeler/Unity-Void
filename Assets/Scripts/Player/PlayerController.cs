@@ -64,8 +64,6 @@ partial class PlayerController : MonoBehaviour
 
 	void LateUpdate()
 	{
-		Debug.Log("Player fall distance: " + lastFallDistance);
-
 		if (!photonView.IsMine)
 		{
 			return;
@@ -93,7 +91,7 @@ partial class PlayerController : MonoBehaviour
 			playerState = PlayerState.NOT_MOVING;
 			if (currentPlatform != null)
 			{
-				AudioManager.Instance.PlayPlatformSound(currentPlatform.GetComponent<PlatformSetup>().PlatformType);
+				AudioManager.Instance.PlayPlatformSound(currentPlatform.GetComponent<PlatformController>().PlatformType);
 			}
 		}
 
@@ -110,7 +108,7 @@ partial class PlayerController : MonoBehaviour
 				return;
 			}
 
-			platformHandler.InvokeAction(currentPlatform.GetComponent<PlatformSetup>().PlatformType, this);
+			platformHandler.InvokeAction(currentPlatform.GetComponent<PlatformController>().PlatformType, this);
 
 			// Calls function Move() when there is input
 			HandleMoveActions();
@@ -261,7 +259,7 @@ partial class PlayerController : MonoBehaviour
 		playerState = PlayerState.DIED;
 		photonView.RPC("RPC_SpawnPlayerDeathParticles", RpcTarget.All, transform.position);
 		photonView.RPC("RPC_DieAndDisableSprite", RpcTarget.All);
-		PhotonRoom.Instance.photonView.RPC("RPC_GameOver", RpcTarget.All, PhotonNetwork.IsMasterClient);
+		PhotonRoom.Instance.photonView.RPC("RPC_GameOver", RpcTarget.All, photonView.ViewID);
 	}
 
 	private void OnSwipe(SwipeDirection swipeDirection)

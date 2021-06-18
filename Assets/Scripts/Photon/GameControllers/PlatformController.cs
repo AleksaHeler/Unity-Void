@@ -5,8 +5,10 @@ using UnityEngine;
 
 // This script spawns platform sprite and manages its type/sprite/movement
 // This is located on "PlatformAvatar" prefab
-public class PlatformSetup : MonoBehaviour
+public class PlatformController : MonoBehaviour
 {
+	private const float spriteDisableDuration = 0.5f;
+
 	private PhotonView photonView;
 
 	[SerializeField]
@@ -93,5 +95,25 @@ public class PlatformSetup : MonoBehaviour
 	void RPC_MovePlatformDown(Vector3 movement)
 	{
 		myPlatform.transform.position += movement;
+	}
+
+	[PunRPC]
+	void RPC_DisableSpriteTemporarily()
+	{
+		StartCoroutine(DisableSpriteTemporarily(spriteDisableDuration));
+	}
+
+	IEnumerator DisableSpriteTemporarily(float duration)
+	{
+		myPlatform.SetActive(false);
+
+		float elapsedTime = 0;
+		while(elapsedTime < duration)
+		{
+			elapsedTime += Time.deltaTime;
+			yield return null;
+		}
+
+		myPlatform.SetActive(true);
 	}
 }

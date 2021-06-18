@@ -11,12 +11,10 @@ GameObject:
   - component: {fileID: 4021727223803735164}
   - component: {fileID: 6571864766708415615}
   - component: {fileID: 8654842154543520739}
-  - component: {fileID: 4403309172167767224}
-  - component: {fileID: 352171220351125776}
-  - component: {fileID: 2527790576126763847}
+  - component: {fileID: -7163695700253648074}
   m_Layer: 0
-  m_Name: PlayerAvatar
-  m_TagString: Player
+  m_Name: Platform
+  m_TagString: Platform
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -74,7 +72,7 @@ MonoBehaviour:
   m_SynchronizeRotation: 0
   m_SynchronizeScale: 0
   m_UseLocal: 1
---- !u!114 &4403309172167767224
+--- !u!114 &-7163695700253648074
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -83,31 +81,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 4021727223803735160}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f2778b6ccc359844682e93134b8e39fe, type: 3}
+  m_Script: {fileID: 11500000, guid: 6aefeef6709ed5942b6df1d0d7fb205b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  characterPrefab: {fileID: 8077238381102788555, guid: 61734854cb8936242b85c2bc2560b3cd, type: 3}
---- !u!114 &352171220351125776
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4021727223803735160}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c198c208586d95042a0073f4fc9ad408, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &2527790576126763847
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4021727223803735160}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 56b1821fb3a80b3479f27099928a4673, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  platformPrefab: {fileID: 6414087614570491438, guid: cdcafc4a1ce7e884ebe5d470aebdf742, type: 3}

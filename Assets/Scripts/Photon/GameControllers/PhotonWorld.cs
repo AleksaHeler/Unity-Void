@@ -122,7 +122,7 @@ public class PhotonWorld : MonoBehaviour
 	private void InstantiatePlatformAvatar(int x, int y, Vector3 position)
 	{
 		Quaternion rotation = Quaternion.identity;
-		platforms[x, y] = PhotonNetwork.Instantiate(Path.Combine("PhotonPrefabs", "PlatformAvatar"), position, rotation, 0);
+		platforms[x, y] = PhotonNetwork.Instantiate(Path.Combine("PhotonPrefabs", "Platform"), position, rotation, 0);
 		platforms[x, y].GetComponent<PhotonView>().RPC("RPC_AddPlatform", RpcTarget.All);
 	}
 
@@ -152,7 +152,7 @@ public class PhotonWorld : MonoBehaviour
 
 	public ItemType GetItemTypeAtPlatform(GameObject platform)
 	{
-		return platform.GetComponent<PlatformSetup>().ItemType;
+		return platform.GetComponent<PlatformController>().ItemType;
 	}
 
 	public void RemoveItemAtPlatform(GameObject platform)
@@ -171,6 +171,7 @@ public class PhotonWorld : MonoBehaviour
 			Vector3 newPos = platforms[x, y].transform.position;
 			newPos.y = topWorldBorder;
 			platforms[x, y].transform.position = newPos;
+			DisablePlatformSpriteTemporarily(platforms[x, y]);
 
 			SetPlatformType(platforms[x, y], predefinedRow[x]);
 
@@ -178,6 +179,12 @@ public class PhotonWorld : MonoBehaviour
 			PlaceRandomItemAtPlatform(platforms[x, y]);
 		}
 	}
+
+	private void DisablePlatformSpriteTemporarily(GameObject platform)
+	{
+		platform.GetComponent<PhotonView>().RPC("RPC_DisableSpriteTemporarily", RpcTarget.All);
+	}
+	
 
 	// Returns platform that is the closest distance to given position
 	private GameObject GetPlatformClosestToPosition(Vector3 position)
@@ -198,7 +205,8 @@ public class PhotonWorld : MonoBehaviour
 		// Go trough all platforms to find closest one
 		foreach (GameObject platform in platforms)
 		{
-			if(platform == null)
+			bool platformNotActive = !platform.activeInHierarchy;
+			if (platform == null || platformNotActive)
 			{
 				continue;
 			}

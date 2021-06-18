@@ -1,3 +1,4 @@
+using Photon.Pun;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -17,6 +18,9 @@ public class AudioManager : MonoBehaviour
     private static AudioManager instance;
     public static AudioManager Instance { get { return instance; } }
 
+    private PhotonView photonView;
+    public PhotonView PhotonView { get => photonView; }
+
 
     private void Awake()
     {
@@ -30,9 +34,10 @@ public class AudioManager : MonoBehaviour
             instance = this;
             DontDestroyOnLoad(this);
         }
+        photonView = GetComponent<PhotonView>();
 
         // Create an audio source on this game object for each sound and copy settings
-        foreach(Sound sound in Sounds)
+        foreach (Sound sound in Sounds)
 		{
             sound.source = gameObject.AddComponent<AudioSource>();
 
@@ -95,6 +100,25 @@ public class AudioManager : MonoBehaviour
 
         sound.source.Pause();
         return;
+    }
+
+    [PunRPC]
+    void RPC_PlaySound(string name)
+    {
+        PlaySound(name);
+    }
+
+    [PunRPC]
+    void RPC_StopSound(string name)
+    {
+        StopSound(name);
+    }
+
+
+    [PunRPC]
+    void RPC_FadeOutAllSounds()
+    {
+        FadeOutAllSounds(0.2f);
     }
 
     private Sound FindSoundInArray(string name)

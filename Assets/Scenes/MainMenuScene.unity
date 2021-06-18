@@ -1919,6 +1919,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 531986048716775450, guid: b8581f20cd1696e4ca1f7f3800c99334, type: 3}
+      propertyPath: sceneViewId
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 3586658568221629736, guid: b8581f20cd1696e4ca1f7f3800c99334, type: 3}
       propertyPath: Sounds.Array.data[0].Volume
       value: 0.4

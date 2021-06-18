@@ -13,6 +13,14 @@ public class MainMenuManager : MonoBehaviour
 		StartCoroutine(AudioManager.Instance.FadeIn(mainMenuMusicName, transitionAnimationDuration));
 	}
 
+	private void Update()
+	{
+		if (Input.GetKeyDown(KeyCode.Escape))
+		{
+			QuitButtonClick();
+		}
+	}
+
 	public void QuitButtonClick()
 	{
 		Application.Quit();
