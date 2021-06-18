@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   width: 5
   height: 6
-  platformSpeed: 0.1
+  platformSpeed: 0.25
   platformSettings:
   - {fileID: 11400000, guid: 6f3b2f79f042e3b4e84f859a7643d187, type: 2}
   - {fileID: 11400000, guid: 9895a6ef84a26ec48b3c298f0756eb46, type: 2}
@@ -32,8 +32,13 @@ MonoBehaviour:
   platformSpacingHorizontal: 2
   platformHeight: 2
   glassPlatformRegenerationTime: 3
-  chanceForPlatformToChangeType: 0.005
+  chanceForPlatformToChangeType: 0.002
   platformChangeTypeDuration: 3
+  cannonSpawnChance: 0.2
+  cannonBulletSpeed: 3
+  cannonBulletPoolingCount: 8
+  cannonRoundsPerMinuteMin: 10
+  cannonRoundsPerMinuteMax: 50
   playerSpeed: 12
   playerToPlatformOffset: {x: 0, y: 0.45, z: 1}
   playerToPlatformSnapRange: 1.8

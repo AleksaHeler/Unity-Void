@@ -59,12 +59,13 @@ public class AudioManager : MonoBehaviour
 
         if (sound == null)
         {
-            Debug.LogWarning("Sound with name: '" + name + "' was not found");
             return;
         }
 
-        sound.source.Play();
-        return;
+        if(sound.source != null)
+        {
+            sound.source.Play();
+        }
     }
 
     /// <summary>
@@ -77,12 +78,13 @@ public class AudioManager : MonoBehaviour
 
         if (sound == null)
         {
-            Debug.LogWarning("Sound with name: '" + name + "' was not found");
             return;
         }
 
-        sound.source.Stop();
-        return;
+        if (sound.source != null)
+        {
+            sound.source.Stop();
+        }
     }
 
     /// <summary>
@@ -95,12 +97,13 @@ public class AudioManager : MonoBehaviour
 
         if (sound == null)
         {
-            Debug.LogWarning("Sound with name: '" + name + "' was not found");
             return;
         }
 
-        sound.source.Pause();
-        return;
+        if (sound.source != null)
+        {
+            sound.source.Pause();
+        }
     }
 
     [PunRPC]
@@ -138,7 +141,10 @@ public class AudioManager : MonoBehaviour
 	{
         foreach(Sound sound in Sounds)
 		{
-            sound.source.Stop();
+            if(sound.source != null)
+            {
+                sound.source.Stop();
+            }
 		}
 	}
 
@@ -155,6 +161,10 @@ public class AudioManager : MonoBehaviour
         float elapsedTime = 0;
         while (elapsedTime < duration)
         {
+            if (sound.source == null)
+            {
+                yield break;
+            }
             float percent = elapsedTime / duration;
             sound.source.volume = startVolume * (1f - percent);
             elapsedTime += Time.deltaTime;
@@ -180,6 +190,10 @@ public class AudioManager : MonoBehaviour
         float elapsedTime = 0;
         while (elapsedTime < duration)
         {
+            if(sound.source == null)
+			{
+                yield break;
+			}
             float percent = elapsedTime / duration;
             sound.source.volume = percent * targetVolume;
             elapsedTime += Time.deltaTime;

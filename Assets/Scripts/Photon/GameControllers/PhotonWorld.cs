@@ -18,6 +18,7 @@ public class PhotonWorld : MonoBehaviour
 
 	// World data
 	private GameObject[,] platforms;
+	private List<GameObject> cannons;
 	private GameSettings gameSettings;
 	private int width;
 	private int height;
@@ -39,6 +40,7 @@ public class PhotonWorld : MonoBehaviour
 		}
 
 		photonView = GetComponent<PhotonView>();
+		cannons = new List<GameObject>();
 	}
 
 	private void Start()
@@ -95,6 +97,18 @@ public class PhotonWorld : MonoBehaviour
 			CollectExistingPlatformsInArray();
 		}
 
+		// Animate cannons
+		foreach (GameObject cannon in cannons)
+		{
+			cannon.transform.position += Vector3.down * Time.deltaTime * platformSpeed;
+
+			if (cannon.transform.position.y < bottomWorldBorder)
+			{
+				cannons.Remove(cannon);
+				Destroy(cannon);
+			}
+		}
+
 		// Animate all platforms -> move them down
 		for (int y = 0; y < height; y++)
 		{
@@ -109,7 +123,9 @@ public class PhotonWorld : MonoBehaviour
 				if(randomPercentage < changeTypeChance)
 				{
 					float changeDuration = gameSettings.PlatformChangeTypeDuration;
-					platforms[x, y].GetComponent<PhotonView>().RPC("RPC_ChangeType", RpcTarget.All, changeDuration);
+					int platformTypesCount = gameSettings.PlatformSettings.Length;
+					int randomPlatformIndex = Random.Range(0, platformTypesCount);
+					platforms[x, y].GetComponent<PhotonView>().RPC("RPC_ChangeType", RpcTarget.All, changeDuration, (PlatformType)randomPlatformIndex);
 				}
 
 				// Respawn up above screen if needed
@@ -174,6 +190,22 @@ public class PhotonWorld : MonoBehaviour
 	{
 		PlatformType[] predefinedRow = GetRandomPredefinedRow();
 
+		float randomPercentage = Random.Range(0f, 1f);
+		float cannonSpawnChance = gameSettings.CannonSpawnChance;
+		if(randomPercentage < cannonSpawnChance)
+		{
+			// Spawn cannon here
+			randomPercentage = Random.Range(0f, 1f);
+			Vector3 side = randomPercentage < 0.5f ? Vector3.left : Vector3.right;
+			Vector3 shootDirection = side * -1f;
+			Vector3 position = side * ((width / 2f) * gameSettings.PlatformSpacingHorizontal + 1f);
+			position.y = topWorldBorder + gameSettings.PlatformSpacingVertical / 2f;
+
+			GameObject cannon = PhotonNetwork.Instantiate(Path.Combine("PhotonPrefabs", "Cannon"), position, Quaternion.identity, 0);
+			cannon.GetComponent<PhotonView>().RPC("RPC_AddCannon", RpcTarget.All, shootDirection);
+			cannons.Add(cannon);
+		}
+
 		for (int x = 0; x < width; x++)
 		{
 			// Move up above screen
@@ -214,7 +246,8 @@ public class PhotonWorld : MonoBehaviour
 		// Go trough all platforms to find closest one
 		foreach (GameObject platform in platforms)
 		{
-			bool platformNotActive = !platform.activeInHierarchy;
+			bool platformNotActive = !platform.GetComponent<PlatformController>().IsSpriteEnabled();
+
 			if (platform == null || platformNotActive)
 			{
 				continue;

@@ -31,9 +31,23 @@ public class GameSettings : ScriptableObject
 	[SerializeField]
 	private float glassPlatformRegenerationTime = 3f;
 	[SerializeField]
+	[Range(0f, 1f)]
 	private float chanceForPlatformToChangeType = 0.01f;
 	[SerializeField]
 	private float platformChangeTypeDuration = 3f;
+	[SerializeField]
+	[Range(0f, 1f)]
+	private float cannonSpawnChance = 0.1f;
+	[SerializeField]
+	[Range(0.1f, 5f)]
+	private float cannonBulletSpeed = 2f;
+	[SerializeField]
+	[Range(1, 10)]
+	private int cannonBulletPoolingCount = 5;
+	[SerializeField]
+	private float cannonRoundsPerMinuteMin = 30;
+	[SerializeField]
+	private float cannonRoundsPerMinuteMax = 80;
 
 
 	[Header("Player settings")]
@@ -152,6 +166,11 @@ public class GameSettings : ScriptableObject
 	public float PlayerEndMovingCheckDistance { get => playerEndMovingCheckDistance; }
 	public int MinDistanceToSwipe { get => minDistanceToSwipe; }
 	public float BombPrimingTime { get => bombPrimingTime; }
+	public float CannonSpawnChance { get => cannonSpawnChance; }
+	public float CannonBulletSpeed { get => cannonBulletSpeed; }
+	public int CannonBulletPoolingCount { get => cannonBulletPoolingCount; }
+	public float CannonRoundsPerMinuteMin { get => cannonRoundsPerMinuteMin; }
+	public float CannonRoundsPerMinuteMax { get => cannonRoundsPerMinuteMax; }
 	public GameObject BombExplosionParticles { get => bombExplosionParticles; }
 	public GameObject PlayerDeathParticles { get => playerDeathParticles; }
 	public PlatformType[][] PredefinedRows { get => predefinedRows; }

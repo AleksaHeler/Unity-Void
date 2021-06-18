@@ -7,7 +7,7 @@ using UnityEngine;
 // This is located on "PlatformAvatar" prefab
 public class PlatformController : MonoBehaviour
 {
-	private const float spriteDisableDuration = 1.5f;
+	private const float spriteDisableDuration = 3f;
 
 	private PhotonView photonView;
 
@@ -55,12 +55,12 @@ public class PlatformController : MonoBehaviour
 
 	[PunRPC]
 	// Randomly change type after some time
-	void RPC_ChangeType(float duration)
+	void RPC_ChangeType(float duration, PlatformType type)
 	{
-		StartCoroutine(ChangeTypeCoroutine(duration));
+		StartCoroutine(ChangeTypeCoroutine(duration, type));
 	}
 
-	IEnumerator ChangeTypeCoroutine(float duration)
+	IEnumerator ChangeTypeCoroutine(float duration, PlatformType type)
 	{
 		// Give visual signal -> pulse transparency
 		Color color = myPlatform.GetComponent<SpriteRenderer>().color;
@@ -77,9 +77,7 @@ public class PlatformController : MonoBehaviour
 		}
 
 		// Actually change type
-		int numberOfPlatformTypes = SettingsReader.Instance.GameSettings.PlatformSettings.Length;
-		int randomType = Random.Range(0, numberOfPlatformTypes);
-		SetPlatformType((PlatformType)randomType);
+		SetPlatformType(type);
 
 		// Reset color
 		color.a = 1f;
@@ -105,6 +103,11 @@ public class PlatformController : MonoBehaviour
 		}
 
 		SetPlatformType(PlatformType.GLASS);
+	}
+
+	public bool IsSpriteEnabled()
+	{
+		return myPlatform.activeInHierarchy;
 	}
 
 	[PunRPC]
