@@ -103,6 +103,15 @@ public class PhotonWorld : MonoBehaviour
 				// Move down
 				platforms[x, y].transform.position += Vector3.down * Time.deltaTime * platformSpeed;
 
+				// Platform may randomly change type 
+				float randomPercentage = Random.Range(0f, 1f);
+				float changeTypeChance = gameSettings.ChanceForPlatformToChangeType * Time.deltaTime;
+				if(randomPercentage < changeTypeChance)
+				{
+					float changeDuration = gameSettings.PlatformChangeTypeDuration;
+					platforms[x, y].GetComponent<PhotonView>().RPC("RPC_ChangeType", RpcTarget.All, changeDuration);
+				}
+
 				// Respawn up above screen if needed
 				if (platforms[x, y].transform.position.y < bottomWorldBorder)
 				{

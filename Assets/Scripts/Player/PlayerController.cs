@@ -288,5 +288,15 @@ partial class PlayerController : MonoBehaviour
 	{
 		Instantiate(gameSettings.PlayerDeathParticles, position, Quaternion.identity);
 	}
-	
+
+	[PunRPC]
+	void RPC_HandlePlatform(GameObject platform)
+	{
+		float distance = Vector3.Distance(transform.position, platform.transform.position);
+		if(distance < snapDistance)
+		{
+			platformHandler.InvokeAction(platform.GetComponent<PlatformController>().PlatformType, this);
+		}
+	}
+
 }

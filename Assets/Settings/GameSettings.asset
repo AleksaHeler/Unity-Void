@@ -32,6 +32,8 @@ MonoBehaviour:
   platformSpacingHorizontal: 2
   platformHeight: 2
   glassPlatformRegenerationTime: 3
+  chanceForPlatformToChangeType: 0.005
+  platformChangeTypeDuration: 3
   playerSpeed: 12
   playerToPlatformOffset: {x: 0, y: 0.45, z: 1}
   playerToPlatformSnapRange: 1.8

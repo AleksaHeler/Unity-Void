@@ -30,6 +30,10 @@ public class GameSettings : ScriptableObject
 	private float platformHeight = 2f;
 	[SerializeField]
 	private float glassPlatformRegenerationTime = 3f;
+	[SerializeField]
+	private float chanceForPlatformToChangeType = 0.01f;
+	[SerializeField]
+	private float platformChangeTypeDuration = 3f;
 
 
 	[Header("Player settings")]
@@ -129,6 +133,8 @@ public class GameSettings : ScriptableObject
 	public int Height { get => height; }
 	public float GlassPlatformRegenerationTime { get => glassPlatformRegenerationTime; }
 	public float PlatformSpeed { get => platformSpeed; }
+	public float ChanceForPlatformToChangeType { get => chanceForPlatformToChangeType; }
+	public float PlatformChangeTypeDuration { get => platformChangeTypeDuration; }
 	public float ScreenBorderTop {
 		get {
 			Vector3 topRightViewport = new Vector3(1, 1, 0);
@@ -149,6 +155,7 @@ public class GameSettings : ScriptableObject
 	public GameObject BombExplosionParticles { get => bombExplosionParticles; }
 	public GameObject PlayerDeathParticles { get => playerDeathParticles; }
 	public PlatformType[][] PredefinedRows { get => predefinedRows; }
+	public PlatformSettings[] PlatformSettings { get => platformSettings; }
 	public Dictionary<PlatformType, string> PlatformTypeToSound { get => platformTypeToSound; }
 	public Dictionary<SwipeDirection, PlayerAction> SwipeDirectionToPlayerAction { get => swipeDirectionToPlayerAction; }
 	public List<PlayerAction> MovePlayerActions { get => movePlayerActions; }

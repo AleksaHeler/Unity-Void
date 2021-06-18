@@ -7,7 +7,7 @@ using UnityEngine;
 // This is located on "PlatformAvatar" prefab
 public class PlatformController : MonoBehaviour
 {
-	private const float spriteDisableDuration = 0.5f;
+	private const float spriteDisableDuration = 1.5f;
 
 	private PhotonView photonView;
 
@@ -51,6 +51,46 @@ public class PlatformController : MonoBehaviour
 		}
 		SetPlatformType(PlatformType.NONE);
 		StartCoroutine(RegenerateGlassCoroutine());
+	}
+
+	[PunRPC]
+	// Randomly change type after some time
+	void RPC_ChangeType(float duration)
+	{
+		StartCoroutine(ChangeTypeCoroutine(duration));
+	}
+
+	IEnumerator ChangeTypeCoroutine(float duration)
+	{
+		// Give visual signal -> pulse transparency
+		Color color = myPlatform.GetComponent<SpriteRenderer>().color;
+
+		float elapsedTime = 0;
+		while (elapsedTime < duration)
+		{
+			// Pulse using sine wave
+			color.a = 0.5f * Mathf.Cos(elapsedTime * 2f * Mathf.PI) + 0.5f;
+			myPlatform.GetComponent<SpriteRenderer>().color = color;
+
+			elapsedTime += Time.deltaTime;
+			yield return null;
+		}
+
+		// Actually change type
+		int numberOfPlatformTypes = SettingsReader.Instance.GameSettings.PlatformSettings.Length;
+		int randomType = Random.Range(0, numberOfPlatformTypes);
+		SetPlatformType((PlatformType)randomType);
+
+		// Reset color
+		color.a = 1f;
+		myPlatform.GetComponent<SpriteRenderer>().color = color;
+
+		// Invoke function for player to handle the current platform if in range
+		GameObject[] playerGameObjects = GameObject.FindGameObjectsWithTag("Player");
+		foreach(GameObject player in playerGameObjects)
+		{
+			player.GetComponent<PhotonView>().RPC("RPC_HandlePlatform", RpcTarget.All, gameObject);
+		}
 	}
 
 	IEnumerator RegenerateGlassCoroutine()
