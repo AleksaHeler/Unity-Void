@@ -20,9 +20,11 @@ public class PhotonRoom : MonoBehaviourPunCallbacks, IInRoomCallbacks
 
 	// Room info
 	private PhotonView photonView;
+	public PhotonView PhotonView { get => photonView; }
 	private bool isGameLoaded;
 	private int currentScene;
-	private int loserID;
+	[SerializeField]
+	private int loserActorNumber;
 
 	// Player info
 	private Player[] photonPlayers;
@@ -40,7 +42,7 @@ public class PhotonRoom : MonoBehaviourPunCallbacks, IInRoomCallbacks
 	private float atMaxPlayers;
 	private float timeToStart;
 
-	public int LoserID { get => loserID; }
+	public int LoserActorNumber { get => loserActorNumber; set => loserActorNumber = value; }
 
 	private void Awake()
 	{
@@ -172,15 +174,8 @@ public class PhotonRoom : MonoBehaviourPunCallbacks, IInRoomCallbacks
 	{
 		base.OnPlayerLeftRoom(otherPlayer);
 
-		playersInRoom--;
-		if (int.TryParse(otherPlayer.UserId, out int j))
-		{
-			loserID = j;
-		}
-		else
-		{
-			loserID = 0;
-		}
+		loserActorNumber = otherPlayer.ActorNumber;
+
 		SceneManager.LoadScene(MultiplayerSettings.Instance.MultiplayerSceneBuildIndex + 1);
 	}
 
@@ -230,16 +225,30 @@ public class PhotonRoom : MonoBehaviourPunCallbacks, IInRoomCallbacks
 		PhotonNetwork.LoadLevel(MultiplayerSettings.Instance.MultiplayerSceneBuildIndex);
 	}
 
+
+	[PunRPC]
+	public void RPC_RequestLoserActorNumber()
+	{
+		photonView.RPC("RPC_ReceiveLoserActorNumber", RpcTarget.All, loserActorNumber);
+	}
+
+	[PunRPC]
+	public void RPC_ReceiveLoserActorNumber(int loserActorNumber)
+	{
+		this.loserActorNumber = loserActorNumber;
+	}
+
+
 	[PunRPC]
 	// This changes scene to GameOverScene and keeps track of who won/lost
-	private void RPC_GameOver(int loserID)
+	private void RPC_GameOver(int loserActorNumber)
 	{
 		if (!PhotonNetwork.IsMasterClient)
 		{
 			return;
 		}
 
-		this.loserID = loserID;
+		this.loserActorNumber = loserActorNumber;
 		AudioManager.Instance.PhotonView.RPC("RPC_StopAllSounds", RpcTarget.All);
 		PhotonNetwork.LoadLevel(MultiplayerSettings.Instance.MultiplayerSceneBuildIndex + 1);
 	}

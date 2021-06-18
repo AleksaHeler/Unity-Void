@@ -32,15 +32,7 @@ public class GameOverMenuManager : MonoBehaviour
 
 		StartCoroutine(AudioManager.Instance.FadeIn(mainMenuMusicName, transitionAnimationDuration));
 
-		if (IsLocalPlayerWinner())
-		{
-			titleText.text = winText;
-			demotivationalText.gameObject.SetActive(false);
-		}
-		else
-		{
-			titleText.text = loseText;
-		}
+		SetGameOverText();
 
 		StartCoroutine(Disconnect());
 	}
@@ -69,6 +61,7 @@ public class GameOverMenuManager : MonoBehaviour
 		quitButton.SetActive(true);
 	}
 
+
 	private void DisplayDemotivationalQuote()
 	{
 		List<string> demotivationalQuotes = SettingsReader.Instance.GameSettings.DemotivationalQuotes;
@@ -76,24 +69,22 @@ public class GameOverMenuManager : MonoBehaviour
 		demotivationalText.text = demotivationalQuotes[index];
 	}
 
-	private bool IsLocalPlayerWinner()
+	private void SetGameOverText()
 	{
-		GameObject[] playerGameObjects = GameObject.FindGameObjectsWithTag("Player");
+		int myID = PhotonNetwork.LocalPlayer.ActorNumber;
+		int loserID = PhotonRoom.Instance.LoserActorNumber;
+		Debug.Log("My id: " + myID + ", losers id: " + loserID);
 
-		foreach (GameObject player in playerGameObjects)
+		if (myID != loserID)
 		{
-			if (player.GetComponent<PhotonView>().IsMine)
-			{
-				int myID = player.GetComponent<PhotonView>().ViewID;
-				int loserID = PhotonRoom.Instance.LoserID;
-				if (myID != loserID)
-				{
-					return true;
-				}
-			}
+			titleText.text = winText;
+			demotivationalText.gameObject.SetActive(false);
 		}
-
-		return false;
+		else
+		{
+			titleText.text = loseText;
+			demotivationalText.gameObject.SetActive(true);
+		}
 	}
 
 	public void MainMenu()

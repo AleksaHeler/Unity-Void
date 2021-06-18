@@ -1,4 +1,5 @@
 using Photon.Pun;
+using Photon.Realtime;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -259,7 +260,8 @@ partial class PlayerController : MonoBehaviour
 		playerState = PlayerState.DIED;
 		photonView.RPC("RPC_SpawnPlayerDeathParticles", RpcTarget.All, transform.position);
 		photonView.RPC("RPC_DieAndDisableSprite", RpcTarget.All);
-		PhotonRoom.Instance.photonView.RPC("RPC_GameOver", RpcTarget.All, photonView.ViewID);
+		PhotonRoom.Instance.LoserActorNumber = PhotonNetwork.LocalPlayer.ActorNumber;
+		PhotonRoom.Instance.photonView.RPC("RPC_GameOver", RpcTarget.All, PhotonNetwork.LocalPlayer.ActorNumber);
 	}
 
 	private void OnSwipe(SwipeDirection swipeDirection)

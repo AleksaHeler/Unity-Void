@@ -68,6 +68,8 @@ MonoBehaviour:
   - RPC_MoveCannonDown
   - RPC_AddCannon
   - RPC_Shoot
+  - RPC_ReceiveLoserActorNumber
+  - RPC_RequestLoserActorNumber
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1

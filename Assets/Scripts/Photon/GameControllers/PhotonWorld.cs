@@ -246,7 +246,13 @@ public class PhotonWorld : MonoBehaviour
 		// Go trough all platforms to find closest one
 		foreach (GameObject platform in platforms)
 		{
-			bool platformNotActive = !platform.GetComponent<PlatformController>().IsSpriteEnabled();
+			PlatformController platformController = platform.GetComponent<PlatformController>();
+			if(platformController == null)
+			{
+				continue;
+			}
+
+			bool platformNotActive = !platformController.IsSpriteEnabled();
 
 			if (platform == null || platformNotActive)
 			{
