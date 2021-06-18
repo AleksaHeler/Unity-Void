@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum ItemType { NONE, BOMB_COLLECTIBLE, BOMB_PRIMING, BOMB_ACTIVE }
+public enum ItemType { NONE, BOMB_COLLECTIBLE, BOMB_PRIMING, BOMB_ACTIVE, COIN }
 
 [CreateAssetMenu(menuName = "ItemSettings")]
 public class ItemSettings : ScriptableObject

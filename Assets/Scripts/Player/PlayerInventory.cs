@@ -5,6 +5,8 @@ using UnityEngine;
 
 public class PlayerInventory : MonoBehaviour
 {
+    private const string playerPrefsCoinsKey = "PlayerCoins";
+
     private PhotonView photonView;
 
     private bool hasBomb;
@@ -116,8 +118,26 @@ public class PlayerInventory : MonoBehaviour
         if (itemType == ItemType.BOMB_COLLECTIBLE && hasBomb == false)
         {
             hasBomb = true;
-            PhotonWorld.Instance.RemoveItemAtPlatform(platform);
         }
+
+        if (itemType == ItemType.COIN)
+        {
+            CollectCoin(platform);
+        }
+
+        PhotonWorld.Instance.RemoveItemAtPlatform(platform);
+    }
+
+    private void CollectCoin(GameObject platform)
+	{
+        int coins = 0;
+        if (PlayerPrefs.HasKey(playerPrefsCoinsKey))
+        {
+            coins = PlayerPrefs.GetInt(playerPrefsCoinsKey);
+        }
+        coins++;
+
+        PlayerPrefs.SetInt(playerPrefsCoinsKey, coins);
     }
 
     [PunRPC]

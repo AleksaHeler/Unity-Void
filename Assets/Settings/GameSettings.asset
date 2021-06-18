@@ -28,6 +28,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 8ad0a5e88e1226942ad5cbef163b3d82, type: 2}
   - {fileID: 11400000, guid: 06b0f0a98186cc241bbc9f6ac9cdade4, type: 2}
   - {fileID: 11400000, guid: cfab81d631bc02d4bba333b7c1ba9b45, type: 2}
+  - {fileID: 11400000, guid: 4f2b584f8638b1349a3305d90a35f1b3, type: 2}
   platformSpacingHorizontal: 2
   platformHeight: 2
   glassPlatformRegenerationTime: 3
@@ -35,7 +36,7 @@ MonoBehaviour:
   playerToPlatformOffset: {x: 0, y: 0.45, z: 1}
   playerToPlatformSnapRange: 1.8
   playerJumpAnimationHeight: 6
-  playerDeathCheckTolerance: 0
+  playerEndMovingCheckDistance: 0.1
   bombPrimingTime: 3
   minDistanceToSwipe: 50
   playerDeathParticles: {fileID: 8148911177897350824, guid: beaceac1990654c4aa40e55aaab2b493, type: 3}
