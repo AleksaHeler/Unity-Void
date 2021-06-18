@@ -224,9 +224,9 @@ public class PhotonRoom : MonoBehaviourPunCallbacks, IInRoomCallbacks
 		{
 			return;
 		}
-		
+
 		PhotonNetwork.CurrentRoom.IsOpen = false;
-		AudioManager.Instance.PhotonView.RPC("RPC_FadeOutAllSounds", RpcTarget.All);
+		AudioManager.Instance.PhotonView.RPC("RPC_StopAllSounds", RpcTarget.All);
 		PhotonNetwork.LoadLevel(MultiplayerSettings.Instance.MultiplayerSceneBuildIndex);
 	}
 
@@ -240,7 +240,7 @@ public class PhotonRoom : MonoBehaviourPunCallbacks, IInRoomCallbacks
 		}
 
 		this.loserID = loserID;
-		AudioManager.Instance.PhotonView.RPC("RPC_FadeOutAllSounds", RpcTarget.All);
+		AudioManager.Instance.PhotonView.RPC("RPC_StopAllSounds", RpcTarget.All);
 		PhotonNetwork.LoadLevel(MultiplayerSettings.Instance.MultiplayerSceneBuildIndex + 1);
 	}
 

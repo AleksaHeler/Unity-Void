@@ -98,6 +98,7 @@ public class GameOverMenuManager : MonoBehaviour
 
 	public void MainMenu()
 	{
+		AudioManager.Instance.StopAllSounds();
 		StartCoroutine(LoadMainMenuScene());
 	}
 
@@ -116,12 +117,14 @@ public class GameOverMenuManager : MonoBehaviour
 		{
 			Destroy(PhotonRoom.Instance.gameObject);
 		}
+		if (AudioManager.Instance != null)
+		{
+			Destroy(AudioManager.Instance.gameObject);
+		}
 		sceneTransitionAnimator.SetTrigger(animatorTriggerString);
-		StartCoroutine(AudioManager.Instance.FadeOut(mainMenuMusicName, transitionAnimationDuration));
 
 		yield return new WaitForSeconds(transitionAnimationDuration);
 
-		AudioManager.Instance.StopAllSounds();
 		SceneManager.LoadScene(0);
 	}
 }

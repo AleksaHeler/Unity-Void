@@ -34,6 +34,7 @@ public class AudioManager : MonoBehaviour
             instance = this;
             DontDestroyOnLoad(this);
         }
+
         photonView = GetComponent<PhotonView>();
 
         // Create an audio source on this game object for each sound and copy settings
@@ -116,9 +117,9 @@ public class AudioManager : MonoBehaviour
 
 
     [PunRPC]
-    void RPC_FadeOutAllSounds()
+    void RPC_StopAllSounds()
     {
-        FadeOutAllSounds(0.2f);
+        StopAllSounds();
     }
 
     private Sound FindSoundInArray(string name)

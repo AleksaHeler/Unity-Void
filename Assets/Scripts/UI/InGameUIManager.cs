@@ -7,11 +7,15 @@ using UnityEngine.UI;
 
 public class InGameUIManager : MonoBehaviour
 {
+    private const string playerPrefsCoinsKey = "PlayerCoins";
     private const string gameMusicName = "Game Music";
     private const float transitionAnimationDuration = 0.4f;
 
     [SerializeField]
     private Animator sceneTransitionAnimator;
+
+    [SerializeField]
+    private TMPro.TextMeshProUGUI coinsText;
 
     [SerializeField]
     private GameObject pauseButton;
@@ -20,6 +24,7 @@ public class InGameUIManager : MonoBehaviour
     [SerializeField]
     private GameObject bombButton;
 
+    private int coins;
 
     private void Start()
     {
@@ -33,10 +38,20 @@ public class InGameUIManager : MonoBehaviour
         {
             DisconnectPlayer();
         }
+
+		if (PlayerPrefs.HasKey(playerPrefsCoinsKey))
+		{
+            int coins = PlayerPrefs.GetInt(playerPrefsCoinsKey);
+            coinsText.text = coins.ToString();
+		}
+		else
+        {
+            coinsText.text = "0";
+        }
     }
 
     public void DisconnectPlayer()
-	{
+    {
         StartCoroutine(DisconnectAndLoad());
 	}
 
@@ -57,6 +72,10 @@ public class InGameUIManager : MonoBehaviour
         if (PhotonRoom.Instance != null)
         {
             Destroy(PhotonRoom.Instance.gameObject);
+        }
+        if (AudioManager.Instance != null)
+        {
+            Destroy(AudioManager.Instance.gameObject);
         }
         AudioManager.Instance.StopAllSounds();
         SceneManager.LoadScene(0);
