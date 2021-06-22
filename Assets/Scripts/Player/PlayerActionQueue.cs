@@ -2,6 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum PlayerAction { NONE, MOVE_UP, MOVE_DOWN, MOVE_LEFT, MOVE_RIGHT }
+
 /// <summary>
 /// Custom data structure containing PlayerActions
 /// Available operations: Push, PushFront and Pop

@@ -4,107 +4,101 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-#region Global defines
-public enum ItemType { NONE, BOMB_COLLECTIBLE, BOMB_PRIMING, BOMB_ACTIVE }
-
-public enum PlatformType { NONE, GLASS, GRASS, NORMAL, SLIDE_LEFT, SLIDE_RIGHT, SLIME, SPIKES }
-
-public enum PlayerAction { NONE, MOVE_UP, MOVE_DOWN, MOVE_LEFT, MOVE_RIGHT }
-
-public enum SwipeDirection { UP, DOWN, LEFT, RIGHT }
-
-#endregion
-
-
 [CreateAssetMenu(menuName = "GameSettings")]
 public class GameSettings : ScriptableObject
 {
 
 	#region Private members for editor
+
 	[Header("World size (# of platforms)")]
 	[SerializeField]
 	private int width = 5;
-
 	[SerializeField]
 	private int height = 6;
 
-	[Header("Platform settings")]
-
-	[SerializeField]
-	private GameObject platformPrefab;
-
-	[SerializeField]
-	private PlatformSettings[] platformSettings;
-
-	[SerializeField]
-	private ItemSettings[] itemSettings;
-
-	[Tooltip("Horizontal size of platform sprite")]
-	[SerializeField]
-	private float platformWidth = 1.5f;
-
-	[Tooltip("Vertical size of platform sprite")]
-	[SerializeField]
-	private float platformHeight = 1f;
-
-	[SerializeField]
-	private List<PlatformType> unsafePlatforms;
 
 	[Header("Level settings")]
-
-	[Tooltip("How fast should platforms move down")]
 	[SerializeField]
 	private float platformSpeed = 0.2f;
-
-	[Tooltip("How many platforms sould be random vs predetermined")]
 	[SerializeField]
-	private float percentOfRandomPlatforms = 0.1f;
-
+	private PlatformSettings[] platformSettings;
 	[SerializeField]
-	private float chanceForBomb = 0.1f;
-
-	[Tooltip("How much spacing should be on sides of level")]
+	private ItemSettings[] itemSettings;
 	[SerializeField]
-	private float platformSideOffset = 4f;
+	private float platformSpacingHorizontal = 2;
+	[SerializeField]
+	private float platformHeight = 2f;
+	[SerializeField]
+	private float glassPlatformRegenerationTime = 3f;
+	[SerializeField]
+	[Range(0f, 1f)]
+	private float chanceForPlatformToChangeType = 0.01f;
+	[SerializeField]
+	private float platformChangeTypeDuration = 3f;
+	[SerializeField]
+	[Range(0f, 1f)]
+	private float cannonSpawnChance = 0.1f;
+	[SerializeField]
+	[Range(0.1f, 5f)]
+	private float cannonBulletSpeed = 2f;
+	[SerializeField]
+	[Range(1, 10)]
+	private int cannonBulletPoolingCount = 5;
+	[SerializeField]
+	private float cannonRoundsPerMinuteMin = 30;
+	[SerializeField]
+	private float cannonRoundsPerMinuteMax = 80;
+
 
 	[Header("Player settings")]
 	[SerializeField]
-	private Vector3 playerToPlatformOffset;
-
+	private float playerSpeed = 12;
 	[SerializeField]
-	private float playerToPlatformSnapRange;
-
+	private Vector3 playerToPlatformOffset = new Vector3(0, 0.45f, 1);
 	[SerializeField]
-	private float playerGravity;
-
+	private float playerToPlatformSnapRange = 1.8f;
 	[SerializeField]
-	private float playerSpeed;
-
+	private float playerJumpAnimationHeight = 6;
 	[SerializeField]
-	private float playerCheckTolerance;
-
+	private float playerEndMovingCheckDistance = 0.1f;
 	[SerializeField]
-	private float moveAnimationCurveOffset;
-
+	private float bombPrimingTime = 3;
 	[SerializeField]
-	private int minDistanceToSwipe;
+	private int minDistanceToSwipe = 50;
 
+
+	[Header("Particles")]
 	[SerializeField]
-	private float bombPrimingTime;
+	private GameObject playerDeathParticles;
+	[SerializeField]
+	private GameObject bombExplosionParticles;
+
+
+	[Header("Menu settings")]
+	[SerializeField]
+	private List<string> demotivationalQuotes = new List<string>();
 
 	#endregion
 
 
 	#region Predefined rows
 	private PlatformType[][] predefinedRows = new PlatformType[][] {
-		new PlatformType[]{ PlatformType.NONE, PlatformType.SLIDE_LEFT, PlatformType.SPIKES, PlatformType.SLIDE_RIGHT, PlatformType.NONE},
-		new PlatformType[]{ PlatformType.NONE, PlatformType.GLASS, PlatformType.NORMAL, PlatformType.SLIME, PlatformType.NONE},
+		new PlatformType[]{ PlatformType.NORMAL, PlatformType.SLIDE_LEFT, PlatformType.SLIME, PlatformType.SLIDE_RIGHT, PlatformType.NORMAL},
+		new PlatformType[]{ PlatformType.NORMAL, PlatformType.GLASS, PlatformType.SLIME, PlatformType.GLASS, PlatformType.NORMAL},
 		new PlatformType[]{ PlatformType.NORMAL, PlatformType.NONE, PlatformType.NORMAL, PlatformType.NONE, PlatformType.NORMAL},
-		new PlatformType[]{ PlatformType.SPIKES, PlatformType.SLIDE_LEFT, PlatformType.NORMAL, PlatformType.SPIKES, PlatformType.SLIDE_LEFT},
-		new PlatformType[]{ PlatformType.GLASS, PlatformType.NONE, PlatformType.GLASS, PlatformType.NONE, PlatformType.GLASS},
-		new PlatformType[]{ PlatformType.NORMAL, PlatformType.SLIME, PlatformType.SLIME, PlatformType.GLASS, PlatformType.NORMAL},
-		new PlatformType[]{ PlatformType.SLIDE_RIGHT, PlatformType.GLASS, PlatformType.GLASS, PlatformType.GLASS, PlatformType.SLIDE_LEFT},
-		new PlatformType[]{ PlatformType.NORMAL, PlatformType.SPIKES, PlatformType.NORMAL, PlatformType.SPIKES, PlatformType.NORMAL }
+		new PlatformType[]{ PlatformType.SPIKES, PlatformType.SLIDE_RIGHT, PlatformType.NORMAL, PlatformType.SLIDE_LEFT, PlatformType.SPIKES},
+		new PlatformType[]{ PlatformType.GLASS, PlatformType.GLASS, PlatformType.GLASS, PlatformType.GLASS, PlatformType.GLASS},
+		new PlatformType[]{ PlatformType.NORMAL, PlatformType.SLIME, PlatformType.GRASS, PlatformType.SLIME, PlatformType.NORMAL},
+		new PlatformType[]{ PlatformType.SLIDE_RIGHT, PlatformType.GRASS, PlatformType.GLASS, PlatformType.GRASS, PlatformType.SLIDE_LEFT},
+		new PlatformType[]{ PlatformType.NORMAL, PlatformType.SPIKES, PlatformType.GRASS, PlatformType.SPIKES, PlatformType.NORMAL },
+		new PlatformType[]{ PlatformType.GLASS, PlatformType.SLIDE_RIGHT, PlatformType.SLIME, PlatformType.SLIDE_LEFT, PlatformType.SPIKES},
+		new PlatformType[]{ PlatformType.NONE, PlatformType.NONE, PlatformType.SLIDE_RIGHT, PlatformType.NONE, PlatformType.GRASS},
+		new PlatformType[]{ PlatformType.GRASS, PlatformType.NONE, PlatformType.GLASS, PlatformType.NONE, PlatformType.NONE},
+		new PlatformType[]{ PlatformType.SPIKES, PlatformType.NONE, PlatformType.SLIDE_LEFT, PlatformType.NONE, PlatformType.NORMAL},
+		new PlatformType[]{ PlatformType.NORMAL, PlatformType.NONE, PlatformType.NONE, PlatformType.NONE, PlatformType.GRASS},
+		new PlatformType[]{ PlatformType.GRASS, PlatformType.NONE, PlatformType.NORMAL, PlatformType.NONE, PlatformType.GRASS},
+		new PlatformType[]{ PlatformType.SLIDE_LEFT, PlatformType.GRASS, PlatformType.NORMAL, PlatformType.SLIME, PlatformType.NONE},
+		new PlatformType[]{ PlatformType.NONE, PlatformType.GLASS, PlatformType.SLIDE_RIGHT, PlatformType.NORMAL, PlatformType.SLIDE_RIGHT}
 	};
 	#endregion
 
@@ -149,14 +143,12 @@ public class GameSettings : ScriptableObject
 
 
 	#region Access modifiers (getters)
-	public int PlatformsCount { get => width; }
-	public int RowsCount { get => height; }
-	public GameObject PlatformPrefab { get => platformPrefab; }
-	public float PlatformWidth { get => platformWidth; }
-	public float PlatformHeight { get => platformHeight; }
+	public int Width { get => width; }
+	public int Height { get => height; }
+	public float GlassPlatformRegenerationTime { get => glassPlatformRegenerationTime; }
 	public float PlatformSpeed { get => platformSpeed; }
-	public float PercentOfRandomPlatforms { get => percentOfRandomPlatforms; }
-	public float ChanceForBomb { get => chanceForBomb; }
+	public float ChanceForPlatformToChangeType { get => chanceForPlatformToChangeType; }
+	public float PlatformChangeTypeDuration { get => platformChangeTypeDuration; }
 	public float ScreenBorderTop {
 		get {
 			Vector3 topRightViewport = new Vector3(1, 1, 0);
@@ -165,23 +157,29 @@ public class GameSettings : ScriptableObject
 		}
 	}
 	public float ScreenBorderBottom { get => -ScreenBorderTop; }
-	public float PlatformSpacingY { get { return (ScreenBorderTop * 2f) / height; } }
-	public float PlatformSpacingX { get { return ((Camera.main.ViewportToWorldPoint(new Vector3(1, 1, 0)).x - platformSideOffset) * 2f) / width; } }
+	public float PlatformSpacingVertical { get { return (ScreenBorderTop * 2f) / (float)height; } }
+	public float PlatformSpacingHorizontal { get => platformSpacingHorizontal; }
 	public float PlayerToPlatformSnapRange { get => playerToPlatformSnapRange; }
 	public Vector3 PlayerToPlatformOffset { get => playerToPlatformOffset;  }
-	public float PlayerGravity { get => playerGravity; }
 	public float PlayerSpeed { get => playerSpeed; }
-	public float PlayerCheckTolerance { get => playerCheckTolerance; }
-	public float MoveAnimationCurveOffset { get => moveAnimationCurveOffset; }
+	public float PlayerJumpAnimationHeight { get => playerJumpAnimationHeight; }
+	public float PlayerEndMovingCheckDistance { get => playerEndMovingCheckDistance; }
 	public int MinDistanceToSwipe { get => minDistanceToSwipe; }
 	public float BombPrimingTime { get => bombPrimingTime; }
+	public float CannonSpawnChance { get => cannonSpawnChance; }
+	public float CannonBulletSpeed { get => cannonBulletSpeed; }
+	public int CannonBulletPoolingCount { get => cannonBulletPoolingCount; }
+	public float CannonRoundsPerMinuteMin { get => cannonRoundsPerMinuteMin; }
+	public float CannonRoundsPerMinuteMax { get => cannonRoundsPerMinuteMax; }
+	public GameObject BombExplosionParticles { get => bombExplosionParticles; }
+	public GameObject PlayerDeathParticles { get => playerDeathParticles; }
 	public PlatformType[][] PredefinedRows { get => predefinedRows; }
+	public PlatformSettings[] PlatformSettings { get => platformSettings; }
 	public Dictionary<PlatformType, string> PlatformTypeToSound { get => platformTypeToSound; }
 	public Dictionary<SwipeDirection, PlayerAction> SwipeDirectionToPlayerAction { get => swipeDirectionToPlayerAction; }
 	public List<PlayerAction> MovePlayerActions { get => movePlayerActions; }
-	public PlatformSettings[] PlatformSettings { get => platformSettings; }
 	public ItemSettings[] ItemSettings { get => itemSettings; }
-	public List<PlatformType> UnsafePlatforms { get => unsafePlatforms; }
+	public List<string> DemotivationalQuotes { get => demotivationalQuotes; }
 	#endregion
 
 
@@ -244,11 +242,11 @@ public class GameSettings : ScriptableObject
 		return PlatformType.NONE;
 	}
 
-	public Vector3 MovePlayerActionToVector3(PlayerAction action)
+	public Vector3 PlayerActionToVector3(PlayerAction action)
 	{
 		Vector3 movement = movePlayerActionToVector3[action];
-		movement.x *= PlatformSpacingX;
-		movement.y *= PlatformSpacingY;
+		movement.x *= PlatformSpacingHorizontal;
+		movement.y *= PlatformSpacingVertical;
 		return movement;
 	}
 	#endregion

@@ -7,16 +7,26 @@ using UnityEngine;
 /// </summary>
 public class SettingsReader : MonoBehaviour
 { 
-	private static SettingsReader instance;
-	public static SettingsReader Instance { get => instance; }
+	private static SettingsReader _instance;
+	public static SettingsReader Instance { get => _instance; }
 
 
 	[SerializeField]
 	private GameSettings gameSettings;
 	public GameSettings GameSettings { get => gameSettings; }
 
+
 	private void Awake()
-	{
-		instance = this;
-	}
+    {
+        // Singleton
+        if (_instance != null && _instance != this)
+        {
+            Destroy(this.gameObject);
+        }
+        else
+        {
+            _instance = this;
+            DontDestroyOnLoad(this);
+        }
+    }
 }

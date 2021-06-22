@@ -5,35 +5,47 @@ using UnityEngine.SceneManagement;
 
 public class MainMenuManager : MonoBehaviour
 {
+	private const string playerPrefsCoinsKey = "PlayerCoins";
+	private const string mainMenuMusicName = "Main Menu Music";
+	private const float transitionAnimationDuration = 0.4f;
+
 	[SerializeField]
-	private Animator sceneTransitionAnimator;
-	[SerializeField]
-	private float transitionAnimationDuration;
+	private TMPro.TextMeshProUGUI coinsText;
 
 	private void Start()
 	{
-		AudioManager.Instance.PlaySound("Main Menu Music");
+		StartCoroutine(AudioManager.Instance.FadeIn(mainMenuMusicName, transitionAnimationDuration));
+
+		int coins = 0;
+		if (PlayerPrefs.HasKey(playerPrefsCoinsKey))
+		{
+			coins = PlayerPrefs.GetInt(playerPrefsCoinsKey);
+		}
+		else
+		{
+			PlayerPrefs.SetInt(playerPrefsCoinsKey, coins);
+		}
+		coinsText.text = coins.ToString();
 	}
 
-	public void Play()
+	private void Update()
 	{
-		StartCoroutine(LoadNextScene());
+		if (Input.GetKeyDown(KeyCode.Escape))
+		{
+			QuitButtonClick();
+		}
 	}
 
-	public void Quit()
+	public void QuitButtonClick()
 	{
 		Application.Quit();
 	}
 
-	IEnumerator LoadNextScene()
+	public void OnCharacterSelectButtonClick(int characterType)
 	{
-		sceneTransitionAnimator.SetTrigger("FadeOut");
-		yield return new WaitForSeconds(transitionAnimationDuration);
-
-		AudioManager.Instance.StopSound("Main Menu Music");
-		AudioManager.Instance.PlaySound("Game Music");
-
-		int currentSceneIndex = SceneManager.GetActiveScene().buildIndex; 
-		SceneManager.LoadScene(currentSceneIndex + 1);
+		if(PlayerSettings.Instance != null)
+		{
+			PlayerSettings.Instance.SetSelectedCharacter((CharacterType)characterType);
+		}
 	}
 }

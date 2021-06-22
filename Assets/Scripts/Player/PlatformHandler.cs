@@ -1,3 +1,4 @@
+using Photon.Pun;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -5,133 +6,140 @@ using UnityEngine;
 
 // Here we define functions that will be called when player steps on certain platforms
 // Parameter for all functions is PlayerController script
-public class PlatformHandler
+partial class PlayerController
 {
-	private Dictionary<PlatformType, Action<PlayerController>> platformActions;
-
-	public void InvokeAction(PlatformType name, PlayerController parameter)
+	public class PlatformHandler
 	{
-		platformActions[name](parameter);
-	}
+		private Dictionary<PlatformType, Action<PlayerController>> platformActions;
 
-	public PlatformHandler()
-	{
-		platformActions = new Dictionary<PlatformType, Action<PlayerController>>();
+		private PlayerAction getOutOfSlimeMove = PlayerAction.NONE;
+		private int getOutOfSlimeMoveCount = 0;
 
-		platformActions.Add(PlatformType.NONE, PlatformCallbackNone);
-		platformActions.Add(PlatformType.NORMAL, PlatformCallbackNormal);
-		platformActions.Add(PlatformType.SLIDE_LEFT, PlatformCallbackSlideLeft);
-		platformActions.Add(PlatformType.SLIDE_RIGHT, PlatformCallbackSlideRight);
-		platformActions.Add(PlatformType.SPIKES, PlatformCallbackSpikes);
-		platformActions.Add(PlatformType.SLIME, PlatformCallbackSlime);
-		platformActions.Add(PlatformType.GRASS, PlatformCallbackGrass);
-		platformActions.Add(PlatformType.GLASS, PlatformCallbackGlass);
-	}
-
-	private void PlatformCallbackNone(PlayerController playerController)
-	{
-		playerController.PushFrontToActionQueue(PlayerAction.MOVE_DOWN);
-	}
-
-	private void PlatformCallbackNormal(PlayerController playerController)
-	{
-		if (PlayerFellToDeath(playerController))
+		public void InvokeAction(PlatformType platformType, PlayerController playerController)
 		{
-			playerController.PlayerDie();
+			platformActions[platformType](playerController);
 		}
-	}
 
-	private void PlatformCallbackSpikes(PlayerController playerController)
-	{
-		playerController.PlayerDie();
-	}
-
-	private void PlatformCallbackSlideLeft(PlayerController playerController)
-	{
-		if (PlayerFellToDeath(playerController))
+		public PlatformHandler()
 		{
-			playerController.PlayerDie();
+			platformActions = new Dictionary<PlatformType, Action<PlayerController>>();
+
+			platformActions.Add(PlatformType.NONE, PlatformCallbackNone);
+			platformActions.Add(PlatformType.NORMAL, PlatformCallbackNormal);
+			platformActions.Add(PlatformType.SLIDE_LEFT, PlatformCallbackSlideLeft);
+			platformActions.Add(PlatformType.SLIDE_RIGHT, PlatformCallbackSlideRight);
+			platformActions.Add(PlatformType.SPIKES, PlatformCallbackSpikes);
+			platformActions.Add(PlatformType.SLIME, PlatformCallbackSlime);
+			platformActions.Add(PlatformType.GRASS, PlatformCallbackGrass);
+			platformActions.Add(PlatformType.GLASS, PlatformCallbackGlass);
 		}
-		playerController.PushFrontToActionQueue(PlayerAction.MOVE_LEFT);
 
-	}
-
-	private void PlatformCallbackSlideRight(PlayerController playerController)
-	{
-		if (PlayerFellToDeath(playerController))
+		private void PlatformCallbackNone(PlayerController playerController)
 		{
-			playerController.PlayerDie();
+			playerController.PushToFrontOfActionQueue(PlayerAction.MOVE_DOWN);
 		}
-		playerController.PushFrontToActionQueue(PlayerAction.MOVE_RIGHT);
-	}
 
-	private static PlayerAction getOutOfSlimeMove = PlayerAction.NONE;
-	private static int getOutOfSlimeMoveCount = 0;
-	private void PlatformCallbackSlime(PlayerController playerController)
-	{
-		if (PlayerFellToDeath(playerController))
+		private void PlatformCallbackNormal(PlayerController playerController)
+		{
+			HandleIfPlayerFellToDeath(playerController);
+		}
+
+		private void PlatformCallbackSpikes(PlayerController playerController)
 		{
 			playerController.PlayerDie();
 		}
 
-		if(playerController.PlayerState != PlayerState.STUCK_IN_SLIME)
+		private void PlatformCallbackSlideLeft(PlayerController playerController)
 		{
-			playerController.GetStuckInSlime();
-			return;
+			HandleIfPlayerFellToDeath(playerController);
+			playerController.PushToFrontOfActionQueue(PlayerAction.MOVE_LEFT);
 		}
 
-		if(playerController.LastPlayerAction != PlayerAction.NONE)
-		{ 
-			if (getOutOfSlimeMove == PlayerAction.NONE)
+		private void PlatformCallbackSlideRight(PlayerController playerController)
+		{
+			HandleIfPlayerFellToDeath(playerController);
+			playerController.PushToFrontOfActionQueue(PlayerAction.MOVE_RIGHT);
+		}
+
+		private void PlatformCallbackSlime(PlayerController playerController)
+		{
+			HandleIfPlayerFellToDeath(playerController);
+
+			// First time getting stuck in slime
+			if (playerController.playerState != PlayerState.STUCK_IN_SLIME)
 			{
-				getOutOfSlimeMove = playerController.LastPlayerAction;
-				getOutOfSlimeMoveCount = 1;
+				playerController.GetStuckInSlime();
+				return;
 			}
-			else
+
+			// Trying to get out of slime
+			if (playerController.lastPlayerAction != PlayerAction.NONE)
 			{
-				if(getOutOfSlimeMove == playerController.LastPlayerAction)
+				AudioManager.Instance.PlayPlatformSound(playerController.currentPlatform.GetComponent<PlatformController>().PlatformType);
+
+				// Setting initial get out of slime move
+				if (getOutOfSlimeMove == PlayerAction.NONE)
 				{
-					getOutOfSlimeMoveCount++;
+					getOutOfSlimeMove = playerController.lastPlayerAction;
+					getOutOfSlimeMoveCount = 1;
 				}
 				else
 				{
-					getOutOfSlimeMove = playerController.LastPlayerAction;
-					getOutOfSlimeMoveCount = 1;
+					HandleGettingOutOfSlime(playerController);
 				}
+			}
 
-				if(getOutOfSlimeMoveCount >= 3)
-				{
-					getOutOfSlimeMoveCount = 0;
-					getOutOfSlimeMove = PlayerAction.NONE;
-					playerController.GetUnstuckFromSlime();
-					return;
-				}
+			playerController.lastPlayerAction = PlayerAction.NONE;
+		}
+
+		private void HandleGettingOutOfSlime(PlayerController playerController)
+		{
+			// Player has to make same move 3 times to escape
+			if (getOutOfSlimeMove == playerController.lastPlayerAction)
+			{
+				getOutOfSlimeMoveCount++;
+			}
+			else
+			{
+				getOutOfSlimeMove = playerController.lastPlayerAction;
+				getOutOfSlimeMoveCount = 1;
+			}
+			// If player made the right moves
+			if (getOutOfSlimeMoveCount >= 3)
+			{
+				getOutOfSlimeMoveCount = 0;
+				getOutOfSlimeMove = PlayerAction.NONE;
+				playerController.GetUnstuckFromSlime();
 			}
 		}
 
-		playerController.LastPlayerAction = PlayerAction.NONE;
-	}
-
-	private void PlatformCallbackGlass(PlayerController playerController)
-	{
-		// If players last move is down -> break glass
-		if (playerController.LastPlayerAction == PlayerAction.MOVE_DOWN)
+		private void PlatformCallbackGlass(PlayerController playerController)
 		{
-			playerController.CurrentPlatform.BreakGlass();
+			// If players last move is down -> break glass
+			if (playerController.lastPlayerAction == PlayerAction.MOVE_DOWN)
+			{
+				playerController.currentPlatform.GetComponent<PhotonView>().RPC("RPC_BreakGlass", RpcTarget.All);
+			}
 		}
-	}
 
-	private void PlatformCallbackGrass(PlayerController playerController)
-	{
-		// Don't do nothing (not even fall damage)
-	}
+		private void PlatformCallbackGrass(PlayerController playerController)
+		{
+			// Don't do nothing (not even fall damage)
+		}
 
-	// Check if player has fell more than he can survive
-	private bool PlayerFellToDeath(PlayerController playerController)
-	{
-		float platformSpacingY = SettingsReader.Instance.GameSettings.PlatformSpacingY;
-		float playerFallDistance = playerController.LastFallDistance;
-		// Has player fallen more than one platform spacing
-		return playerFallDistance > platformSpacingY * 1.5f;
+		// Check if player has fell more than he can survive
+		private void HandleIfPlayerFellToDeath(PlayerController playerController)
+		{
+			float platformSpacingY = SettingsReader.Instance.GameSettings.PlatformSpacingVertical;
+			float playerFallDistance = playerController.lastFallDistance;
+
+			// Has player fallen more than one platform spacing
+			if (playerFallDistance > platformSpacingY * 1.5f)
+			{
+				playerController.PlayerDie();
+			}
+
+			playerController.lastFallDistance = 0;
+		}
 	}
 }

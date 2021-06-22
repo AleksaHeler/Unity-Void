@@ -1,81 +1,79 @@
-using System;
+using Photon.Pun;
+using Photon.Realtime;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
-public enum PlayerState { NOT_MOVING, MOVING, STUCK_IN_SLIME, DIED }
+public enum PlayerState { NOT_MOVING, MOVING, STUCK_IN_SLIME, DIED, NOT_LOADED }
 
-// Subscribes to PlayerInput scripts event system which triggers the event on detected swipe.
-// So this script then adds a movement action to actions queue on swipe
+// This is the main player script
 [RequireComponent(typeof(PlayerInput))]
 [RequireComponent(typeof(PlayerInventory))]
-[RequireComponent(typeof(Animator))]
-public class PlayerController : MonoBehaviour
+partial class PlayerController : MonoBehaviour
 {
-	// TODO: bug -> falling trough glass on to slime made horrible sound (trying to play something every frame maybe?)
-	#region Variables
+
+	private PhotonView photonView;
+	private GameSettings gameSettings;
+	private PlayerActionQueue actions;
+	private PlayerInventory playerInventory;
 	private PlayerState playerState;
+
+	private Vector3 movePoint;
+	private Vector3 platformOffset;
+	private float snapDistance;
+	private float playerSpeed;
+
 	private float lastFallDistance;
 	private PlayerAction lastPlayerAction;
-	private Platform currentPlatform;
-
-	private Vector3 playerVelocity;
-	private float gravity;
-	private float playerSpeed;
-	private float platformSnapRange;
-	private Vector3 platformOffset;
-	private Vector3 movePoint;
-	private Animator playerAnimator;
-
-	private PlayerActionQueue actions;
-	private GameSettings gameSettings;
-	private PlayerInventory playerInventory;
+	private GameObject currentPlatform;
 	private PlatformHandler platformHandler;
 
-	public static event Action<int> OnPlayerDeath = delegate { };
-	public float LastFallDistance { get => lastFallDistance; }
-	public PlayerAction LastPlayerAction { get => lastPlayerAction; set => lastPlayerAction = value; }
-	public Platform CurrentPlatform { get => currentPlatform; }
-	public PlayerState PlayerState { get => playerState; }
-	#endregion // Variables
-
-	#region Start, LateUpdate & OnDestroy
-	private void Start()
+	void Start()
 	{
-		// Subsctribe to events
-		PlayerInput.OnSwipe += OnSwipe;
-		WorldManager.OnPlatformDestroy += OnPlatformDestroy;
+		DontDestroyOnLoad(this.gameObject);
 
+		photonView = GetComponent<PhotonView>();
+		playerInventory = GetComponent<PlayerInventory>();
 		actions = new PlayerActionQueue();
 		platformHandler = new PlatformHandler();
-
 		gameSettings = SettingsReader.Instance.GameSettings;
-		playerInventory = GetComponent<PlayerInventory>();
-		playerAnimator = GetComponent<Animator>();
 
 		lastFallDistance = 0;
 		lastPlayerAction = PlayerAction.NONE;
-		playerVelocity = Vector3.zero;
-		gravity = gameSettings.PlayerGravity;
-		platformOffset = gameSettings.PlayerToPlatformOffset;
-		platformSnapRange = gameSettings.PlayerToPlatformSnapRange;
+		playerState = PlayerState.NOT_LOADED;
+		snapDistance = gameSettings.PlayerToPlatformSnapRange;
 		playerSpeed = gameSettings.PlayerSpeed;
+		platformOffset = gameSettings.PlayerToPlatformOffset;
 
-		SnapToClosestSafePlatform();
+		if (!photonView.IsMine)
+		{
+			return;
+		}
+
+		PlayerInput.OnSwipe += OnSwipe;
+		movePoint = transform.position;
+		SnapToClosestPlatformInRange();
+
+		SceneManager.sceneLoaded += OnSceneFinishedLoading;
 	}
-
 	private void OnDestroy()
 	{
 		// Unsubscribe from events
 		PlayerInput.OnSwipe -= OnSwipe;
-		WorldManager.OnPlatformDestroy -= OnPlatformDestroy;
 	}
 
-	private void LateUpdate()
+	void LateUpdate()
 	{
-		if (Input.GetKeyDown(KeyCode.Escape))
+		if (!photonView.IsMine)
 		{
-			Application.Quit();
+			return;
+		}
+
+		if(playerState == PlayerState.NOT_LOADED)
+		{
+			SnapToClosestPlatformInRange();
+			return;
 		}
 
 		if (playerState == PlayerState.DIED)
@@ -83,21 +81,25 @@ public class PlayerController : MonoBehaviour
 			return;
 		}
 
+		if (IsBelowScreenBorder())
+		{
+			PlayerDie();
+		}
+
+		// Transition from MOVING state to NOT_MOVING
 		if (playerState == PlayerState.MOVING && IsCloseToMovePoint())
 		{
 			playerState = PlayerState.NOT_MOVING;
-			// TODO: BUG: the platform sound plays even when falling
-			AudioManager.Instance.PlayPlatformSound(currentPlatform.PlatformType);
+			if (currentPlatform != null)
+			{
+				AudioManager.Instance.PlayPlatformSound(currentPlatform.GetComponent<PlatformController>().PlatformType);
+			}
 		}
 
-		// Update players position to match wanted position
-		SnapToClosestPlatformInRange();
-		HandlePhysics();
-
 		// Handle different platforms
-		if (playerState == PlayerState.NOT_MOVING || playerState == PlayerState.STUCK_IN_SLIME)
+		if (PlayerIsNotMoving())
 		{
-			Platform currentPlatform = GetPlatformWithinRange(transform.position);
+			GameObject currentPlatform = PhotonWorld.Instance.GetPlatformWithinRange(transform.position, snapDistance);
 
 			// Fall into the void
 			if (currentPlatform == null)
@@ -107,60 +109,52 @@ public class PlayerController : MonoBehaviour
 				return;
 			}
 
-			// Handle platform action by calling specific function from PlatformHandler class
-			// Argument passed should be height from which the player has fallen
-			platformHandler.InvokeAction(currentPlatform.PlatformType, this);
+			platformHandler.InvokeAction(currentPlatform.GetComponent<PlatformController>().PlatformType, this);
 
 			// Calls function Move() when there is input
 			HandleMoveActions();
 		}
 
-		if (IsBelowScreenBorder())
-		{
-			PlayerDie();
-		}
+		HandlePhysics();
+		SnapToClosestPlatformInRange();
 	}
-	#endregion // Start, LateUpdate & OnDestroy
-
-	Dictionary<PlatformType, Delegate> keyValuePairs;
-
-	#region Movement
 
 	private void HandleMoveActions()
 	{
-		if (actions.ActionCount > 0)
+		if (actions.ActionCount == 0)
 		{
-			PlayerAction action = actions.Pop();
+			return;
+		}
 
-			bool notMoving = playerState == PlayerState.NOT_MOVING || playerState == PlayerState.STUCK_IN_SLIME;
-			if (ActionIsMove(action) && notMoving)
-			{
-				Move(action);
-				return;
-			}
+		PlayerAction action = actions.Pop();
+
+		if (action != PlayerAction.NONE)
+		{
+			Move(action);
 		}
 	}
 
 	private void Move(PlayerAction action)
 	{
 		lastPlayerAction = action;
+
 		if (playerState == PlayerState.STUCK_IN_SLIME)
 		{
 			return;
 		}
 
-		Vector3 movement = gameSettings.MovePlayerActionToVector3(action);
+		Vector3 movement = gameSettings.PlayerActionToVector3(action);
 		movePoint += movement;
 
 		playerState = PlayerState.MOVING;
-		playerAnimator.SetTrigger("Jump");
-		Platform snappedPlatform = SnapToClosestPlatformInRange();
-		if(snappedPlatform == null)
+		GameObject snappedPlatform = SnapToClosestPlatformInRange();
+
+		if (snappedPlatform == null)
 		{
 			actions.PushFront(PlayerAction.MOVE_DOWN);
+			currentPlatform = null;
 		}
 
-		// TODO: bug - going down two times triggers death
 		if (action == PlayerAction.MOVE_DOWN)
 		{
 			lastFallDistance += Mathf.Abs(movement.y);
@@ -174,32 +168,61 @@ public class PlayerController : MonoBehaviour
 	private void HandlePhysics()
 	{
 		Vector3 playerToDestinationVector = movePoint - transform.position;
-		float distance = playerToDestinationVector.magnitude;
 
-		// If distance is large, dont move too fast
-		playerToDestinationVector = Vector3.ClampMagnitude(playerToDestinationVector, 1.5f);
-
-		// If player is practically there, just snap to final position (too small diff)
-		if (distance < 0.05f)
+		// If move is on X axis (left/right)
+		Vector3 sineOffset = Vector3.zero;
+		if (playerToDestinationVector.x != 0)
 		{
-			transform.position = movePoint;
+			float leftoverMoveDistance = playerToDestinationVector.x;
+			float totalMoveDistance = gameSettings.PlatformSpacingHorizontal;
+			float animationPercent = Mathf.Abs(leftoverMoveDistance / totalMoveDistance);
+			float sine = Mathf.Sin(animationPercent * Mathf.PI) * gameSettings.PlayerJumpAnimationHeight;
+			sineOffset = Vector3.up * sine * Time.deltaTime;
+		}
+
+		transform.position = Vector3.MoveTowards(transform.position, movePoint, playerSpeed * Time.deltaTime) + sineOffset;
+	}
+
+	private GameObject SnapToClosestPlatformInRange()
+	{
+		GameObject platform = PhotonWorld.Instance.GetPlatformWithinRange(movePoint, snapDistance);
+
+		if (platform == null)
+		{
+			return null;
+		}
+
+		if(playerState == PlayerState.NOT_LOADED)
+		{
+			playerState = PlayerState.NOT_MOVING;
+		}
+
+		movePoint = platform.transform.position + platformOffset;
+		currentPlatform = platform;
+		CheckForCollectible();
+		return platform;
+	}
+
+	private void CheckForCollectible()
+	{
+		GameObject itemCheckPlatform = PhotonWorld.Instance.GetPlatformWithinRange(transform.position, snapDistance);
+		if(itemCheckPlatform == null)
+		{
 			return;
 		}
-
-		// If nearing the destination slow down a bit
-		if(distance < 0.6f)
+		ItemType item = PhotonWorld.Instance.GetItemTypeAtPlatform(itemCheckPlatform);
+		if (item != ItemType.NONE)
 		{
-			playerToDestinationVector = playerToDestinationVector.normalized * 0.6f;
+			playerInventory.CollectItem(itemCheckPlatform);
 		}
-
-		// Apply motion
-		Vector3 moveDiff = playerToDestinationVector * playerSpeed * Time.deltaTime;
-		transform.position += moveDiff;
 	}
-	#endregion // Movement
 
-	#region Helper functions
-	public void GetStuckInSlime()
+	private void PushToFrontOfActionQueue(PlayerAction action)
+	{
+		actions.PushFront(action);
+	}
+
+	private void GetStuckInSlime()
 	{
 		lastPlayerAction = PlayerAction.NONE;
 		playerState = PlayerState.STUCK_IN_SLIME;
@@ -209,114 +232,73 @@ public class PlayerController : MonoBehaviour
 		playerState = PlayerState.NOT_MOVING;
 		actions.PushFront(lastPlayerAction);
 	}
-	private void CheckForCollectible()
+	private bool PlayerIsNotMoving()
 	{
-		Platform itemCheckPlatform = WorldManager.Instance.GetPlatformWithinRange(transform.position, platformSnapRange);
-		ItemType item = ItemManager.Instance.ItemTypeAtPlatform(itemCheckPlatform);
-		if (item != ItemType.NONE)
-		{
-			playerInventory.CollectItem(itemCheckPlatform);
-		}
+		return playerState == PlayerState.NOT_MOVING || playerState == PlayerState.STUCK_IN_SLIME;
 	}
-
-	private Platform GetPlatformWithinRange(Vector3 position)
-	{
-		return WorldManager.Instance.GetPlatformWithinRange(movePoint, platformSnapRange);
-	}
-
-	private Platform SnapToClosestPlatformInRange()
-	{
-		Platform platform = WorldManager.Instance.GetPlatformWithinRange(movePoint, platformSnapRange);
-
-		if (platform == null)
-		{
-			return platform;
-		}
-
-		SnapToPlatform(platform);
-
-		return platform;
-	}
-
-	private void SnapToClosestSafePlatform()
-	{
-		Platform platform = WorldManager.Instance.GetSafePlatformClosestToPos(movePoint);
-		SnapToPlatform(platform);
-	}
-
-	// If the given platform exists, snap to it (with some offset)
-	private void SnapToPlatform(Platform platform)
-	{
-		Vector3 newPosition = platform.transform.position + platformOffset;
-		movePoint = newPosition;
-		currentPlatform = platform;
-
-		CheckForCollectible();
-	}
-
-
 	private bool IsCloseToMovePoint()
 	{
-		float playerCheckTolerance = gameSettings.PlayerCheckTolerance;
+		float playerEndMovingCheckDistance = gameSettings.PlayerEndMovingCheckDistance;
 		float distance = Vector3.Distance(transform.position, movePoint);
-		return distance < playerCheckTolerance;
+		return distance < playerEndMovingCheckDistance;
 	}
 
 	private bool IsBelowScreenBorder()
 	{
-		float playerCheckTolerance = gameSettings.PlayerCheckTolerance;
+		float playerCheckTolerance = gameSettings.PlayerEndMovingCheckDistance;
 		float checkPositionY = gameSettings.ScreenBorderBottom + playerCheckTolerance;
 		return transform.position.y < checkPositionY;
 	}
 
-	private bool ActionIsMove(PlayerAction action)
-	{
-		return gameSettings.MovePlayerActions.Contains(action);
-	}
-
-	public void PushFrontToActionQueue(PlayerAction action)
-	{
-		actions.PushFront(action);
-	}
-
-	// Destroy player, play lose sound and stop time
 	public void PlayerDie()
-	{
-		Debug.LogWarning("Player died...");
-		AudioManager.Instance.PlaySound("Lose");
-		playerState = PlayerState.DIED;
-		//playerAnimator.SetTrigger("Die");
-		GetComponent<SpriteRenderer>().sprite = null;
-		//Destroy(gameObject);
-		OnPlayerDeath(0);
-	}
-	#endregion // Helper functions
-
-	#region Event callbacks
-	// Convert swipe direction to player action and add it to actions queue
-	private void OnSwipe(SwipeDirection swipeDirection)
 	{
 		if (playerState == PlayerState.DIED)
 		{
 			return;
 		}
+
+		playerState = PlayerState.DIED;
+		photonView.RPC("RPC_SpawnPlayerDeathParticles", RpcTarget.All, transform.position);
+		photonView.RPC("RPC_DieAndDisableSprite", RpcTarget.All);
+		PhotonRoom.Instance.LoserActorNumber = PhotonNetwork.LocalPlayer.ActorNumber;
+		PhotonRoom.Instance.photonView.RPC("RPC_GameOver", RpcTarget.All, PhotonNetwork.LocalPlayer.ActorNumber);
+	}
+
+	private void OnSwipe(SwipeDirection swipeDirection)
+	{
 		PlayerAction action = gameSettings.SwipeDirectionToPlayerAction[swipeDirection];
 		actions.Push(action);
 	}
 
-	// Check if our platform was destroyed, and if it was its game over
-	private void OnPlatformDestroy(float platformYPosition)
+	private void OnSceneFinishedLoading(Scene scene, LoadSceneMode mode)
 	{
-		if (playerState == PlayerState.DIED)
+		if (scene.buildIndex == 2)
 		{
-			return;
-		}
-		float distanceToDestroyedPlatform = Mathf.Abs(transform.position.y - platformYPosition);
-		if (distanceToDestroyedPlatform < 1.5f * platformOffset.y)
-		{
-			PlayerDie();
+			photonView.RPC("RPC_DieAndDisableSprite", RpcTarget.All);
 		}
 	}
-	#endregion // Event callbacks
+
+	[PunRPC]
+	void RPC_DieAndDisableSprite()
+	{
+		playerState = PlayerState.DIED;
+		GetComponent<AvatarSetup>().MyCharacter.GetComponent<SpriteRenderer>().sprite = null;
+	}
+
+	[PunRPC]
+	void RPC_SpawnPlayerDeathParticles(Vector3 position)
+	{
+		Instantiate(gameSettings.PlayerDeathParticles, position, Quaternion.identity);
+	}
+
+	[PunRPC]
+	void RPC_HandlePlatform(GameObject platform)
+	{
+		float distance = Vector3.Distance(transform.position, platform.transform.position);
+		if(distance < snapDistance)
+		{
+			platformHandler.InvokeAction(platform.GetComponent<PlatformController>().PlatformType, this);
+		}
+	}
 
 }

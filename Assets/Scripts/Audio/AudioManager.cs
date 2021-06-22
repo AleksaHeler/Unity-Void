@@ -1,3 +1,4 @@
+using Photon.Pun;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -14,25 +15,30 @@ public class AudioManager : MonoBehaviour
     public Sound[] Sounds;
 
     // Singleton
-    private static AudioManager _instance;
-    public static AudioManager Instance { get { return _instance; } }
+    private static AudioManager instance;
+    public static AudioManager Instance { get { return instance; } }
+
+    private PhotonView photonView;
+    public PhotonView PhotonView { get => photonView; }
 
 
     private void Awake()
     {
         // Singleton
-        if (_instance != null && _instance != this)
+        if (instance != null && instance != this)
         {
             Destroy(this.gameObject);
         }
         else
         {
-            _instance = this;
+            instance = this;
             DontDestroyOnLoad(this);
         }
 
+        photonView = GetComponent<PhotonView>();
+
         // Create an audio source on this game object for each sound and copy settings
-        foreach(Sound sound in Sounds)
+        foreach (Sound sound in Sounds)
 		{
             sound.source = gameObject.AddComponent<AudioSource>();
 
@@ -53,12 +59,13 @@ public class AudioManager : MonoBehaviour
 
         if (sound == null)
         {
-            Debug.LogWarning("Sound with name: '" + name + "' was not found");
             return;
         }
 
-        sound.source.Play();
-        return;
+        if(sound.source != null)
+        {
+            sound.source.Play();
+        }
     }
 
     /// <summary>
@@ -71,12 +78,13 @@ public class AudioManager : MonoBehaviour
 
         if (sound == null)
         {
-            Debug.LogWarning("Sound with name: '" + name + "' was not found");
             return;
         }
 
-        sound.source.Stop();
-        return;
+        if (sound.source != null)
+        {
+            sound.source.Stop();
+        }
     }
 
     /// <summary>
@@ -89,12 +97,32 @@ public class AudioManager : MonoBehaviour
 
         if (sound == null)
         {
-            Debug.LogWarning("Sound with name: '" + name + "' was not found");
             return;
         }
 
-        sound.source.Pause();
-        return;
+        if (sound.source != null)
+        {
+            sound.source.Pause();
+        }
+    }
+
+    [PunRPC]
+    void RPC_PlaySound(string name)
+    {
+        PlaySound(name);
+    }
+
+    [PunRPC]
+    void RPC_StopSound(string name)
+    {
+        StopSound(name);
+    }
+
+
+    [PunRPC]
+    void RPC_StopAllSounds()
+    {
+        StopAllSounds();
     }
 
     private Sound FindSoundInArray(string name)
@@ -107,5 +135,77 @@ public class AudioManager : MonoBehaviour
     {
         string soundName = SettingsReader.Instance.GameSettings.PlatformTypeToSound[platformType];
         PlaySound(soundName);
+    }
+
+    public void StopAllSounds()
+	{
+        foreach(Sound sound in Sounds)
+		{
+            if(sound.source != null)
+            {
+                sound.source.Stop();
+            }
+		}
+	}
+
+    public IEnumerator FadeOut(string soundName, float duration)
+    {
+        Sound sound = FindSoundInArray(soundName);
+        if (sound == null)
+        {
+            yield break;
+        }
+
+        float startVolume = sound.source.volume;
+
+        float elapsedTime = 0;
+        while (elapsedTime < duration)
+        {
+            if (sound.source == null)
+            {
+                yield break;
+            }
+            float percent = elapsedTime / duration;
+            sound.source.volume = startVolume * (1f - percent);
+            elapsedTime += Time.deltaTime;
+            yield return null;
+        }
+
+        StopSound(soundName);
+        sound.source.volume = startVolume;
+    }
+
+    public IEnumerator FadeIn(string soundName, float duration)
+    {
+        Sound sound = FindSoundInArray(soundName);
+        if (sound == null)
+        {
+            yield break;
+        }
+
+        float targetVolume = sound.source.volume;
+        sound.source.volume = 0f;
+        PlaySound(soundName);
+
+        float elapsedTime = 0;
+        while (elapsedTime < duration)
+        {
+            if(sound.source == null)
+			{
+                yield break;
+			}
+            float percent = elapsedTime / duration;
+            sound.source.volume = percent * targetVolume;
+            elapsedTime += Time.deltaTime;
+            yield return null;
+        }
+    }
+
+    public void FadeOutAllSounds(float duration)
+	{
+        foreach(Sound sound in Sounds)
+		{
+            StartCoroutine(FadeOut(sound.name, duration));
+		}
     }
 }

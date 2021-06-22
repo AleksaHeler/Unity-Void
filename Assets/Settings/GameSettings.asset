@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   width: 5
   height: 6
-  platformPrefab: {fileID: 8512226233930854249, guid: 483c6cc6c408bec4d9037d652ee29ec3, type: 3}
+  platformSpeed: 0.25
   platformSettings:
   - {fileID: 11400000, guid: 6f3b2f79f042e3b4e84f859a7643d187, type: 2}
   - {fileID: 11400000, guid: 9895a6ef84a26ec48b3c298f0756eb46, type: 2}
@@ -28,18 +28,34 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 8ad0a5e88e1226942ad5cbef163b3d82, type: 2}
   - {fileID: 11400000, guid: 06b0f0a98186cc241bbc9f6ac9cdade4, type: 2}
   - {fileID: 11400000, guid: cfab81d631bc02d4bba333b7c1ba9b45, type: 2}
-  platformWidth: 1.5
+  - {fileID: 11400000, guid: 4f2b584f8638b1349a3305d90a35f1b3, type: 2}
+  platformSpacingHorizontal: 2
   platformHeight: 2
-  unsafePlatforms: 0000000007000000
-  platformSpeed: 0.3
-  percentOfRandomPlatforms: 0.4
-  chanceForBomb: 0.1
-  platformSideOffset: 2
+  glassPlatformRegenerationTime: 3
+  chanceForPlatformToChangeType: 0.002
+  platformChangeTypeDuration: 3
+  cannonSpawnChance: 0.2
+  cannonBulletSpeed: 3
+  cannonBulletPoolingCount: 8
+  cannonRoundsPerMinuteMin: 10
+  cannonRoundsPerMinuteMax: 50
+  playerSpeed: 12
   playerToPlatformOffset: {x: 0, y: 0.45, z: 1}
-  playerToPlatformSnapRange: 1.6
-  playerGravity: 0.2
-  playerSpeed: 10
-  playerCheckTolerance: 0.05
-  moveAnimationCurveOffset: 0.3
-  minDistanceToSwipe: 50
+  playerToPlatformSnapRange: 1.8
+  playerJumpAnimationHeight: 6
+  playerEndMovingCheckDistance: 0.1
   bombPrimingTime: 3
+  minDistanceToSwipe: 50
+  playerDeathParticles: {fileID: 8148911177897350824, guid: beaceac1990654c4aa40e55aaab2b493, type: 3}
+  bombExplosionParticles: {fileID: 6492633587015454445, guid: f2c8e7a6ed8964d4fa634f3017d91938, type: 3}
+  demotivationalQuotes:
+  - If you hate yourself remember you are not alone. A lot of people hate you too.
+  - If the life doesn't break you today, don't worry. It will try again tomorrow.
+  - Everybody sucks at something.
+  - Those who doubt your ability probably have a valid reason.
+  - It's never too late to fail.
+  - Trying is the first step toward failure.
+  - Not everything is a lesson. Sometimes you just fail.
+  - It could be that your purpose in life is to serve as a warning to others.
+  - The light at the end of the tunnel has been turned off due to budget cuts.
+  - Hope is the first step on the road to disappointment.
